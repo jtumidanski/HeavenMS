@@ -30,11 +30,11 @@ import net.server.channel.packet.ring.RespondToProposalPacket;
 import net.server.world.World;
 import scripting.event.EventInstanceManager;
 import server.MapleItemInformationProvider;
+import tools.I18nMessage;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
 import tools.ServerNoticeType;
-import tools.I18nMessage;
 import tools.packet.stat.EnableActions;
 import tools.packet.wedding.MarriageRequest;
 import tools.packet.wedding.MarriageResult;
@@ -171,15 +171,17 @@ public final class RingActionHandler extends AbstractPacketHandler<BaseRingPacke
    private static void resetRingId(MapleCharacter player) {
       int ringItemId = player.getMarriageRing().itemId();
 
-      Item it = player.getInventory(MapleInventoryType.EQUIP).findById(ringItemId);
+      MapleInventoryType type = MapleInventoryType.EQUIP;
+      Item it = player.getInventory(type).findById(ringItemId);
       if (it == null) {
-         it = player.getInventory(MapleInventoryType.EQUIPPED).findById(ringItemId);
+         type = MapleInventoryType.EQUIPPED;
+         it = player.getInventory(type).findById(ringItemId);
       }
 
       if (it != null) {
-         Equip eqp = (Equip) it;
-         eqp.ringId_$eq(-1);
+         it = Equip.newBuilder((Equip) it).setRingId(-1).build();
       }
+      player.getInventory(type).update(it);
    }
 
    private synchronized static void breakEngagement(MapleCharacter chr) {
@@ -238,18 +240,16 @@ public final class RingActionHandler extends AbstractPacketHandler<BaseRingPacke
       Pair<Integer, Integer> rings = MapleRingProcessor.getInstance().createRing(marriageRingId, player, partner);
       MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
 
-      Item ringObj = ii.getEquipById(marriageRingId);
-      Equip ringEqp = (Equip) ringObj;
-      ringEqp.ringId_$eq(rings.getLeft());
+      Equip ringObj = ii.getEquipById(marriageRingId);
+      ringObj = Equip.newBuilder(ringObj).setRingId(rings.getLeft()).build();
       player.addMarriageRing(MapleRingProcessor.getInstance().loadFromDb(rings.getLeft()));
-      MapleInventoryManipulator.addFromDrop(player.getClient(), ringEqp, false, -1);
+      MapleInventoryManipulator.addFromDrop(player.getClient(), ringObj, false, -1);
       player.broadcastMarriageMessage();
 
       ringObj = ii.getEquipById(marriageRingId);
-      ringEqp = (Equip) ringObj;
-      ringEqp.ringId_$eq(rings.getRight());
+      ringObj = Equip.newBuilder(ringObj).setRingId(rings.getRight()).build();
       partner.addMarriageRing(MapleRingProcessor.getInstance().loadFromDb(rings.getRight()));
-      MapleInventoryManipulator.addFromDrop(partner.getClient(), ringEqp, false, -1);
+      MapleInventoryManipulator.addFromDrop(partner.getClient(), ringObj, false, -1);
       partner.broadcastMarriageMessage();
    }
 
@@ -382,8 +382,7 @@ public final class RingActionHandler extends AbstractPacketHandler<BaseRingPacke
                   }
 
                   Item weddingTicket = new Item(newItemId, (short) 0, (short) 1);
-                  weddingTicket.expiration_(expiration);
-
+                  weddingTicket = Item.newBuilder(weddingTicket).setExpiration(expiration).build();
                   DueyProcessor.dueyCreatePackage(weddingTicket, 0, groom, guest);
                }
             } else {

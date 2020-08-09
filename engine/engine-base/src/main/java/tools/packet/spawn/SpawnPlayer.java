@@ -6,11 +6,11 @@ import net.opcodes.SendOpcode;
 import tools.packet.PacketInput;
 
 public class SpawnPlayer implements PacketInput {
-   private MapleClient target;
+   private final MapleClient target;
 
-   private MapleCharacter character;
+   private final MapleCharacter character;
 
-   private boolean enteringField;
+   private final boolean enteringField;
 
    public SpawnPlayer(MapleClient target, MapleCharacter character, boolean enteringField) {
       this.target = target;

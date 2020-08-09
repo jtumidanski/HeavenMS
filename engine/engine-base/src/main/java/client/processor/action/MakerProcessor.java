@@ -1,7 +1,7 @@
 package client.processor.action;
 
+import accessor.AbstractQueryExecutor;
 import client.MapleCharacter;
-import database.AbstractQueryExecutor;
 
 public class MakerProcessor extends AbstractQueryExecutor {
    private static MakerProcessor instance;

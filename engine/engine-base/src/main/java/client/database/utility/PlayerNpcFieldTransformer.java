@@ -1,8 +1,8 @@
 package client.database.utility;
 
 import client.database.data.PlayerNpcFieldData;
-import database.SqlTransformer;
 import entity.PlayerNpcField;
+import transformer.SqlTransformer;
 
 public class PlayerNpcFieldTransformer implements SqlTransformer<PlayerNpcFieldData, PlayerNpcField> {
    @Override

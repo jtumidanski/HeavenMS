@@ -7,8 +7,8 @@ import java.util.stream.StreamSupport;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import accessor.AbstractQueryExecutor;
 import client.MapleCharacter;
-import database.AbstractQueryExecutor;
 import client.inventory.Item;
 import entity.PlayerNpc;
 import entity.PlayerNpcEquip;

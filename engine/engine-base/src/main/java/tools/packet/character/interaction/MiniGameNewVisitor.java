@@ -6,11 +6,11 @@ import server.maps.MapleMiniGame;
 import tools.packet.PacketInput;
 
 public class MiniGameNewVisitor implements PacketInput {
-   private MapleMiniGame miniGame;
+   private final MapleMiniGame miniGame;
 
-   private MapleCharacter character;
+   private final MapleCharacter character;
 
-   private int slot;
+   private final int slot;
 
    public MiniGameNewVisitor(MapleMiniGame miniGame, MapleCharacter character, int slot) {
       this.miniGame = miniGame;

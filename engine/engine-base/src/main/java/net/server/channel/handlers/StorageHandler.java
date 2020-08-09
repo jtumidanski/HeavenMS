@@ -158,8 +158,8 @@ public final class StorageHandler extends AbstractPacketHandler<BaseStoragePacke
 
          chr.gainMeso(-storeFee, false, true, false);
 
-         MapleKarmaManipulator.toggleKarmaFlagToUntradeable(item);
-         item.quantity_$eq(quantity);
+         item = MapleKarmaManipulator.toggleKarmaFlagToUntradeable(item);
+         item = item.setQuantity(quantity);
          storage.store(item);    // inside a critical section, "!(storage.isFull())" is still in effect...
          chr.setUsedStorage();
          String itemName = ii.getName(item.id());
@@ -195,7 +195,7 @@ public final class StorageHandler extends AbstractPacketHandler<BaseStoragePacke
             if (storage.takeOut(item)) {
                chr.setUsedStorage();
 
-               MapleKarmaManipulator.toggleKarmaFlagToUntradeable(item);
+               item = MapleKarmaManipulator.toggleKarmaFlagToUntradeable(item);
                MapleInventoryManipulator.addFromDrop(c, item, false);
 
                String itemName = ii.getName(item.id());

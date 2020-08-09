@@ -4,7 +4,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
-import database.AbstractQueryExecutor;
+import accessor.AbstractQueryExecutor;
 import client.database.data.PlayerNpcFieldData;
 import client.database.utility.PlayerNpcFieldTransformer;
 import entity.PlayerNpcField;

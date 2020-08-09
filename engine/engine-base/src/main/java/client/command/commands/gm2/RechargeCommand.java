@@ -7,9 +7,9 @@ import client.inventory.Item;
 import client.inventory.MapleInventoryType;
 import constants.inventory.ItemConstants;
 import server.MapleItemInformationProvider;
+import tools.I18nMessage;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
-import tools.I18nMessage;
 
 public class RechargeCommand extends Command {
    {
@@ -21,18 +21,11 @@ public class RechargeCommand extends Command {
       MapleCharacter player = c.getPlayer();
       MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
       for (Item toRecharge : c.getPlayer().getInventory(MapleInventoryType.USE).list()) {
-         if (ItemConstants.isThrowingStar(toRecharge.id())) {
-            toRecharge.quantity_$eq(ii.getSlotMax(c, toRecharge.id()));
-            c.getPlayer().forceUpdateItem(toRecharge);
-         } else if (ItemConstants.isArrow(toRecharge.id())) {
-            toRecharge.quantity_$eq(ii.getSlotMax(c, toRecharge.id()));
-            c.getPlayer().forceUpdateItem(toRecharge);
-         } else if (ItemConstants.isBullet(toRecharge.id())) {
-            toRecharge.quantity_$eq(ii.getSlotMax(c, toRecharge.id()));
-            c.getPlayer().forceUpdateItem(toRecharge);
-         } else if (ItemConstants.isConsumable(toRecharge.id())) {
-            toRecharge.quantity_$eq(ii.getSlotMax(c, toRecharge.id()));
-            c.getPlayer().forceUpdateItem(toRecharge);
+         if (ItemConstants.isThrowingStar(toRecharge.id())
+               || ItemConstants.isArrow(toRecharge.id())
+               || ItemConstants.isBullet(toRecharge.id())
+               || ItemConstants.isConsumable(toRecharge.id())) {
+            c.getPlayer().forceUpdateItem(Item.newBuilder(toRecharge).setQuantity(ii.getSlotMax(c, toRecharge.id())).build());
          }
       }
       MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("RECHARGE_COMMAND_SUCCESS"));

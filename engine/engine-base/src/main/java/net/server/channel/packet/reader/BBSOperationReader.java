@@ -15,22 +15,16 @@ public class BBSOperationReader implements PacketReader<BaseBBSOperationPacket> 
    @Override
    public BaseBBSOperationPacket read(SeekableLittleEndianAccessor accessor) {
       byte mode = accessor.readByte();
-      switch (mode) {
-         case 0:
-            return readUpdateOrInsert(accessor, mode);
-         case 1:
-            return readDelete(accessor, mode);
-         case 2:
-            return readListThreads(accessor, mode);
-         case 3:
-            return readDisplayThread(accessor, mode);
-         case 4:
-            return readReply(accessor, mode);
-         case 5:
-            return readDeleteReply(accessor, mode);
-      }
+      return switch (mode) {
+         case 0 -> readUpdateOrInsert(accessor, mode);
+         case 1 -> readDelete(accessor, mode);
+         case 2 -> readListThreads(accessor, mode);
+         case 3 -> readDisplayThread(accessor, mode);
+         case 4 -> readReply(accessor, mode);
+         case 5 -> readDeleteReply(accessor, mode);
+         default -> new BaseBBSOperationPacket(mode);
+      };
 
-      return new BaseBBSOperationPacket(mode);
    }
 
    private BaseBBSOperationPacket readDeleteReply(SeekableLittleEndianAccessor accessor, byte mode) {

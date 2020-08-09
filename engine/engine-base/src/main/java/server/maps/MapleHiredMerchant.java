@@ -14,6 +14,7 @@ import java.util.stream.IntStream;
 
 import client.MapleCharacter;
 import client.MapleClient;
+import database.DatabaseConnection;
 import database.administrator.CharacterAdministrator;
 import database.provider.CharacterProvider;
 import client.inventory.Item;
@@ -30,7 +31,6 @@ import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
 import server.MapleItemInformationProvider;
 import server.MapleTradeUtil;
 import server.processor.maps.MapleHiredMerchantProcessor;
-import database.DatabaseConnection;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
@@ -67,7 +67,7 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
    private Lock visitorLock = MonitoredReentrantLockFactory.createLock(MonitoredLockType.VISITOR_MERCHANT, true);
 
    public MapleHiredMerchant(final MapleCharacter owner, String desc, int itemId) {
-      this.position_$eq(owner.position());
+      this.setPosition(owner.position());
       this.start = System.currentTimeMillis();
       this.ownerId = owner.getId();
       this.channel = owner.getClient().getChannel();
@@ -203,7 +203,7 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
          if (shopItem.doesExist()) {
             if (shopItem.bundles() > 0) {
                Item item = shopItem.item().copy();
-               item.quantity_$eq((short) (shopItem.item().quantity() * shopItem.bundles()));
+               item = item.setQuantity((short) (shopItem.item().quantity() * shopItem.bundles()));
 
                if (!MapleInventory.checkSpot(chr, item)) {
                   MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, I18nMessage.from("HIRED_MERCHANT_TAKE_ITEM_BACK"));
@@ -238,7 +238,7 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
          MaplePlayerShopItem pItem = items.get(item);
          Item newItem = pItem.item().copy();
 
-         newItem.quantity_$eq((short) ((pItem.item().quantity() * quantity)));
+         newItem = newItem.setQuantity((short) ((pItem.item().quantity() * quantity)));
          if (quantity < 1 || !pItem.doesExist() || pItem.bundles() < quantity) {
             PacketCreator.announce(c, new EnableActions());
             return;
@@ -247,7 +247,7 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
             return;
          }
 
-         MapleKarmaManipulator.toggleKarmaFlagToUntradeable(newItem);
+         newItem = MapleKarmaManipulator.toggleKarmaFlagToUntradeable(newItem);
 
          int price = (int) Math.min((float) pItem.price() * quantity, Integer.MAX_VALUE);
          if (c.getPlayer().getMeso() >= price) {
@@ -259,9 +259,9 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
                   sold.add(new MapleSoldItem(c.getPlayer().getName(), pItem.item().id(), newItem.quantity(), price));
                }
 
-               pItem.bundles_$eq((short) (pItem.bundles() - quantity));
+               pItem.setBundles((short) (pItem.bundles() - quantity));
                if (pItem.bundles() < 1) {
-                  pItem.doesExist_$eq(false);
+                  pItem.setDoesExist(false);
                }
 
                if (YamlConfig.config.server.USE_ANNOUNCE_SHOPITEMSOLD) {
@@ -557,7 +557,7 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
          Item newItem = shopItem.item();
          short newBundle = shopItem.bundles();
 
-         newItem.quantity_$eq(shopItem.item().quantity());
+         newItem = newItem.setQuantity(shopItem.item().quantity());
          if (newBundle > 0) {
             itemsWithType.add(new Pair<>(newItem, newItem.inventoryType()));
             bundles.add(newBundle);

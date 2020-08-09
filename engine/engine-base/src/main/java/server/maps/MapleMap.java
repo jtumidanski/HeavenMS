@@ -35,6 +35,7 @@ import client.autoban.AutoBanFactory;
 import client.inventory.Equip;
 import client.inventory.Item;
 import client.inventory.MapleInventoryType;
+import client.inventory.MaplePet;
 import client.status.MonsterStatus;
 import client.status.MonsterStatusEffect;
 import config.YamlConfig;
@@ -55,7 +56,6 @@ import net.server.services.task.channel.MobMistService;
 import net.server.services.task.channel.OverallService;
 import net.server.services.type.ChannelServices;
 import net.server.world.World;
-import scala.Option;
 import scripting.event.EventInstanceManager;
 import scripting.map.MapScriptManager;
 import server.MapleItemInformationProvider;
@@ -90,6 +90,7 @@ import server.processor.maps.MapleMapObjectProcessor;
 import server.processor.maps.MapleMapObjectTypeProcessor;
 import server.processor.maps.MapleMapProcessor;
 import tools.FilePrinter;
+import tools.I18nMessage;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
@@ -97,7 +98,6 @@ import tools.Pair;
 import tools.PointUtil;
 import tools.Randomizer;
 import tools.ServerNoticeType;
-import tools.I18nMessage;
 import tools.packet.PacketInput;
 import tools.packet.buff.GiveForeignBuff;
 import tools.packet.character.CharacterLook;
@@ -400,7 +400,7 @@ public class MapleMap {
 
       objectWLock.lock();
       try {
-         mapObject.objectId_$eq(curOID);
+         mapObject.setObjectId(curOID);
          this.mapObjects.put(curOID, mapObject);
       } finally {
          objectWLock.unlock();
@@ -428,7 +428,7 @@ public class MapleMap {
       chrRLock.lock();
       objectWLock.lock();
       try {
-         mapObject.objectId_$eq(curOID);
+         mapObject.setObjectId(curOID);
          this.mapObjects.put(curOID, mapObject);
          characters.stream()
                .filter(character -> condition == null || condition.canSpawn(character))
@@ -453,7 +453,7 @@ public class MapleMap {
       chrRLock.lock();
       try {
          int curOID = getUsableOID();
-         mapObject.objectId_$eq(curOID);
+         mapObject.setObjectId(curOID);
 
          characters.stream()
                .filter(character -> condition == null || condition.canSpawn(character))
@@ -505,15 +505,15 @@ public class MapleMap {
       if (fh == null) {
          return null;
       }
-      int dropY = fh.firstY();
-      if (!fh.isWall() && fh.firstY() != fh.secondY()) {
-         double s1 = Math.abs(fh.secondY() - fh.firstY());
-         double s2 = Math.abs(fh.secondX() - fh.firstX());
-         double s5 = Math.cos(Math.atan(s2 / s1)) * (Math.abs(initial.x - fh.firstX()) / Math.cos(Math.atan(s1 / s2)));
-         if (fh.secondY() < fh.firstY()) {
-            dropY = fh.firstY() - (int) s5;
+      int dropY = fh.firstPoint().y;
+      if (!fh.isWall() && fh.firstPoint().y != fh.secondPoint().y) {
+         double s1 = Math.abs(fh.secondPoint().y - fh.firstPoint().y);
+         double s2 = Math.abs(fh.secondPoint().x - fh.firstPoint().x);
+         double s5 = Math.cos(Math.atan(s2 / s1)) * (Math.abs(initial.x - fh.firstPoint().x) / Math.cos(Math.atan(s1 / s2)));
+         if (fh.secondPoint().y < fh.firstPoint().y) {
+            dropY = fh.firstPoint().y - (int) s5;
          } else {
-            dropY = fh.firstY() + (int) s5;
+            dropY = fh.firstPoint().y + (int) s5;
          }
       }
       return new Point(initial.x, dropY);
@@ -639,9 +639,12 @@ public class MapleMap {
                }
             } else {
                if (ItemConstants.getInventoryType(de.itemId()) == MapleInventoryType.EQUIP) {
-                  itemDrop = ii.randomizeStats((Equip) ii.getEquipById(de.itemId()));
+                  itemDrop = Equip.newBuilder(ii.getEquipById(de.itemId())).randomizeStats().build();
                } else {
-                  itemDrop = new Item(de.itemId(), (short) 0, (short) (de.maximum() != 1 ? Randomizer.nextInt(de.maximum() - de.minimum()) + de.minimum() : 1));
+                  itemDrop = Item.newBuilder(de.itemId())
+                        .setPosition((short) 0)
+                        .setQuantity((short) (de.maximum() != 1 ? Randomizer.nextInt(de.maximum() - de.minimum()) + de.minimum() : 1))
+                        .build();
                }
                spawnDrop(itemDrop, calcDropPos(pos, mob.position()), mob, chr, dropType, (short) de.questId());
             }
@@ -667,9 +670,12 @@ public class MapleMap {
             }
             if (de.itemId() != 0) {
                if (ItemConstants.getInventoryType(de.itemId()) == MapleInventoryType.EQUIP) {
-                  itemDrop = ii.randomizeStats((Equip) ii.getEquipById(de.itemId()));
+                  itemDrop = Equip.newBuilder(ii.getEquipById(de.itemId())).randomizeStats().build();
                } else {
-                  itemDrop = new Item(de.itemId(), (short) 0, (short) (de.maximum() != 1 ? Randomizer.nextInt(de.maximum() - de.minimum()) + de.minimum() : 1));
+                  itemDrop = Item.newBuilder(de.itemId())
+                        .setPosition((short) 0)
+                        .setQuantity((short) (de.maximum() != 1 ? Randomizer.nextInt(de.maximum() - de.minimum()) + de.minimum() : 1))
+                        .build();
                }
                spawnDrop(itemDrop, calcDropPos(pos, mob.position()), mob, chr, dropType, (short) de.questId());
                d++;
@@ -1247,10 +1253,10 @@ public class MapleMap {
       if (monster.isAlive()) {
          boolean killed = monster.damage(chr, damage, false);
 
-         Option<SelfDestruction> selfDestruction = monster.getStats().selfDestruction();
-         if (selfDestruction.isDefined() && selfDestruction.get().hp() > -1) {// should work ;p
-            if (monster.getHp() <= selfDestruction.get().hp()) {
-               killMonster(monster, chr, true, selfDestruction.get().action());
+         SelfDestruction selfDestruction = monster.getStats().selfDestruction();
+         if (selfDestruction != null && selfDestruction.hp() > -1) {// should work ;p
+            if (monster.getHp() <= selfDestruction.hp()) {
+               killMonster(monster, chr, true, selfDestruction.action());
                return true;
             }
          }
@@ -1510,7 +1516,7 @@ public class MapleMap {
 
          mapObjects.values().stream()
                .filter(mapObject -> mapObject.type() == MapleMapObjectType.REACTOR)
-               .forEach(mapObject -> mapObject.position_$eq(points.remove(points.size() - 1)));
+               .forEach(mapObject -> mapObject.setPosition(points.remove(points.size() - 1)));
       } finally {
          objectRLock.unlock();
       }
@@ -1533,7 +1539,7 @@ public class MapleMap {
 
       targets.stream()
             .map(mapObject -> (MapleReactor) mapObject)
-            .forEach(reactor -> reactor.position_$eq(points.remove(points.size() - 1)));
+            .forEach(reactor -> reactor.setPosition(points.remove(points.size() - 1)));
    }
 
    public final void shuffleReactors(List<Object> list) {
@@ -1563,7 +1569,7 @@ public class MapleMap {
 
       targets.stream()
             .map(mapObject -> (MapleReactor) mapObject)
-            .forEach(reactor -> reactor.position_$eq(points.remove(points.size() - 1)));
+            .forEach(reactor -> reactor.setPosition(points.remove(points.size() - 1)));
    }
 
    private Map<Integer, MapleMapObject> getCopyMapObjects() {
@@ -1699,7 +1705,7 @@ public class MapleMap {
       Point spos = new Point(pos.x, pos.y - 1);
       spos = calcPointBelow(spos);
       spos.y--;
-      mob.position_$eq(spos);
+      mob.setPosition(spos);
       spawnMonster(mob);
    }
 
@@ -1707,7 +1713,7 @@ public class MapleMap {
       Point spos = new Point(pos.x, pos.y - 1);
       spos = calcPointBelow(spos);
       spos.y--;
-      mob.position_$eq(spos);
+      mob.setPosition(spos);
       mob.setTeam(team);
       spawnMonster(mob);
    }
@@ -1718,7 +1724,7 @@ public class MapleMap {
 
    public void spawnFakeMonsterOnGroundBelow(MapleMonster mob, Point pos) {
       Point spos = getGroundBelow(pos);
-      mob.position_$eq(spos);
+      mob.setPosition(spos);
       spawnFakeMonster(mob);
    }
 
@@ -1751,16 +1757,16 @@ public class MapleMap {
    }
 
    private void applyRemoveAfter(final MapleMonster monster) {
-      final Option<SelfDestruction> selfDestruction = monster.getStats().selfDestruction();
-      if (monster.getStats().removeAfter() > 0 || selfDestruction.isDefined() && selfDestruction.get().hp() < 0) {
+      final SelfDestruction selfDestruction = monster.getStats().selfDestruction();
+      if (monster.getStats().removeAfter() > 0 || selfDestruction != null && selfDestruction.hp() < 0) {
          Runnable removeAfterAction;
 
-         if (selfDestruction.isEmpty()) {
+         if (selfDestruction == null) {
             removeAfterAction = () -> killMonster(monster, null, false);
             registerMapSchedule(removeAfterAction, monster.getStats().removeAfter() * 1000);
          } else {
-            removeAfterAction = () -> killMonster(monster, null, false, selfDestruction.get().action());
-            registerMapSchedule(removeAfterAction, selfDestruction.get().removeAfter() * 1000);
+            removeAfterAction = () -> killMonster(monster, null, false, selfDestruction.action());
+            registerMapSchedule(removeAfterAction, selfDestruction.removeAfter() * 1000);
          }
 
          monster.pushRemoveAfterAction(removeAfterAction);
@@ -1877,7 +1883,7 @@ public class MapleMap {
       }
 
       spos.y--;
-      monster.position_$eq(spos);
+      monster.setPosition(spos);
       monster.setSpawnEffect(effect);
       spawnAndAddRangedMapObject(monster, c -> PacketCreator.announce(c, new SpawnMonster(monster, true, effect)));
 
@@ -2074,9 +2080,9 @@ public class MapleMap {
             int randomId = integer;
 
             if (ItemConstants.getInventoryType(randomId) != MapleInventoryType.EQUIP) {
-               drop = new Item(randomId, (short) 0, (short) (rnd.nextInt(copies) + minCopies));
+               drop = Item.newBuilder(randomId).setPosition((short) 0).setQuantity((short) (rnd.nextInt(copies) + minCopies)).build();
             } else {
-               drop = ii.randomizeStats((Equip) ii.getEquipById(randomId));
+               drop = Equip.newBuilder(ii.getEquipById(randomId)).randomizeStats().build();
             }
 
             spawnItemDrop(dropper, owner, drop, calcDropPos(dropPos, pos), ffaDrop, playerDrop);
@@ -2334,12 +2340,8 @@ public class MapleMap {
          PacketCreator.announce(chr, new GetClock(pqTimer / 1000));
       }
 
-      Arrays.stream(chr.getPets())
-            .filter(Objects::nonNull)
-            .forEach(pet -> {
-               pet.pos_$eq(getGroundBelow(chr.position()));
-               PacketCreator.announce(chr, new ShowPet(chr, pet, false, false));
-            });
+      MaplePet[] pets = chr.updateAndGetPets(pet -> pet.updatePos(getGroundBelow(chr.position())));
+      Arrays.stream(pets).forEach(pet -> PacketCreator.announce(chr, new ShowPet(chr, pet, false, false)));
       chr.commitExcludedItems();
 
       if (chr.getMonsterCarnival() != null) {
@@ -2408,7 +2410,7 @@ public class MapleMap {
 
       final MapleDragon dragon = chr.getDragon();
       if (dragon != null) {
-         dragon.position_$eq(chr.position());
+         dragon.setPosition(chr.position());
          this.addMapObject(dragon);
          if (chr.isHidden()) {
             this.broadcastGMMessage(chr, new SpawnDragon(dragon));
@@ -2420,7 +2422,7 @@ public class MapleMap {
       MapleStatEffect summonStat = chr.getStatForBuff(MapleBuffStat.SUMMON);
       if (summonStat != null) {
          MapleSummon summon = chr.getSummonByKey(summonStat.getSourceId());
-         summon.position_$eq(chr.position());
+         summon.setPosition(chr.position());
          chr.getMap().spawnSummon(summon);
          MapleMapObjectProcessor.getInstance().updateMapObjectVisibility(chr, summon);
       }
@@ -2858,12 +2860,12 @@ public class MapleMap {
    }
 
    public void moveMonster(MapleMonster monster, Point reportedPos) {
-      monster.position_$eq(reportedPos);
+      monster.setPosition(reportedPos);
       getAllPlayers().forEach(character -> MapleMapObjectProcessor.getInstance().updateMapObjectVisibility(character, monster));
    }
 
    public void movePlayer(MapleCharacter player, Point newPosition) {
-      player.position_$eq(newPosition);
+      player.setPosition(newPosition);
 
       try {
          MapleMapObject[] visibleObjects = player.getVisibleMapObjects();
@@ -3357,14 +3359,11 @@ public class MapleMap {
    }
 
    public MapleSnowball getSnowball(int team) {
-      switch (team) {
-         case 0:
-            return snowball0;
-         case 1:
-            return snowball1;
-         default:
-            return null;
-      }
+      return switch (team) {
+         case 0 -> snowball0;
+         case 1 -> snowball1;
+         default -> null;
+      };
    }
 
    private boolean specialEquip() {//Maybe I shouldn't use fieldType :\
@@ -3464,7 +3463,7 @@ public class MapleMap {
             if (obj.type() == MapleMapObjectType.NPC) {
                MapleNPC npc = (MapleNPC) obj;
                if (npc.id() == id) {
-                  npc.hide_$eq(!npc.hide());
+                  npc.setHide(!npc.hide());
                   if (!npc.hide()) //Should only be hidden upon changing maps
                   {
                      MasterBroadcaster.getInstance().sendToAllInMap(this, new SpawnNPC(npc));
@@ -3665,66 +3664,38 @@ public class MapleMap {
    }
 
    public boolean isCPQMap() {
-      switch (this.getId()) {
-         case 980000101:
-         case 980000201:
-         case 980000301:
-         case 980000401:
-         case 980000501:
-         case 980000601:
-         case 980031100:
-         case 980032100:
-         case 980033100:
-            return true;
-      }
-      return false;
+      return switch (this.getId()) {
+         case 980000101, 980000201, 980000301, 980000401, 980000501, 980000601, 980031100, 980032100, 980033100 -> true;
+         default -> false;
+      };
    }
 
    public boolean isCPQMap2() {
-      switch (this.getId()) {
-         case 980031100:
-         case 980032100:
-         case 980033100:
-            return true;
-      }
-      return false;
+      return switch (this.getId()) {
+         case 980031100, 980032100, 980033100 -> true;
+         default -> false;
+      };
    }
 
    public boolean isCPQLobby() {
-      switch (this.getId()) {
-         case 980000100:
-         case 980000200:
-         case 980000300:
-         case 980000400:
-         case 980000500:
-         case 980000600:
-            return true;
-      }
-      return false;
+      return switch (this.getId()) {
+         case 980000100, 980000200, 980000300, 980000400, 980000500, 980000600 -> true;
+         default -> false;
+      };
    }
 
    public boolean isBlueCPQMap() {
-      switch (this.getId()) {
-         case 980000501:
-         case 980000601:
-         case 980031200:
-         case 980032200:
-         case 980033200:
-            return true;
-      }
-      return false;
+      return switch (this.getId()) {
+         case 980000501, 980000601, 980031200, 980032200, 980033200 -> true;
+         default -> false;
+      };
    }
 
    public boolean isPurpleCPQMap() {
-      switch (this.getId()) {
-         case 980000301:
-         case 980000401:
-         case 980031200:
-         case 980032200:
-         case 980033200:
-            return true;
-      }
-      return false;
+      return switch (this.getId()) {
+         case 980000301, 980000401, 980031200, 980032200, 980033200 -> true;
+         default -> false;
+      };
    }
 
    public Point getRandomSP(int team) {
@@ -3793,8 +3764,8 @@ public class MapleMap {
          }
          int reactorID = 9980000 + team;
          MapleReactor reactor = new MapleReactor(MapleReactorFactory.getReactorS(reactorID), reactorID);
-         pt.taken_$eq(true);
-         reactor.position_$eq(pt.position());
+         pt.setTaken(true);
+         reactor.setPosition(pt.position());
          reactor.setName(team + "" + num); //lol
          reactor.resetReactorActions(0);
          this.spawnReactor(reactor);
@@ -3842,35 +3813,17 @@ public class MapleMap {
    }
 
    public boolean isCPQWinnerMap() {
-      switch (this.getId()) {
-         case 980000103:
-         case 980000203:
-         case 980000303:
-         case 980000403:
-         case 980000503:
-         case 980000603:
-         case 980031300:
-         case 980032300:
-         case 980033300:
-            return true;
-      }
-      return false;
+      return switch (this.getId()) {
+         case 980000103, 980000203, 980000303, 980000403, 980000503, 980000603, 980031300, 980032300, 980033300 -> true;
+         default -> false;
+      };
    }
 
    public boolean isCPQLoserMap() {
-      switch (this.getId()) {
-         case 980000104:
-         case 980000204:
-         case 980000304:
-         case 980000404:
-         case 980000504:
-         case 980000604:
-         case 980031400:
-         case 980032400:
-         case 980033400:
-            return true;
-      }
-      return false;
+      return switch (this.getId()) {
+         case 980000104, 980000204, 980000304, 980000404, 980000504, 980000604, 980031400, 980032400, 980033400 -> true;
+         default -> false;
+      };
    }
 
    public void runCharacterStatUpdate() {

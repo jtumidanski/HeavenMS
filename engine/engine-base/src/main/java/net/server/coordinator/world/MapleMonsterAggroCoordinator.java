@@ -35,47 +35,49 @@ public class MapleMonsterAggroCoordinator {
 
    private Set<Integer> mapPuppetEntries = new HashSet<>();
 
-   private static void updateEntryExpiration(PlayerAggroEntry pae) {
-      pae.toNextUpdate_$eq((int) Math.ceil((120000L / YamlConfig.config.server.MOB_STATUS_AGGRO_INTERVAL) / Math.pow(2, pae.expireStreak() + pae.currentDamageInstances())));
+   private static int updateEntryExpiration(PlayerAggroEntry pae) {
+      return (int) Math.ceil((120000L / YamlConfig.config.server.MOB_STATUS_AGGRO_INTERVAL) / Math.pow(2, pae.expireStreak() + pae.currentDamageInstances()));
    }
 
-   private static void insertEntryDamage(PlayerAggroEntry pae, int damage) {
+   private static PlayerAggroEntry insertEntryDamage(PlayerAggroEntry pae, int damage) {
       synchronized (pae) {
          long totalDamage = pae.averageDamage();
          totalDamage *= pae.currentDamageInstances();
          totalDamage += damage;
 
-         pae.expireStreak_$eq(0);
-         pae.updateStreak_$eq(0);
-         updateEntryExpiration(pae);
-
-         pae.currentDamageInstances_$eq(pae.currentDamageInstances() + 1);
-         pae.averageDamage_$eq((int) (totalDamage / pae.currentDamageInstances()));
-         pae.accumulatedDamage_$eq(totalDamage);
+         return new PlayerAggroEntryBuilder(pae)
+               .setExpireStreak(0)
+               .setUpdateStreak(0)
+               .setToNextUpdate(updateEntryExpiration(pae))
+               .setCurrentDamageInstances(pae.currentDamageInstances() + 1)
+               .setAverageDamage((int) (totalDamage / pae.currentDamageInstances()))
+               .setAccumulatedDamage(totalDamage)
+               .build();
       }
    }
 
-   private static boolean expiredAfterUpdateEntryDamage(PlayerAggroEntry pae, int deltaTime) {
+   private static Pair<PlayerAggroEntry, Boolean> expiredAfterUpdateEntryDamage(PlayerAggroEntry pae, int deltaTime) {
       synchronized (pae) {
-         pae.updateStreak_$eq(pae.updateStreak() + 1);
-         pae.toNextUpdate_$eq(pae.toNextUpdate() - deltaTime);
+         PlayerAggroEntryBuilder builder = new PlayerAggroEntryBuilder(pae)
+               .setUpdateStreak(pae.updateStreak() + 1)
+               .setToNextUpdate(pae.toNextUpdate() - deltaTime);
 
          if (pae.toNextUpdate() <= 0) {    // reached dmg instance expire time
-            pae.expireStreak_$eq(pae.expireStreak() + 1);
-            updateEntryExpiration(pae);
+            builder.setExpireStreak(pae.expireStreak() + 1)
+                  .setToNextUpdate(updateEntryExpiration(pae))
+                  .setCurrentDamageInstances(pae.currentDamageInstances() - 1);
 
-            pae.currentDamageInstances_$eq(pae.currentDamageInstances() - 1);
             if (pae.currentDamageInstances() < 1) {   // expired aggro for this player
-               return true;
+               return new Pair<>(builder.build(), true);
             }
-            pae.accumulatedDamage_$eq(pae.averageDamage() + pae.currentDamageInstances());
+            builder.setAccumulatedDamage(pae.averageDamage() + pae.currentDamageInstances());
          }
 
-         return false;
+         return new Pair<>(builder.build(), false);
       }
    }
 
-   private static void insertionSortAggroList(List<PlayerAggroEntry> paeList) {
+   private static List<PlayerAggroEntry> insertionSortAggroList(List<PlayerAggroEntry> paeList) {
       for (int i = 1; i < paeList.size(); i++) {
          PlayerAggroEntry pae = paeList.get(i);
          long curAccDmg = pae.accumulatedDamage();
@@ -92,11 +94,13 @@ public class MapleMonsterAggroCoordinator {
          }
       }
 
+      List<PlayerAggroEntry> resultList = new ArrayList<>();
       int i = 0;
       for (PlayerAggroEntry pae : paeList) {
-         pae.entryRank_$eq(i);
+         resultList.add(new PlayerAggroEntryBuilder(pae).setEntryRank(i).build());
          i += 1;
       }
+      return resultList;
    }
 
    public void stopAggroCoordinator() {
@@ -184,7 +188,8 @@ public class MapleMonsterAggroCoordinator {
          return;
       }
 
-      insertEntryDamage(aggroEntry, damage);
+      PlayerAggroEntry result = insertEntryDamage(aggroEntry, damage);
+      mobAggro.put(cid, result);
    }
 
    private void runAggroUpdate(int deltaTime) {
@@ -210,12 +215,15 @@ public class MapleMonsterAggroCoordinator {
             synchronized (mobAggro) {
                synchronized (sortedAggro) {
                   for (PlayerAggroEntry pae : mobAggro.values()) {
-                     if (expiredAfterUpdateEntryDamage(pae, deltaTime)) {
-                        toRemove.add(pae.cid());
-                        if (pae.entryRank() > -1) {
-                           toRemoveIdx.add(pae.entryRank());
+                     Pair<PlayerAggroEntry, Boolean> result = expiredAfterUpdateEntryDamage(pae, deltaTime);
+                     PlayerAggroEntry updatePae = result.getLeft();
+
+                     if (result.getRight()) {
+                        toRemove.add(updatePae.cid());
+                        if (updatePae.entryRank() > -1) {
+                           toRemoveIdx.add(updatePae.entryRank());
                         } else {
-                           toRemoveByFetch.add(pae.cid());
+                           toRemoveByFetch.add(updatePae.cid());
                         }
                      }
                   }
@@ -290,18 +298,15 @@ public class MapleMonsterAggroCoordinator {
    }
 
    public void runSortLeadingCharactersAggro() {
-      List<List<PlayerAggroEntry>> aggroList;
       lock.lock();
       try {
-         aggroList = new ArrayList<>(mobSortedAggros.values());
+         for (MapleMonster monster : mobSortedAggros.keySet()) {
+            synchronized (monster) {
+               mobSortedAggros.put(monster, insertionSortAggroList(mobSortedAggros.get(monster)));
+            }
+         }
       } finally {
          lock.unlock();
-      }
-
-      for (List<PlayerAggroEntry> mobAggroList : aggroList) {
-         synchronized (mobAggroList) {
-            insertionSortAggroList(mobAggroList);
-         }
       }
    }
 

@@ -7,13 +7,13 @@ import net.opcodes.SendOpcode;
 import tools.packet.PacketInput;
 
 public class TakePhoto implements PacketInput {
-   private String reservedGroomName;
+   private final String reservedGroomName;
 
-   private String reservedBrideName;
+   private final String reservedBrideName;
 
-   private int field;
+   private final int field;
 
-   private List<MapleCharacter> attendees;
+   private final List<MapleCharacter> attendees;
 
    public TakePhoto(String reservedGroomName, String reservedBrideName, int field, List<MapleCharacter> attendees) {
       this.reservedGroomName = reservedGroomName;

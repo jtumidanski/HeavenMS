@@ -30,55 +30,46 @@ public class AbnormalStatusCommand extends Command {
       MobSkill skill = null;
 
       switch (params[0].toUpperCase()) {
-         case "SLOW":
+         case "SLOW" -> {
             disease = MapleAbnormalStatus.SLOW;
             skill = MobSkillFactory.getMobSkill(126, 7);
-            break;
-
-         case "SEDUCE":
+         }
+         case "SEDUCE" -> {
             disease = MapleAbnormalStatus.SEDUCE;
             skill = MobSkillFactory.getMobSkill(128, 7);
-            break;
-
-         case "ZOMBIFY":
+         }
+         case "ZOMBIFY" -> {
             disease = MapleAbnormalStatus.ZOMBIFY;
             skill = MobSkillFactory.getMobSkill(133, 1);
-            break;
-
-         case "CONFUSE":
+         }
+         case "CONFUSE" -> {
             disease = MapleAbnormalStatus.CONFUSE;
             skill = MobSkillFactory.getMobSkill(132, 2);
-            break;
-
-         case "STUN":
+         }
+         case "STUN" -> {
             disease = MapleAbnormalStatus.STUN;
             skill = MobSkillFactory.getMobSkill(123, 7);
-            break;
-
-         case "POISON":
+         }
+         case "POISON" -> {
             disease = MapleAbnormalStatus.POISON;
             skill = MobSkillFactory.getMobSkill(125, 5);
-            break;
-
-         case "SEAL":
+         }
+         case "SEAL" -> {
             disease = MapleAbnormalStatus.SEAL;
             skill = MobSkillFactory.getMobSkill(120, 1);
-            break;
-
-         case "DARKNESS":
+         }
+         case "DARKNESS" -> {
             disease = MapleAbnormalStatus.DARKNESS;
             skill = MobSkillFactory.getMobSkill(121, 1);
-            break;
-
-         case "WEAKEN":
+         }
+         case "WEAKEN" -> {
             disease = MapleAbnormalStatus.WEAKEN;
             skill = MobSkillFactory.getMobSkill(122, 1);
-            break;
-
-         case "CURSE":
+         }
+         case "CURSE" -> {
             disease = MapleAbnormalStatus.CURSE;
             skill = MobSkillFactory.getMobSkill(124, 1);
-            break;
+         }
       }
 
       if (disease == null) {

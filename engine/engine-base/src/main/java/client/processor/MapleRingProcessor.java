@@ -2,11 +2,11 @@ package client.processor;
 
 import client.MapleCharacter;
 import client.Ring;
+import client.inventory.manipulator.MapleCashIdGenerator;
+import database.DatabaseConnection;
 import database.administrator.InventoryEquipmentAdministrator;
 import database.administrator.RingAdministrator;
 import database.provider.RingProvider;
-import client.inventory.manipulator.MapleCashIdGenerator;
-import database.DatabaseConnection;
 import tools.Pair;
 
 public class MapleRingProcessor {
@@ -23,7 +23,7 @@ public class MapleRingProcessor {
    }
 
    public Ring loadFromDb(int ringId) {
-      return DatabaseConnection.getInstance().withConnectionResultOpt(connection -> RingProvider.getInstance().getRingById(connection, ringId)).orElseThrow();
+      return DatabaseConnection.getInstance().withConnectionResult(connection -> RingProvider.getInstance().getRingById(connection, ringId).orElse(null)).orElseThrow();
    }
 
    public void removeRing(final Ring ring) {

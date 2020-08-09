@@ -1,6 +1,5 @@
 package scripting.event;
 
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -41,7 +40,6 @@ import server.TimerManager;
 import server.expeditions.MapleExpedition;
 import server.life.MapleLifeFactory;
 import server.life.MapleMonster;
-import server.life.MapleNPC;
 import server.maps.MapleMap;
 import server.maps.MapleMapManager;
 import server.maps.MaplePortal;
@@ -52,7 +50,6 @@ import tools.Pair;
 import tools.packet.field.effect.EnvironmentChange;
 import tools.packet.field.effect.PlaySound;
 import tools.packet.field.effect.ShowEffect;
-import tools.packet.spawn.SpawnNPC;
 import tools.packet.ui.GetClock;
 import tools.packet.ui.StopClock;
 

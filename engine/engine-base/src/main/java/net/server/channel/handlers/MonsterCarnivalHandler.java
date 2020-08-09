@@ -65,7 +65,7 @@ public final class MonsterCarnivalHandler extends AbstractPacketHandler<MonsterC
                      }
 
                      Point spawnPos = client.getPlayer().getMap().getRandomSP(client.getPlayer().getTeam());
-                     mob.position_$eq(spawnPos);
+                     mob.setPosition(spawnPos);
 
                      client.getPlayer().getMap().addMonsterSpawn(mob, 1, client.getPlayer().getTeam());
                      client.getPlayer().getMap().addAllMonsterSpawn(mob, 1, client.getPlayer().getTeam());
@@ -138,14 +138,9 @@ public final class MonsterCarnivalHandler extends AbstractPacketHandler<MonsterC
                      int success = client.getPlayer().getMap().spawnGuardian(client.getPlayer().getTeam(), num);
                      if (success != 1) {
                         switch (success) {
-                           case -1:
-                              PacketCreator.announce(client, new MonsterCarnivalMessage((byte) 3));
-                              break;
-                           case 0:
-                              PacketCreator.announce(client, new MonsterCarnivalMessage((byte) 4));
-                              break;
-                           default:
-                              PacketCreator.announce(client, new MonsterCarnivalMessage((byte) 3));
+                           case -1 -> PacketCreator.announce(client, new MonsterCarnivalMessage((byte) 3));
+                           case 0 -> PacketCreator.announce(client, new MonsterCarnivalMessage((byte) 4));
+                           default -> PacketCreator.announce(client, new MonsterCarnivalMessage((byte) 3));
                         }
                         PacketCreator.announce(client, new EnableActions());
                         return;

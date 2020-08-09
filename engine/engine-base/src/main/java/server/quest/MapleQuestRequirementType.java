@@ -9,59 +9,32 @@ public enum MapleQuestRequirementType {
    }
 
    public static MapleQuestRequirementType getByWZName(String name) {
-      switch (name) {
-         case "job":
-            return JOB;
-         case "quest":
-            return QUEST;
-         case "item":
-            return ITEM;
-         case "lvmin":
-            return MIN_LEVEL;
-         case "lvmax":
-            return MAX_LEVEL;
-         case "end":
-            return END_DATE;
-         case "mob":
-            return MOB;
-         case "npc":
-            return NPC;
-         case "fieldEnter":
-            return FIELD_ENTER;
-         case "interval":
-            return INTERVAL;
-         case "startscript":
-         case "endscript":
-            return SCRIPT;
-         case "pet":
-            return PET;
-         case "pettamenessmin":
-            return MIN_PET_TAMENESS;
-         case "mbmin":
-            return MONSTER_BOOK;
-         case "normalAutoStart":
-            return NORMAL_AUTO_START;
-         case "infoNumber":
-            return INFO_NUMBER;
-         case "infoex":
-            return INFO_EX;
-         case "questComplete":
-            return COMPLETED_QUEST;
-         case "start":
-            return START;
-	/*} else if(name.equals("end")) {   already coded
-            return END;*/
-         case "daybyday":
-            return DAY_BY_DAY;
-         case "money":
-            return MESO;
-         case "buff":
-            return BUFF;
-         case "exceptbuff":
-            return EXCEPT_BUFF;
-         default:
-            return UNDEFINED;
-      }
+      return switch (name) {
+         case "job" -> JOB;
+         case "quest" -> QUEST;
+         case "item" -> ITEM;
+         case "lvmin" -> MIN_LEVEL;
+         case "lvmax" -> MAX_LEVEL;
+         case "end" -> END_DATE;
+         case "mob" -> MOB;
+         case "npc" -> NPC;
+         case "fieldEnter" -> FIELD_ENTER;
+         case "interval" -> INTERVAL;
+         case "startscript", "endscript" -> SCRIPT;
+         case "pet" -> PET;
+         case "pettamenessmin" -> MIN_PET_TAMENESS;
+         case "mbmin" -> MONSTER_BOOK;
+         case "normalAutoStart" -> NORMAL_AUTO_START;
+         case "infoNumber" -> INFO_NUMBER;
+         case "infoex" -> INFO_EX;
+         case "questComplete" -> COMPLETED_QUEST;
+         case "start" -> START;
+         case "daybyday" -> DAY_BY_DAY;
+         case "money" -> MESO;
+         case "buff" -> BUFF;
+         case "exceptbuff" -> EXCEPT_BUFF;
+         default -> UNDEFINED;
+      };
    }
 
    public byte getType() {

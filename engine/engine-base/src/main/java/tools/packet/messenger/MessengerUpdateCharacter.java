@@ -5,13 +5,13 @@ import net.opcodes.SendOpcode;
 import tools.packet.PacketInput;
 
 public class MessengerUpdateCharacter implements PacketInput {
-   private String characterNameFrom;
+   private final String characterNameFrom;
 
-   private MapleCharacter character;
+   private final MapleCharacter character;
 
-   private int position;
+   private final int position;
 
-   private int channel;
+   private final int channel;
 
    public MessengerUpdateCharacter(String characterNameFrom, MapleCharacter character, int position, int channel) {
       this.characterNameFrom = characterNameFrom;

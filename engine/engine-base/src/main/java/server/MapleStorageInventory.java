@@ -135,20 +135,10 @@ class PairedQuickSort {
 
    void MapleQuickSort(int Esq, int Dir, ArrayList<Item> A, int sort) {
       switch (sort) {
-         case 3:
-            PartitionByLevel(Esq, Dir, A);
-            break;
-
-         case 2:
-            PartitionByName(Esq, Dir, A);
-            break;
-
-         case 1:
-            PartitionByQuantity(Esq, Dir, A);
-            break;
-
-         default:
-            PartitionByItemId(Esq, Dir, A);
+         case 3 -> PartitionByLevel(Esq, Dir, A);
+         case 2 -> PartitionByName(Esq, Dir, A);
+         case 1 -> PartitionByQuantity(Esq, Dir, A);
+         default -> PartitionByItemId(Esq, Dir, A);
       }
 
 
@@ -199,7 +189,8 @@ public class MapleStorageInventory {
          return -1;
       }
       addSlot(slotId, item);
-      item.position_(slotId);
+      //TODO JDT fix this
+      item = Item.newBuilder(item).setPosition(slotId).build();
       return slotId;
    }
 
@@ -210,7 +201,7 @@ public class MapleStorageInventory {
          return;
       }
       if (target == null) {
-         source.position_(dSlot);
+         source = Item.newBuilder(source).setPosition(dSlot).build();
          inventory.put(dSlot, source);
          inventory.remove(sSlot);
       } else if (target.id() == source.id() && !ItemConstants.isRechargeable(source.id()) && !MapleItemInformationProvider.getInstance().isPickupRestricted(source.id()) && isSameOwner(source, target)) {
@@ -218,10 +209,11 @@ public class MapleStorageInventory {
             swap(target, source);
          } else if (source.quantity() + target.quantity() > slotMax) {
             short rest = (short) ((source.quantity() + target.quantity()) - slotMax);
-            source.quantity_$eq(rest);
-            target.quantity_$eq(slotMax);
+            //TODO JDT fix this
+            source = Item.newBuilder(source).setQuantity(rest).build();
+            target = Item.newBuilder(target).setQuantity(slotMax).build();
          } else {
-            target.quantity_$eq((short) (source.quantity() + target.quantity()));
+            target = Item.newBuilder(target).setQuantity((short) (source.quantity() + target.quantity())).build();
             inventory.remove(sSlot);
          }
       } else {
@@ -249,8 +241,8 @@ public class MapleStorageInventory {
       inventory.remove(source.position());
       inventory.remove(target.position());
       short swapPos = source.position();
-      source.position_(target.position());
-      target.position_(swapPos);
+      source = Item.newBuilder(source).setPosition(target.position()).build();
+      target = Item.newBuilder(target).setPosition(swapPos).build();
       inventory.put(source.position(), source);
       inventory.put(target.position(), target);
    }

@@ -40,11 +40,11 @@ public class PlayerMobCommand extends Command {
             return;
          }
 
-         mob.position_$eq(checkPosition);
-         mob.cy_$eq(yPosition);
-         mob.rx0_$eq(xPosition + 50);
-         mob.rx1_$eq(xPosition - 50);
-         mob.fh_$eq(fh);
+         mob.setPosition(checkPosition);
+         mob.setCy(yPosition);
+         mob.setRx0(xPosition + 50);
+         mob.setRx1(xPosition - 50);
+         mob.setFh(fh);
 
          DatabaseConnection.getInstance().withConnection(connection ->
                PlayerLifeAdministrator.getInstance().create(connection, mobId, 0, fh, yPosition, xPosition + 50, xPosition - 50, "m", xPosition, yPosition, player.getWorld(), mapId, mobTime, 0));

@@ -8,7 +8,7 @@ import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
-import database.AbstractQueryExecutor;
+import accessor.AbstractQueryExecutor;
 import client.database.utility.DueyPackageFromResultSetTransformer;
 import server.DueyPackage;
 import tools.Pair;

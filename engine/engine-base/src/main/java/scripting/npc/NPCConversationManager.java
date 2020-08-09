@@ -351,7 +351,7 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
    public void gainCloseness(int closeness) {
       for (MaplePet pet : getPlayer().getPets()) {
          if (pet != null) {
-            PetProcessor.getInstance().gainClosenessFullness(pet, getPlayer(), closeness, 0, 0);
+            PetProcessor.getInstance().gainClosenessFullness(getPlayer(), getPlayer().getPetIndex(pet), closeness, 0, 0);
          }
       }
    }
@@ -433,7 +433,7 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
             .ifPresent(alliance -> {
                Server.getInstance().allianceMessage(allianceId, new GetGuildAlliances(alliance, c.getWorld()), -1, -1);
                Server.getInstance().allianceMessage(allianceId, new AllianceNotice(allianceId, alliance.notice()), -1, -1);
-               alliance.increaseCapacity(1);
+               Server.getInstance().increaseAllianceCapacity(allianceId, 1);
                PacketCreator.announce(c, new UpdateAllianceInfo(alliance, c.getWorld()));
             });
    }
@@ -592,16 +592,12 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
 
    public String getSkillBookInfo(int itemId) {
       SkillBookEntry sbe = MapleSkillBookInformationProvider.getInstance().getSkillBookAvailability(itemId);
-      switch (sbe) {
-         case UNAVAILABLE:
-            return "";
-         case QUEST_BOOK:
-            return "    Obtainable through #rquestline#k (collecting book).";
-         case QUEST_REWARD:
-            return "    Obtainable through #rquestline#k (quest reward).";
-         default:
-            return "    Obtainable through #rquestline#k.";
-      }
+      return switch (sbe) {
+         case UNAVAILABLE -> "";
+         case QUEST_BOOK -> "    Obtainable through #rquestline#k (collecting book).";
+         case QUEST_REWARD -> "    Obtainable through #rquestline#k (quest reward).";
+         default -> "    Obtainable through #rquestline#k.";
+      };
    }
 
    public int cpqCalcAvgLvl(int map) {

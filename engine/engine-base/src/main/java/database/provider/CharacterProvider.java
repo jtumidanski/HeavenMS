@@ -7,7 +7,7 @@ import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
-import database.AbstractQueryExecutor;
+import accessor.AbstractQueryExecutor;
 import client.database.data.CharNameAndIdData;
 import client.database.data.CharacterData;
 import client.database.data.CharacterGuildData;

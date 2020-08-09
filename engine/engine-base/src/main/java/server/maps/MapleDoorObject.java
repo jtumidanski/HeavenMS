@@ -29,7 +29,7 @@ public class MapleDoorObject extends AbstractMapleMapObject {
 
    public MapleDoorObject(int owner, int destinationMapId, int originMapId, int townPortalId, Point targetPosition, Point toPosition) {
       super();
-      position_$eq(targetPosition);
+      setPosition(targetPosition);
 
       ownerId = owner;
       linkedPortalId = townPortalId;

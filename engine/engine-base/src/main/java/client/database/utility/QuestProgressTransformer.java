@@ -1,8 +1,8 @@
 package client.database.utility;
 
 import client.database.data.QuestProgressData;
-import database.SqlTransformer;
 import entity.quest.QuestProgress;
+import transformer.SqlTransformer;
 
 public class QuestProgressTransformer implements SqlTransformer<QuestProgressData, QuestProgress> {
    @Override

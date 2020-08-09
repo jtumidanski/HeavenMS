@@ -240,7 +240,7 @@ public abstract class AbstractPacketFactory implements PacketFactory {
       }
       addExpirationTime(writer, item.expiration());
       if (isPet) {
-         MaplePet pet = item.pet().get();
+         MaplePet pet = item.pet();
          writer.writeAsciiString(StringUtil.getRightPaddedStr(pet.name(), '\0', 13));
          writer.write(pet.level());
          writer.writeShort(pet.closeness());
@@ -267,7 +267,7 @@ public abstract class AbstractPacketFactory implements PacketFactory {
       writer.write(equip.level()); // level
       writer.writeShort(equip.str()); // str
       writer.writeShort(equip.dex()); // dex
-      writer.writeShort(equip._int()); // int
+      writer.writeShort(equip.intelligence()); // int
       writer.writeShort(equip.luk()); // luk
       writer.writeShort(equip.hp()); // hp
       writer.writeShort(equip.mp()); // mp
@@ -323,7 +323,7 @@ public abstract class AbstractPacketFactory implements PacketFactory {
       }
       boolean yes = false;
       for (Ring ring : rings) {
-         if (ring.isEquipped()) {
+         if (ring.equipped()) {
             if (!yes) {
                yes = true;
                writer.write(1);
@@ -343,7 +343,7 @@ public abstract class AbstractPacketFactory implements PacketFactory {
    protected void addMarriageRingLook(MapleClient target, final MaplePacketLittleEndianWriter writer, MapleCharacter character) {
       Ring ring = character.getMarriageRing();
 
-      if (ring == null || !ring.isEquipped()) {
+      if (ring == null || !ring.equipped()) {
          writer.write(0);
       } else {
          writer.write(1);

@@ -5,9 +5,9 @@ import server.maps.MaplePlayerShop;
 import tools.packet.PacketInput;
 
 public class GetPlayerShop implements PacketInput {
-   private MaplePlayerShop playerShop;
+   private final MaplePlayerShop playerShop;
 
-   private boolean owner;
+   private final boolean owner;
 
    public GetPlayerShop(MaplePlayerShop playerShop, boolean owner) {
       this.playerShop = playerShop;

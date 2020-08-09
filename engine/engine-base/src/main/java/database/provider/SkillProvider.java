@@ -4,7 +4,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
-import database.AbstractQueryExecutor;
+import accessor.AbstractQueryExecutor;
 import client.database.data.SkillData;
 import client.database.utility.SkillTransformer;
 import entity.Skill;

@@ -7,6 +7,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 
+import database.DatabaseConnection;
 import database.administrator.InventoryEquipmentAdministrator;
 import database.administrator.InventoryItemAdministrator;
 import database.administrator.InventoryMerchantAdministrator;
@@ -14,7 +15,6 @@ import database.provider.InventoryItemProvider;
 import database.provider.InventoryMerchantProvider;
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
-import database.DatabaseConnection;
 import tools.Pair;
 
 public enum ItemFactory {
@@ -129,8 +129,8 @@ public enum ItemFactory {
                return original;
             } else {
                if (bundles > 0) {
-                  original.getLeft().quantity_$eq((short) (bundles * original.getLeft().quantity()));
-                  return original;
+                  Item updated = Item.newBuilder(original.getLeft()).setQuantity((short) (bundles * original.getLeft().quantity())).build();
+                  return new Pair<>(updated, original.getRight());
                }
             }
             return null;
@@ -176,7 +176,7 @@ public enum ItemFactory {
 
    private void saveEquipItem(EntityManager entityManager, Equip item, int genKey) {
       InventoryEquipmentAdministrator.getInstance().create(entityManager, genKey, item.slots(),
-            item.level(), item.str(), item.dex(), item._int(), item.luk(),
+            item.level(), item.str(), item.dex(), item.intelligence(), item.luk(),
             item.hp(), item.mp(), item.watk(), item.matk(), item.wdef(),
             item.mdef(), item.acc(), item.avoid(), item.hands(), item.speed(),
             item.jump(), 0, item.vicious(), item.itemLevel(), item.itemExp(),

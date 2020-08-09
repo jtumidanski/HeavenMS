@@ -51,10 +51,10 @@ public class SpawnPoint {
 
    public MapleMonster getMonster() {
       MapleMonster mob = new MapleMonster(MapleLifeFactory.getMonster(monster).orElseThrow());
-      mob.position_$eq(new Point(pos));
+      mob.setPosition(new Point(pos));
       mob.setTeam(team);
-      mob.fh_$eq(fh);
-      mob.f_$eq(f);
+      mob.setFh(fh);
+      mob.setF(f);
       spawnedMonsters.incrementAndGet();
       mob.addListener(new MonsterListener() {
          @Override

@@ -3,7 +3,7 @@ package database.provider;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
-import database.AbstractQueryExecutor;
+import accessor.AbstractQueryExecutor;
 
 public class InventoryMerchantProvider extends AbstractQueryExecutor {
    private static InventoryMerchantProvider instance;

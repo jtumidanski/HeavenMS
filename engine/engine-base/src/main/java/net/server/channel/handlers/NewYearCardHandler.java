@@ -2,23 +2,23 @@ package net.server.channel.handlers;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import database.provider.CharacterProvider;
 import client.inventory.Item;
 import client.newyear.NewYearCardRecord;
 import client.processor.NewYearCardProcessor;
 import constants.inventory.ItemConstants;
+import database.DatabaseConnection;
+import database.provider.CharacterProvider;
 import net.server.AbstractPacketHandler;
 import net.server.Server;
 import net.server.channel.packet.newyear.BaseNewYearCardPacket;
 import net.server.channel.packet.newyear.CardAcceptedPacket;
 import net.server.channel.packet.newyear.CardHasBeenSentPacket;
 import net.server.channel.packet.reader.NewYearCardReader;
-import database.DatabaseConnection;
+import tools.I18nMessage;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
-import tools.I18nMessage;
 import tools.packet.NewYearCardResolution;
 
 public final class NewYearCardHandler extends AbstractPacketHandler<BaseNewYearCardPacket> {
@@ -40,9 +40,9 @@ public final class NewYearCardHandler extends AbstractPacketHandler<BaseNewYearC
    }
 
    private int getReceiverId(String receiver, int world) {
-      return DatabaseConnection.getInstance().withConnectionResultOpt(connection ->
-            CharacterProvider.getInstance().getCharacterForNameAndWorld(connection, receiver, world))
-            .orElse(-1);
+      return DatabaseConnection.getInstance().withConnectionResult(connection ->
+            CharacterProvider.getInstance().getCharacterForNameAndWorld(connection, receiver, world).orElse(-1))
+            .orElseThrow();
    }
 
    private int getValidNewYearCardStatus(int itemId, MapleCharacter player, short slot) {
@@ -61,20 +61,20 @@ public final class NewYearCardHandler extends AbstractPacketHandler<BaseNewYearC
          if (!newYear.senderDiscardCard()) {
             if (player.canHold(4301000, 1)) {
                newYear.stopNewYearCardTask();
-               NewYearCardProcessor.getInstance().updateNewYearCard(newYear);
+               NewYearCardRecord updatedCard = NewYearCardProcessor.getInstance().updateNewYearCard(newYear);
 
                player.getAbstractPlayerInteraction().gainItem(4301000, (short) 1);
-               if (!newYear.message().isEmpty()) {
-                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("NEW_YEAR_CARD_MESSAGE").with(newYear.senderName(), newYear.message()));
+               if (!updatedCard.message().isEmpty()) {
+                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("NEW_YEAR_CARD_MESSAGE").with(updatedCard.senderName(), updatedCard.message()));
                }
 
-               player.addNewYearRecord(newYear);
-               PacketCreator.announce(player, new NewYearCardResolution(player.getId(), newYear, 6, 0));    // successfully received
+               player.addNewYearRecord(updatedCard);
+               PacketCreator.announce(player, new NewYearCardResolution(player.getId(), updatedCard, 6, 0));    // successfully received
 
-               MasterBroadcaster.getInstance().sendToAllInMap(player.getMap(), new NewYearCardResolution(player.getId(), newYear, 0xD, 0));
+               MasterBroadcaster.getInstance().sendToAllInMap(player.getMap(), new NewYearCardResolution(player.getId(), updatedCard, 0xD, 0));
 
-               c.getWorldServer().getPlayerStorage().getCharacterById(newYear.senderId()).filter(MapleCharacter::isLoggedInWorld).ifPresent(sender -> {
-                  MasterBroadcaster.getInstance().sendToAllInMap(sender.getMap(), new NewYearCardResolution(sender.getId(), newYear, 0xD, 0));
+               c.getWorldServer().getPlayerStorage().getCharacterById(updatedCard.senderId()).filter(MapleCharacter::isLoggedInWorld).ifPresent(sender -> {
+                  MasterBroadcaster.getInstance().sendToAllInMap(sender.getMap(), new NewYearCardResolution(sender.getId(), updatedCard, 0xD, 0));
                   MessageBroadcaster.getInstance().sendServerNotice(sender, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("NEW_YEAR_CARD_RECEIPT_CONFIRMATION"));
                });
             } else {
@@ -101,7 +101,7 @@ public final class NewYearCardHandler extends AbstractPacketHandler<BaseNewYearC
                   if (receiverId != c.getPlayer().getId()) {
 
                      NewYearCardRecord newYearCardRecord = new NewYearCardRecord(player.getId(), player.getName(), receiverId, receiver, message);
-                     NewYearCardProcessor.getInstance().saveNewYearCard(newYearCardRecord);
+                     newYearCardRecord = NewYearCardProcessor.getInstance().saveNewYearCard(newYearCardRecord);
                      player.addNewYearRecord(newYearCardRecord);
 
                      player.getAbstractPlayerInteraction().gainItem(2160101, (short) -1);

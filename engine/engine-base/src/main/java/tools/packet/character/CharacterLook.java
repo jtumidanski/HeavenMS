@@ -6,9 +6,9 @@ import net.opcodes.SendOpcode;
 import tools.packet.PacketInput;
 
 public class CharacterLook implements PacketInput {
-   private MapleClient target;
+   private final MapleClient target;
 
-   private MapleCharacter reference;
+   private final MapleCharacter reference;
 
    public CharacterLook(MapleClient target, MapleCharacter reference) {
       this.target = target;

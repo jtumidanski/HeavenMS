@@ -18,6 +18,7 @@ import javax.persistence.EntityManager;
 import org.apache.mina.core.session.IoSession;
 
 import client.MapleClient;
+import database.DatabaseConnection;
 import database.administrator.HwidAccountAdministrator;
 import database.provider.HwidAccountProvider;
 import client.processor.CharacterProcessor;
@@ -26,7 +27,6 @@ import net.server.Server;
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
 import net.server.coordinator.login.LoginStorage;
-import database.DatabaseConnection;
 import tools.Pair;
 
 public class MapleSessionCoordinator {
@@ -66,22 +66,12 @@ public class MapleSessionCoordinator {
          subdegreeTime = 1 + (3 * degree);
       }
 
-      switch (degree) {
-         case 0:
-            baseTime = 2;       // 2 hours
-            break;
-
-         case 1:
-            baseTime = 24;      // 1 day
-            break;
-
-         case 2:
-            baseTime = 168;     // 7 days
-            break;
-
-         default:
-            baseTime = 1680;    // 70 days
-      }
+      baseTime = switch (degree) {
+         case 0 -> 2; // 2 hours
+         case 1 -> 24; // 1 day
+         case 2 -> 168; // 7 days
+         default -> 1680; // 70 days
+      };
 
       return 3600000 * (baseTime + subdegreeTime);
    }

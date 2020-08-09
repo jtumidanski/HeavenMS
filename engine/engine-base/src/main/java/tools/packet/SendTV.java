@@ -6,13 +6,13 @@ import client.MapleCharacter;
 import net.opcodes.SendOpcode;
 
 public class SendTV implements PacketInput {
-   private MapleCharacter character;
+   private final MapleCharacter character;
 
-   private List<String> messages;
+   private final List<String> messages;
 
-   private int type;
+   private final int type;
 
-   private MapleCharacter partner;
+   private final MapleCharacter partner;
 
    public SendTV(MapleCharacter character, List<String> messages, int type, MapleCharacter partner) {
       this.character = character;

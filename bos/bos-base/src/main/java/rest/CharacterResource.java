@@ -55,12 +55,11 @@ public class CharacterResource {
    @Consumes(MediaType.APPLICATION_JSON)
    @Produces(MediaType.APPLICATION_JSON)
    public Response deleteCharacter(@PathParam("id") Integer id) {
-      DatabaseConnection.getInstance().withConnection(entityManager ->
-            DatabaseConnection.getInstance().thing(entityManager, em -> {
-               BuddyAdministrator.getInstance().deleteForCharacter(em, id);
-               BuddyAdministrator.getInstance().deleteByBuddy(em, id);
-               CharacterAdministrator.getInstance().deleteCharacter(em, id);
-            }));
+      DatabaseConnection.getInstance().withConnection(entityManager ->{
+               BuddyAdministrator.getInstance().deleteForCharacter(entityManager, id);
+               BuddyAdministrator.getInstance().deleteByBuddy(entityManager, id);
+               CharacterAdministrator.getInstance().deleteCharacter(entityManager, id);
+            });
       return Response.ok().build();
    }
 

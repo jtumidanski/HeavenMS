@@ -5,9 +5,9 @@ import server.maps.MapleMapItem;
 import tools.packet.PacketInput;
 
 public class UpdateMapItemObject implements PacketInput {
-   private MapleMapItem mapItem;
+   private final MapleMapItem mapItem;
 
-   private boolean giveOwnership;
+   private final boolean giveOwnership;
 
    public UpdateMapItemObject(MapleMapItem mapItem, boolean giveOwnership) {
       this.mapItem = mapItem;

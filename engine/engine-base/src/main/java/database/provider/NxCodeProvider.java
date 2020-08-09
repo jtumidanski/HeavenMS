@@ -5,7 +5,7 @@ import java.util.Optional;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
-import database.AbstractQueryExecutor;
+import accessor.AbstractQueryExecutor;
 import client.database.data.NxCodeData;
 import client.database.utility.NxCodeTransformer;
 import entity.nx.NxCode;

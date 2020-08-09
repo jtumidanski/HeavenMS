@@ -1,4 +1,4 @@
-FROM openjdk:13-jdk-alpine
+FROM openjdk:14-ea-jdk-alpine
 USER root
 
 RUN mkdir bos
@@ -9,4 +9,4 @@ ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.5.0/wait
 
 RUN chmod +x /wait
 
-CMD /wait && java -jar /bos/bos-base-1.0-SNAPSHOT.jar
+CMD /wait && java --enable-preview -jar /bos/bos-base-1.0-SNAPSHOT.jar

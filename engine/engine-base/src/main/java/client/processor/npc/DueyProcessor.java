@@ -6,16 +6,12 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-
 import javax.persistence.EntityManager;
 
 import client.DueyAction;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.autoban.AutoBanFactory;
-import database.administrator.DueyPackageAdministrator;
-import database.provider.CharacterProvider;
-import database.provider.DueyPackageProvider;
 import client.inventory.Item;
 import client.inventory.ItemFactory;
 import client.inventory.MapleInventory;
@@ -25,12 +21,14 @@ import client.inventory.manipulator.MapleKarmaManipulator;
 import client.processor.ItemProcessor;
 import config.YamlConfig;
 import constants.inventory.ItemConstants;
+import database.DatabaseConnection;
+import database.administrator.DueyPackageAdministrator;
+import database.provider.CharacterProvider;
+import database.provider.DueyPackageProvider;
 import net.server.channel.Channel;
-import scala.Option;
 import server.DueyPackage;
 import server.MapleItemInformationProvider;
 import server.MapleTradeUtil;
-import database.DatabaseConnection;
 import tools.FilePrinter;
 import tools.PacketCreator;
 import tools.Pair;
@@ -42,8 +40,8 @@ import tools.packet.stat.EnableActions;
 public class DueyProcessor {
 
    private static Pair<Integer, Integer> getAccountCharacterIdFromCNAME(String name) {
-      return DatabaseConnection.getInstance().withConnectionResultOpt(connection ->
-            CharacterProvider.getInstance().getIdAndAccountIdForName(connection, name)).orElse(null);
+      return DatabaseConnection.getInstance().withConnectionResult(connection ->
+            CharacterProvider.getInstance().getIdAndAccountIdForName(connection, name).orElse(null)).orElse(null);
    }
 
    private static void showDueyNotification(MapleClient c, MapleCharacter player) {
@@ -114,8 +112,8 @@ public class DueyProcessor {
             inv.unlockInventory();
          }
 
-         MapleKarmaManipulator.toggleKarmaFlagToUntradeable(item);
-         item.quantity_$eq(amount);
+         item = MapleKarmaManipulator.toggleKarmaFlagToUntradeable(item);
+         item = item.setQuantity(amount);
 
          if (!insertPackageItem(packageId, item)) {
             return 1;
@@ -238,7 +236,7 @@ public class DueyProcessor {
                return;
             }
 
-            if (dp.item().isDefined()) {
+            if (dp.item().isPresent()) {
                Item dpItem = dp.item().get();
                if (!c.getPlayer().canHoldMeso(dp.mesos())) {
                   PacketCreator.announce(c, new SendDuey(DueyAction.TO_CLIENT_RECV_UNKNOWN_ERROR));
@@ -281,7 +279,7 @@ public class DueyProcessor {
             if (quickDelivery) {
                PacketCreator.announce(c, new SendDuey(DueyAction.SOMETHING));
             } else {
-               PacketCreator.announce(c, new SendDuey(DueyAction.TO_CLIENT_OPEN_DUEY, Option.apply(loadPackages(c.getPlayer()))));
+               PacketCreator.announce(c, new SendDuey(DueyAction.TO_CLIENT_OPEN_DUEY, loadPackages(c.getPlayer())));
             }
          } finally {
             c.releaseClient();

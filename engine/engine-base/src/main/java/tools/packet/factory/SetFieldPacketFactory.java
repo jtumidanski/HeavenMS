@@ -46,7 +46,7 @@ public class SetFieldPacketFactory extends AbstractPacketFactory {
       writer.writeInt(packet.mapId());
       writer.write(packet.spawnPoint());
       writer.writeShort(packet.characterHp());
-      if (packet.spawnPosition().isDefined()) {
+      if (packet.spawnPosition().isPresent()) {
          writer.writeBool(true);
          writer.writeInt(packet.spawnPosition().get().x);
          writer.writeInt(packet.spawnPosition().get().y);

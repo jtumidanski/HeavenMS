@@ -12,16 +12,7 @@
     <artifactId>parent-model</artifactId>
     <packaging>pom</packaging>
 
-    <properties>
-        <scala.version>2.13.0</scala.version>
-    </properties>
-
     <dependencies>
-        <dependency>
-            <groupId>org.scala-lang</groupId>
-            <artifactId>scala-library</artifactId>
-            <version>${scala.version}</version>
-        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

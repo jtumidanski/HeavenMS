@@ -29,6 +29,8 @@ import client.AbstractMapleCharacterObject;
 import client.MapleCharacter;
 import client.MapleFamily;
 import client.database.data.MarriageData;
+import client.inventory.MaplePet;
+import client.processor.PetProcessor;
 import config.YamlConfig;
 import constants.game.GameConstants;
 import database.DatabaseConnection;
@@ -131,8 +133,6 @@ public class World {
    private MonitoredReentrantLock srvMessagesLock = MonitoredReentrantLockFactory.createLock(MonitoredLockType.WORLD_SERVER_MESSAGES);
    private ScheduledFuture<?> srvMessagesSchedule;
 
-   private MonitoredReentrantLock activePetsLock = MonitoredReentrantLockFactory.createLock(MonitoredLockType.WORLD_PETS, true);
-   private Map<Integer, Integer> activePets = new LinkedHashMap<>();
    private ScheduledFuture<?> petsSchedule;
    private long petUpdate;
 
@@ -210,10 +210,6 @@ public class World {
       list.sort(Comparator.comparingInt(Entry::getKey));
 
       return list;
-   }
-
-   private static Integer getPetKey(MapleCharacter chr, byte petSlot) {    // assuming max 3 pets
-      return (chr.getId() << 2) + petSlot;
    }
 
    private static void executePlayerNpcMapDataUpdate(EntityManager entityManager, boolean isPodium, Map<Integer, ?> playerNpcData, int value, int worldId, int mapId) {
@@ -1119,70 +1115,31 @@ public class World {
       return cashLeaderboard;
    }
 
-   public void registerPetHunger(MapleCharacter chr, byte petSlot) {
-      if (chr.isGM() && YamlConfig.config.server.GM_PETS_NEVER_HUNGRY || YamlConfig.config.server.PETS_NEVER_HUNGRY) {
+   public void runPetSchedule() {
+      if (YamlConfig.config.server.PETS_NEVER_HUNGRY) {
+         // TODO should probably just not make this to begin with
          return;
       }
 
-      Integer key = getPetKey(chr, petSlot);
-
-      activePetsLock.lock();
-      try {
-         int initProc;
-         if (Server.getInstance().getCurrentTime() - petUpdate > 55000) {
-            initProc = YamlConfig.config.server.PET_EXHAUST_COUNT - 2;
-         } else {
-            initProc = YamlConfig.config.server.PET_EXHAUST_COUNT - 1;
-         }
-
-         activePets.put(key, initProc);
-      } finally {
-         activePetsLock.unlock();
-      }
-   }
-
-   public void unregisterPetHunger(MapleCharacter chr, byte petSlot) {
-      Integer key = getPetKey(chr, petSlot);
-
-      activePetsLock.lock();
-      try {
-         activePets.remove(key);
-      } finally {
-         activePetsLock.unlock();
-      }
-   }
-
-   public void runPetSchedule() {
-      Map<Integer, Integer> deployedPets;
-
-      activePetsLock.lock();
-      try {
-         petUpdate = Server.getInstance().getCurrentTime();
-         deployedPets = new HashMap<>(activePets);
-      } finally {
-         activePetsLock.unlock();
-      }
-
-      for (Map.Entry<Integer, Integer> dp : deployedPets.entrySet()) {
-         int characterId = dp.getKey() / 4;
-         getPlayerStorage().getCharacterById(characterId)
-               .filter(MapleCharacter::isLoggedInWorld)
-               .ifPresent(character -> {
-                  int dpVal = dp.getValue() + 1;
-                  if (dpVal == YamlConfig.config.server.PET_EXHAUST_COUNT) {
-                     character.runFullnessSchedule(dp.getKey() % 4);
-                     dpVal = 0;
+      getPlayerStorage().getAllCharacters().parallelStream()
+            .filter(MapleCharacter::isLoggedInWorld)
+            .filter(MapleCharacter::hasSummonedPet)
+            .filter(character -> (!character.isGM()) || (character.isGM() && !YamlConfig.config.server.GM_PETS_NEVER_HUNGRY))
+            .forEach(character -> {
+               for (int i = 0; i < 3; i++) {
+                  MaplePet pet = character.getPet(i);
+                  if (pet == null) {
+                     return;
                   }
-
-                  activePetsLock.lock();
-                  try {
-                     activePets.put(dp.getKey(), dpVal);
-                  } finally {
-                     activePetsLock.unlock();
+                  long lastFullnessDegrade = pet.lastFullnessDegrade();
+                  if (lastFullnessDegrade == -1) {
+                     return;
                   }
-               });
-
-      }
+                  if (Server.getInstance().getCurrentTime() - lastFullnessDegrade > YamlConfig.config.server.PET_EXHAUST_COUNT * 60 * 1000) {
+                     PetProcessor.getInstance().runFullnessSchedule(character, character.getPetIndex(pet.uniqueId()));
+                  }
+               }
+            });
    }
 
    public void registerMountHunger(int ownerId, boolean isGm) {
@@ -1673,7 +1630,6 @@ public class World {
       accountCharsLock = accountCharsLock.dispose();
       partyLock = partyLock.dispose();
       srvMessagesLock = srvMessagesLock.dispose();
-      activePetsLock = activePetsLock.dispose();
       activeMountsLock = activeMountsLock.dispose();
       activePlayerShopsLock = activePlayerShopsLock.dispose();
       activeMerchantsLock = activeMerchantsLock.dispose();

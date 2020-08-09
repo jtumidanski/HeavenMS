@@ -418,7 +418,7 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
 
       Item sellItem = ivItem.copy();
       if (!ItemConstants.isRechargeable(ivItem.id())) {
-         sellItem.quantity_$eq(perBundle);
+         sellItem = Item.newBuilder(sellItem).setQuantity(perBundle).build();
       }
 
       MaplePlayerShopItem shopItem = new MaplePlayerShopItem(sellItem, bundles, price);
@@ -533,14 +533,14 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
                quantity = item.quantity();
             }
 
-            tradeItem.quantity_$eq(quantity);
-            tradeItem.position_(targetSlot);
+            tradeItem = Item.newBuilder(tradeItem).setQuantity(quantity).setPosition(targetSlot).build();
 
             if (trade.addItem(tradeItem)) {
                MapleInventoryManipulator.removeFromSlot(c, ivType, item.position(), quantity, true);
 
                PacketCreator.announce(trade.getOwner(), new TradeItemAdd((byte) 0, tradeItem));
-               trade.getPartnerTrade().ifPresent(partner -> PacketCreator.announce(partner.getOwner(), new TradeItemAdd((byte) 1, tradeItem)));
+               Item finalTradeItem = tradeItem;
+               trade.getPartnerTrade().ifPresent(partner -> PacketCreator.announce(partner.getOwner(), new TradeItemAdd((byte) 1, finalTradeItem)));
             }
          } catch (Exception e) {
             FilePrinter.printError(FilePrinter.TRADE_EXCEPTION, e, "Player '" + chr + "' tried to add " + ii.getName(item.id()) + " qty. " + item.quantity() + " in trade (slot " + targetSlot + ") then exception occurred.");
@@ -773,22 +773,16 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
          }
 
          MapleMapObject ob = chr.getMap().getMapObject(oid);
-         if (ob instanceof MaplePlayerShop) {
-            MaplePlayerShop shop = (MaplePlayerShop) ob;
+         if (ob instanceof MaplePlayerShop shop) {
             shop.visitShop(chr);
-         } else if (ob instanceof MapleMiniGame) {
-            MapleMiniGame game = (MapleMiniGame) ob;
+         } else if (ob instanceof MapleMiniGame game) {
             if (game.checkPassword(pw)) {
                if (game.hasFreeSlot() && !game.isVisitor(chr)) {
                   game.addVisitor(chr);
                   chr.setMiniGame(game);
                   switch (game.getGameType()) {
-                     case OMOK:
-                        game.sendOmok(c, game.getPieceType());
-                        break;
-                     case MATCH_CARD:
-                        game.sendMatchCard(c, game.getPieceType());
-                        break;
+                     case OMOK -> game.sendOmok(c, game.getPieceType());
+                     case MATCH_CARD -> game.sendMatchCard(c, game.getPieceType());
                   }
                } else {
                   PacketCreator.announce(chr, new GetMiniRoomError(MiniRoomError.FULL_CAPACITY));
@@ -796,8 +790,7 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
             } else {
                PacketCreator.announce(chr, new GetMiniRoomError(MiniRoomError.INCORRECT_PASSWORD));
             }
-         } else if (ob instanceof MapleHiredMerchant && chr.getHiredMerchant() == null) {
-            MapleHiredMerchant merchant = (MapleHiredMerchant) ob;
+         } else if (ob instanceof MapleHiredMerchant merchant && chr.getHiredMerchant() == null) {
             merchant.visitShop(chr);
          }
       }
@@ -939,8 +932,7 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
    private boolean canPlaceStore(MapleCharacter chr) {
       try {
          for (MapleMapObject mmo : chr.getMap().getMapObjectsInRange(chr.position(), 23000, Arrays.asList(MapleMapObjectType.HIRED_MERCHANT, MapleMapObjectType.PLAYER))) {
-            if (mmo instanceof MapleCharacter) {
-               MapleCharacter mc = (MapleCharacter) mmo;
+            if (mmo instanceof MapleCharacter mc) {
                if (mc.getId() == chr.getId()) {
                   continue;
                }

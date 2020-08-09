@@ -5,7 +5,7 @@ import net.opcodes.SendOpcode;
 import tools.packet.PacketInput;
 
 public class GetFamilyInfo implements PacketInput {
-   private MapleFamilyEntry familyEntry;
+   private final MapleFamilyEntry familyEntry;
 
    public GetFamilyInfo(MapleFamilyEntry familyEntry) {
       this.familyEntry = familyEntry;

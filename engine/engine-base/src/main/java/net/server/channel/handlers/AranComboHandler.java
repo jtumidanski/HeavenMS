@@ -27,21 +27,12 @@ public class AranComboHandler extends AbstractPacketHandler<NoOpPacket> {
             }
             combo++;
             switch (combo) {
-               case 10:
-               case 20:
-               case 30:
-               case 40:
-               case 50:
-               case 60:
-               case 70:
-               case 80:
-               case 90:
-               case 100:
+               case 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 -> {
                   if (player.getJob().getId() != 2000 && (combo / 10) > skillLevel) {
                      break;
                   }
                   skill.getEffect(combo / 10).applyComboBuff(player, combo);
-                  break;
+               }
             }
             player.setCombo(combo);
             player.setLastCombo(currentTime);

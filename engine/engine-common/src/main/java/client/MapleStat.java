@@ -37,61 +37,38 @@ public enum MapleStat {
    }
 
    public static MapleStat getBy5ByteEncoding(int encoded) {
-      switch (encoded) {
-         case 64:
-            return STR;
-         case 128:
-            return DEX;
-         case 256:
-            return INT;
-         case 512:
-            return LUK;
-      }
-      return null;
+      return switch (encoded) {
+         case 64 -> STR;
+         case 128 -> DEX;
+         case 256 -> INT;
+         case 512 -> LUK;
+         default -> null;
+      };
    }
 
    public static MapleStat getByString(String type) {
-      switch (type) {
-         case "SKIN":
-            return SKIN;
-         case "FACE":
-            return FACE;
-         case "HAIR":
-            return HAIR;
-         case "LEVEL":
-            return LEVEL;
-         case "JOB":
-            return JOB;
-         case "STR":
-            return STR;
-         case "DEX":
-            return DEX;
-         case "INT":
-            return INT;
-         case "LUK":
-            return LUK;
-         case "HP":
-            return HP;
-         case "MAXHP":
-            return MAX_HP;
-         case "MP":
-            return MP;
-         case "MAXMP":
-            return MAX_MP;
-         case "AVAILABLEAP":
-            return AVAILABLE_AP;
-         case "AVAILABLESP":
-            return AVAILABLE_SP;
-         case "EXP":
-            return EXP;
-         case "FAME":
-            return FAME;
-         case "MESO":
-            return MESO;
-         case "PET":
-            return PET;
-      }
-      return null;
+      return switch (type) {
+         case "SKIN" -> SKIN;
+         case "FACE" -> FACE;
+         case "HAIR" -> HAIR;
+         case "LEVEL" -> LEVEL;
+         case "JOB" -> JOB;
+         case "STR" -> STR;
+         case "DEX" -> DEX;
+         case "INT" -> INT;
+         case "LUK" -> LUK;
+         case "HP" -> HP;
+         case "MAXHP" -> MAX_HP;
+         case "MP" -> MP;
+         case "MAXMP" -> MAX_MP;
+         case "AVAILABLEAP" -> AVAILABLE_AP;
+         case "AVAILABLESP" -> AVAILABLE_SP;
+         case "EXP" -> EXP;
+         case "FAME" -> FAME;
+         case "MESO" -> MESO;
+         case "PET" -> PET;
+         default -> null;
+      };
    }
 
    public int getValue() {

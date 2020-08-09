@@ -6,7 +6,7 @@ import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
-import database.AbstractQueryExecutor;
+import accessor.AbstractQueryExecutor;
 
 public class MtsCartProvider extends AbstractQueryExecutor {
    private static MtsCartProvider instance;

@@ -24,15 +24,9 @@ public class ReadPointsCommand extends Command {
       }
 
       switch (params[0]) {
-         case "rp":
-            MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("READ_POINTS_COMMAND_RP").with(player.getRewardPoints()));
-            break;
-         case "vp":
-            MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("READ_POINTS_COMMAND_VP").with(player.getClient().getVotePoints()));
-            break;
-         default:
-            MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("READ_POINTS_COMMAND_ALL").with(player.getRewardPoints(), player.getClient().getVotePoints()));
-            break;
+         case "rp" -> MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("READ_POINTS_COMMAND_RP").with(player.getRewardPoints()));
+         case "vp" -> MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("READ_POINTS_COMMAND_VP").with(player.getClient().getVotePoints()));
+         default -> MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("READ_POINTS_COMMAND_ALL").with(player.getRewardPoints(), player.getClient().getVotePoints()));
       }
    }
 }

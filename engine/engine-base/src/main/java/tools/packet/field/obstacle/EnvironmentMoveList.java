@@ -7,7 +7,7 @@ import net.opcodes.SendOpcode;
 import tools.packet.PacketInput;
 
 public class EnvironmentMoveList implements PacketInput {
-   private Set<Map.Entry<String, Integer>> environmentMoveList;
+   private final Set<Map.Entry<String, Integer>> environmentMoveList;
 
    public EnvironmentMoveList(Set<Map.Entry<String, Integer>> environmentMoveList) {
       this.environmentMoveList = environmentMoveList;

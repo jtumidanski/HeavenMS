@@ -18,6 +18,6 @@ public class RanksCommand extends Command {
       MapleCharacter player = c.getPlayer();
 
       WorldRankData worldRanking = Server.getInstance().getWorldPlayerRanking(player.getWorld());
-      PacketCreator.announce(player, new ShowPlayerRanks(9010000, worldRanking.getUserRanks()));
+      PacketCreator.announce(player, new ShowPlayerRanks(9010000, worldRanking.userRanks()));
    }
 }

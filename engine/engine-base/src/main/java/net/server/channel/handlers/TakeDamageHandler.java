@@ -83,7 +83,7 @@ public final class TakeDamageHandler extends AbstractPacketHandler<TakeDamagePac
 
                List<LoseItem> loseItems;
                if (damage > 0) {
-                  loseItems = attacker.getStats().loseItem();
+                  loseItems = attacker.getStats().loseItemList();
                   if (loseItems != null) {
                      if (chr.getBuffEffect(MapleBuffStat.AURA) == null) {
                         MapleInventoryType type;

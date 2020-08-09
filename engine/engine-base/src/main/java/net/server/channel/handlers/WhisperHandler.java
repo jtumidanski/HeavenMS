@@ -5,13 +5,13 @@ import java.util.Optional;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.autoban.AutoBanFactory;
+import database.DatabaseConnection;
 import database.provider.CharacterProvider;
 import config.YamlConfig;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.WhisperPacket;
 import net.server.channel.packet.reader.WhisperReader;
 import net.server.world.World;
-import database.DatabaseConnection;
 import tools.FilePrinter;
 import tools.LogHelper;
 import tools.PacketCreator;
@@ -29,15 +29,9 @@ public final class WhisperHandler extends AbstractPacketHandler<WhisperPacket> {
    @Override
    public void handlePacket(WhisperPacket packet, MapleClient client) {
       switch (packet.mode()) {
-         case 6:
-            whisper(packet, client);
-            break;
-         case 5:
-            find(packet, client);
-            break;
-         case 0x44:
-            buddyFind(packet, client);
-            break;
+         case 6 -> whisper(packet, client);
+         case 5 -> find(packet, client);
+         case 0x44 -> buddyFind(packet, client);
       }
    }
 
@@ -68,8 +62,8 @@ public final class WhisperHandler extends AbstractPacketHandler<WhisperPacket> {
          }
       }, () -> {
          if (client.getPlayer().isGM()) { // not found
-            Optional<Integer> gmLevel = DatabaseConnection.getInstance().withConnectionResultOpt(connection ->
-                  CharacterProvider.getInstance().getGmLevel(connection, packet.recipient()));
+            Optional<Integer> gmLevel = DatabaseConnection.getInstance().withConnectionResult(connection ->
+                  CharacterProvider.getInstance().getGmLevel(connection, packet.recipient()).orElse(0));
             if (gmLevel.isPresent() && gmLevel.get() >= client.getPlayer().gmLevel()) {
                PacketCreator.announce(client, new WhisperReply(packet.recipient(), (byte) 0));
                return;

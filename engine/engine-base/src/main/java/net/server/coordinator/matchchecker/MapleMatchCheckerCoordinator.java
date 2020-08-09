@@ -27,7 +27,7 @@ public class MapleMatchCheckerCoordinator {
    }
 
    private void unpoolMatchPlayers(Set<Integer> matchPlayers) {
-      matchPlayers.stream().forEach(pooledCharacterIds::remove);
+      matchPlayers.forEach(pooledCharacterIds::remove);
    }
 
    private boolean poolMatchPlayer(Integer cid) {

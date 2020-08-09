@@ -7,11 +7,11 @@ import net.opcodes.SendOpcode;
 import tools.packet.PacketInput;
 
 public class ApplyMonsterStatus implements PacketInput {
-   private int objectId;
+   private final int objectId;
 
-   private MonsterStatusEffect statusEffect;
+   private final MonsterStatusEffect statusEffect;
 
-   private List<Integer> reflection;
+   private final List<Integer> reflection;
 
    public ApplyMonsterStatus(int objectId, MonsterStatusEffect statusEffect, List<Integer> reflection) {
       this.objectId = objectId;

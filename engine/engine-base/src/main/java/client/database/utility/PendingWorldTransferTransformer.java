@@ -1,8 +1,8 @@
 package client.database.utility;
 
 import client.database.data.PendingWorldTransfers;
-import database.SqlTransformer;
 import entity.WorldTransfer;
+import transformer.SqlTransformer;
 
 public class PendingWorldTransferTransformer implements SqlTransformer<PendingWorldTransfers, WorldTransfer> {
    @Override

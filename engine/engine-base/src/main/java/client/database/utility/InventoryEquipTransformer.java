@@ -2,8 +2,8 @@ package client.database.utility;
 
 import client.database.data.GetInventoryItems;
 import client.inventory.Item;
-import database.SqlTransformer;
 import tools.Pair;
+import transformer.SqlTransformer;
 
 public class InventoryEquipTransformer implements SqlTransformer<Pair<Item, Integer>, GetInventoryItems> {
    @Override

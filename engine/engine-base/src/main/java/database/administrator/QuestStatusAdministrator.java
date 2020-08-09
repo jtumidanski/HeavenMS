@@ -3,8 +3,8 @@ package database.administrator;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import accessor.AbstractQueryExecutor;
 import client.MapleQuestStatus;
-import database.AbstractQueryExecutor;
 import database.DeleteForCharacter;
 import entity.quest.QuestStatus;
 

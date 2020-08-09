@@ -5,7 +5,7 @@ import server.maps.MapleHiredMerchant;
 import tools.packet.PacketInput;
 
 public class SpawnHiredMerchant implements PacketInput {
-   private MapleHiredMerchant hiredMerchant;
+   private final MapleHiredMerchant hiredMerchant;
 
    public SpawnHiredMerchant(MapleHiredMerchant hiredMerchant) {
       this.hiredMerchant = hiredMerchant;

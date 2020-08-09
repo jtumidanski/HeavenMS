@@ -34,26 +34,22 @@ public class InventoryPacketFactory extends AbstractPacketFactory {
          writer.write(mod.inventoryType());
          writer.writeShort(mod.mode() == 2 ? mod.oldPos() : mod.position());
          switch (mod.mode()) {
-            case 0: {//add item
+            case 0 -> {//add item
                addItemInfo(writer, mod.item(), true);
-               break;
             }
-            case 1: {//update quantity
+            case 1 -> {//update quantity
                writer.writeShort(mod.quantity());
-               break;
             }
-            case 2: {//move
+            case 2 -> {//move
                writer.writeShort(mod.position());
                if (mod.position() < 0 || mod.oldPos() < 0) {
                   addMovement = mod.oldPos() < 0 ? 1 : 2;
                }
-               break;
             }
-            case 3: {//remove
+            case 3 -> {//remove
                if (mod.position() < 0) {
                   addMovement = 2;
                }
-               break;
             }
          }
          mod.clear();

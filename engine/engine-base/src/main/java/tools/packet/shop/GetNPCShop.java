@@ -8,11 +8,11 @@ import server.MapleShopItem;
 import tools.packet.PacketInput;
 
 public class GetNPCShop implements PacketInput {
-   private MapleClient client;
+   private final MapleClient client;
 
-   private int shopId;
+   private final int shopId;
 
-   private List<MapleShopItem> shopItems;
+   private final List<MapleShopItem> shopItems;
 
    public GetNPCShop(MapleClient client, int shopId, List<MapleShopItem> shopItems) {
       this.client = client;

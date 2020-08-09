@@ -58,6 +58,7 @@ import server.maps.MapleMap;
 import server.maps.MapleMapObjectType;
 import server.maps.MapleSummon;
 import server.processor.maps.MapleMapObjectProcessor;
+import tools.I18nMessage;
 import tools.IntervalBuilder;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
@@ -65,7 +66,6 @@ import tools.PacketCreator;
 import tools.Pair;
 import tools.Randomizer;
 import tools.ServerNoticeType;
-import tools.I18nMessage;
 import tools.SimpleMessage;
 import tools.packet.PacketInput;
 import tools.packet.field.effect.PlaySound;
@@ -177,7 +177,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
    }
 
    private void initWithStats(MapleMonsterStats baseStats) {
-      stance_$eq(5);
+      setStance(5);
       this.stats = baseStats.copy();
       hp.set(stats.hp());
       mp = stats.mp();
@@ -280,7 +280,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
    }
 
    public synchronized void setStartingHp(int hp) {
-      stats.hp_$eq(hp);
+      stats = stats.setHp(hp);
       this.hp.set(hp);
    }
 
@@ -340,7 +340,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
    }
 
    public void setBoss(boolean boss) {
-      this.stats.isBoss_$eq(boss);
+      this.stats = this.stats.setBoss(boss);
    }
 
    public int getAnimationTime(String name) {
@@ -791,8 +791,8 @@ public class MapleMonster extends AbstractLoadedMapleLife {
 
                for (Integer mid : toSpawn) {
                   MapleLifeFactory.getMonster(mid).ifPresent(mob -> {
-                     mob.position_$eq(MapleMonster.this.position());
-                     mob.fh_$eq(fh());
+                     mob.setPosition(MapleMonster.this.position());
+                     mob.setFh(fh());
                      mob.setParentMobOid(MapleMonster.this.objectId());
 
                      if (dropsDisabled()) {
@@ -1336,9 +1336,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
 
    public void resetMobPosition(Point newPoint) {
       aggroRemoveController();
-
-      position_$eq(newPoint);
-
+      setPosition(newPoint);
       MasterBroadcaster.getInstance().sendToAllInMap(map, new MoveMonster(this.objectId(), false, -1, 0, 0, 0, this.position(), MapleMapObjectProcessor.getInstance().getIdleMovementBytes(this)));
       map.moveMonster(this, this.position());
 
@@ -1438,7 +1436,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
    }
 
    public List<Pair<Integer, Integer>> getSkills() {
-      return stats.getSkills();
+      return stats.skills();
    }
 
    public boolean hasSkill(int skillId, int level) {
@@ -1609,7 +1607,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
    }
 
    public boolean isFirstAttack() {
-      return this.stats.isFirstAttack();
+      return this.stats.firstAttack();
    }
 
    public int getBuffToGive() {
@@ -1634,14 +1632,14 @@ public class MapleMonster extends AbstractLoadedMapleLife {
          final Element fE = e;
          final ElementalEffectiveness fEE = stats.getEffectiveness(e);
          if (!fEE.equals(ElementalEffectiveness.WEAK)) {
-            stats.setEffectiveness(e, ee);
+            stats = stats.setEffectiveness(e, ee);
 
             MapleMap mmap = this.getMap();
             Runnable r = () -> {
                monsterLock.lock();
                try {
-                  stats.removeEffectiveness(fE);
-                  stats.setEffectiveness(fE, fEE);
+                  stats = stats.removeEffectiveness(fE);
+                  stats = stats.setEffectiveness(fE, fEE);
                } finally {
                   monsterLock.unlock();
                }
@@ -1665,7 +1663,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
    }
 
    public BanishInfo getBanish() {
-      return stats.banish().get();
+      return stats.banish();
    }
 
    public int getDropPeriodTime() {
@@ -1727,20 +1725,14 @@ public class MapleMonster extends AbstractLoadedMapleLife {
    }
 
    private float getDifficultyRate(final int difficulty) {
-      switch (difficulty) {
-         case 6:
-            return (7.7f);
-         case 5:
-            return (5.6f);
-         case 4:
-            return (3.2f);
-         case 3:
-            return (2.1f);
-         case 2:
-            return (1.4f);
-      }
-
-      return (1.0f);
+      return switch (difficulty) {
+         case 6 -> (7.7f);
+         case 5 -> (5.6f);
+         case 4 -> (3.2f);
+         case 3 -> (2.1f);
+         case 2 -> (1.4f);
+         default -> (1.0f);
+      };
    }
 
    private void changeLevelByDifficulty(final int difficulty, boolean pqMob) {

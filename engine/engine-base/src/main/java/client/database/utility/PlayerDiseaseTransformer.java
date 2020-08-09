@@ -1,8 +1,8 @@
 package client.database.utility;
 
 import client.database.data.PlayerDiseaseData;
-import database.SqlTransformer;
 import entity.PlayerDisease;
+import transformer.SqlTransformer;
 
 public class PlayerDiseaseTransformer implements SqlTransformer<PlayerDiseaseData, PlayerDisease> {
    @Override

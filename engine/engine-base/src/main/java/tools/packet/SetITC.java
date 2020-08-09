@@ -4,7 +4,7 @@ import client.MapleClient;
 import net.opcodes.SendOpcode;
 
 public class SetITC implements PacketInput {
-   private MapleClient client;
+   private final MapleClient client;
 
    public SetITC(MapleClient client) {
       this.client = client;

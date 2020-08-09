@@ -6,11 +6,11 @@ import server.MapleTrade;
 import tools.packet.PacketInput;
 
 public class GetTradeStart implements PacketInput {
-   private MapleCharacter character;
+   private final MapleCharacter character;
 
-   private MapleTrade trade;
+   private final MapleTrade trade;
 
-   private byte number;
+   private final byte number;
 
    public GetTradeStart(MapleCharacter character, MapleTrade trade, byte number) {
       this.character = character;

@@ -1,5 +1,7 @@
 package client.inventory;
 
+import java.util.Optional;
+
 import client.MapleCharacter;
 
 public class MapleInventoryProof extends MapleInventory {
@@ -35,20 +37,22 @@ public class MapleInventoryProof extends MapleInventory {
    }
 
    @Override
-   protected short addSlot(Item item) {
+   protected Optional<Item> addToSlot(Item item) {
       if (item == null) {
-         return -1;
+         return Optional.empty();
       }
 
       lock.lock();
       try {
+         Item itemWithSlot;
          short slotId = getNextFreeSlot();
          if (slotId < 0) {
-            return -1;
+            return Optional.empty();
          }
+         itemWithSlot = item.updatePosition(slotId);
          inventory.put(slotId, item);
 
-         return slotId;
+         return Optional.of(itemWithSlot);
       } finally {
          lock.unlock();
       }

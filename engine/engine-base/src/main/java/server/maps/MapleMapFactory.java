@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import database.DatabaseConnection;
 import database.provider.PlayerLifeProvider;
 import database.provider.PlayerNpcProvider;
 import provider.MapleData;
@@ -20,7 +21,6 @@ import server.life.MapleMonster;
 import server.life.MaplePlayerNPC;
 import server.life.MaplePlayerNPCFactory;
 import server.partyquest.GuardianSpawnPoint;
-import database.DatabaseConnection;
 import tools.StringUtil;
 
 public class MapleMapFactory {
@@ -74,8 +74,7 @@ public class MapleMapFactory {
 
    private static void loadLifeRaw(MapleMap map, int id, String type, int cy, int f, int fh, int rx0, int rx1, int x, int y, int hide, int mobTime, int team) {
       AbstractLoadedMapleLife myLife = loadLife(id, type, cy, f, fh, rx0, rx1, x, y, hide);
-      if (myLife instanceof MapleMonster) {
-         MapleMonster monster = (MapleMonster) myLife;
+      if (myLife instanceof MapleMonster monster) {
 
          if (mobTime == -1) { //does not respawn, force spawn once
             map.spawnMonster(monster);
@@ -162,17 +161,17 @@ public class MapleMapFactory {
                int x2 = MapleDataTool.getInt(footHold.getChildByPath("x2"));
                int y2 = MapleDataTool.getInt(footHold.getChildByPath("y2"));
                MapleFoothold fh = new MapleFoothold(new Point(x1, y1), new Point(x2, y2), Integer.parseInt(footHold.getName()));
-               if (fh.firstX() < lBound.x) {
-                  lBound.x = fh.firstX();
+               if (fh.firstPoint().x < lBound.x) {
+                  lBound.x = fh.firstPoint().x;
                }
-               if (fh.secondX() > uBound.x) {
-                  uBound.x = fh.secondX();
+               if (fh.secondPoint().x > uBound.x) {
+                  uBound.x = fh.secondPoint().x;
                }
-               if (fh.firstY() < lBound.y) {
-                  lBound.y = fh.firstY();
+               if (fh.firstPoint().y < lBound.y) {
+                  lBound.y = fh.firstPoint().y;
                }
-               if (fh.secondY() > uBound.y) {
-                  uBound.y = fh.secondY();
+               if (fh.secondPoint().y > uBound.y) {
+                  uBound.y = fh.secondPoint().y;
                }
                allFootholds.add(fh);
             }
@@ -220,8 +219,8 @@ public class MapleMapFactory {
             MapleData guardianGenData = mcData.getChildByPath("guardianGenPos");
             for (MapleData node : guardianGenData.getChildren()) {
                GuardianSpawnPoint pt = new GuardianSpawnPoint(new Point(MapleDataTool.getIntConvert("x", node), MapleDataTool.getIntConvert("y", node)));
-               pt.team_$eq(MapleDataTool.getIntConvert("team", node, -1));
-               pt.taken_$eq(false);
+               pt.setTeam(MapleDataTool.getIntConvert("team", node, -1));
+               pt.setTaken(false);
                map.addGuardianSpawnPoint(pt);
             }
             if (mcData.getChildByPath("skill") != null) {
@@ -298,14 +297,14 @@ public class MapleMapFactory {
 
    private static AbstractLoadedMapleLife loadLife(int id, String type, int cy, int f, int fh, int rx0, int rx1, int x, int y, int hide) {
       AbstractLoadedMapleLife myLife = MapleLifeFactory.getLife(id, type);
-      myLife.cy_$eq(cy);
-      myLife.f_$eq(f);
-      myLife.fh_$eq(fh);
-      myLife.rx0_$eq(rx0);
-      myLife.rx1_$eq(rx1);
-      myLife.position_$eq(new Point(x, y));
+      myLife.setCy(cy);
+      myLife.setF(f);
+      myLife.setFh(fh);
+      myLife.setRx0(rx0);
+      myLife.setRx1(rx1);
+      myLife.setPosition(new Point(x, y));
       if (hide == 1) {
-         myLife.hide_$eq(true);
+         myLife.setHide(true);
       }
       return myLife;
    }
@@ -315,7 +314,7 @@ public class MapleMapFactory {
       int x = MapleDataTool.getInt(reactor.getChildByPath("x"));
       int y = MapleDataTool.getInt(reactor.getChildByPath("y"));
       myReactor.setFacingDirection(FacingDirection);
-      myReactor.position_$eq(new Point(x, y));
+      myReactor.setPosition(new Point(x, y));
       myReactor.setDelay(MapleDataTool.getInt(reactor.getChildByPath("reactorTime")) * 1000);
       myReactor.setName(MapleDataTool.getString(reactor.getChildByPath("name"), ""));
       myReactor.resetReactorActions(0);

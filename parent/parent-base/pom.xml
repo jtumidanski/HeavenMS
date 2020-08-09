@@ -107,5 +107,16 @@
             <artifactId>jersey-media-json-jackson</artifactId>
             <version>${jersey.version}</version>
         </dependency>
+        <dependency>
+            <groupId>app-core</groupId>
+            <artifactId>app-database</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>app-core</groupId>
+            <artifactId>app-persistence</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 </project>

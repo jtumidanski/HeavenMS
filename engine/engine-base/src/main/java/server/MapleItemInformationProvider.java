@@ -2,7 +2,6 @@ package server;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -15,7 +14,6 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -29,6 +27,7 @@ import client.SkillFactory;
 import client.autoban.AutoBanFactory;
 import client.database.data.MakerCreateData;
 import client.inventory.Equip;
+import client.inventory.EquipBuilder;
 import client.inventory.Item;
 import client.inventory.MapleInventory;
 import client.inventory.MapleInventoryType;
@@ -58,6 +57,7 @@ import server.life.MapleLifeFactory;
 import server.life.MapleMonsterInformationProvider;
 import server.processor.StatEffectProcessor;
 import tools.FilePrinter;
+import tools.I18nMessage;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
@@ -65,7 +65,6 @@ import tools.Randomizer;
 import tools.ServerNoticeType;
 import tools.StringUtil;
 import tools.TriFunction;
-import tools.I18nMessage;
 import tools.packet.message.YellowTip;
 
 public class MapleItemInformationProvider {
@@ -83,7 +82,6 @@ public class MapleItemInformationProvider {
    protected Map<Integer, Short> slotMaxCache = new HashMap<>();
    protected Map<Integer, MapleStatEffect> itemEffects = new HashMap<>();
    protected Map<Integer, Map<String, Integer>> equipStatsCache = new HashMap<>();
-   protected Map<Integer, Equip> equipCache = new HashMap<>();
    protected Map<Integer, MapleData> equipLevelInfoCache = new HashMap<>();
    protected Map<Integer, Integer> equipLevelReqCache = new HashMap<>();
    protected Map<Integer, Integer> equipMaxLevelCache = new HashMap<>();
@@ -207,82 +205,58 @@ public class MapleItemInformationProvider {
       return Math.random() >= testYourLuck(propPercent / 100.0, YamlConfig.config.server.SCROLL_CHANCE_ROLLS);
    }
 
-   private static short getMaximumShortMaxIfOverflow(int value1, int value2) {
-      return (short) Math.min(Short.MAX_VALUE, Math.max(value1, value2));
-   }
+   public static Equip improveEquipStats(Equip nEquip, Map<String, Integer> stats) {
+      EquipBuilder builder = Equip.newBuilder(nEquip);
 
-   private static short getShortMaxIfOverflow(int value) {
-      return (short) Math.min(Short.MAX_VALUE, value);
-   }
-
-   private static short chaosScrollRandomizedStat(int range) {
-      return (short) Randomizer.rand(-range, range);
-   }
-
-   public static void improveEquipStats(Equip nEquip, Map<String, Integer> stats) {
       for (Entry<String, Integer> stat : stats.entrySet()) {
          switch (stat.getKey()) {
             case "STR":
-               nEquip.str_$eq(getShortMaxIfOverflow(nEquip.str() + stat.getValue()));
+               builder.increaseStr(stat.getValue());
                break;
             case "DEX":
-               nEquip.dex_$eq(getShortMaxIfOverflow(nEquip.dex() + stat.getValue()));
+               builder.increaseDex(stat.getValue());
                break;
             case "INT":
-               nEquip._int_$eq(getShortMaxIfOverflow(nEquip._int() + stat.getValue()));
+               builder.increaseIntelligence(stat.getValue());
                break;
             case "LUK":
-               nEquip.luk_$eq(getShortMaxIfOverflow(nEquip.luk() + stat.getValue()));
+               builder.increaseLuk(stat.getValue());
                break;
             case "PAD":
-               nEquip.watk_$eq(getShortMaxIfOverflow(nEquip.watk() + stat.getValue()));
+               builder.increaseWatk(stat.getValue());
                break;
             case "PDD":
-               nEquip.wdef_$eq(getShortMaxIfOverflow(nEquip.wdef() + stat.getValue()));
+               builder.increaseWdef(stat.getValue());
                break;
             case "MAD":
-               nEquip.matk_$eq(getShortMaxIfOverflow(nEquip.matk() + stat.getValue()));
+               builder.increaseMatk(stat.getValue());
                break;
             case "MDD":
-               nEquip.mdef_$eq(getShortMaxIfOverflow(nEquip.mdef() + stat.getValue()));
+               builder.increaseMdef(stat.getValue());
                break;
             case "ACC":
-               nEquip.acc_$eq(getShortMaxIfOverflow(nEquip.acc() + stat.getValue()));
+               builder.increaseAcc(stat.getValue());
                break;
             case "EVA":
-               nEquip.avoid_$eq(getShortMaxIfOverflow(nEquip.avoid() + stat.getValue()));
+               builder.increaseAvoid(stat.getValue());
                break;
             case "Speed":
-               nEquip.speed_$eq(getShortMaxIfOverflow(nEquip.speed() + stat.getValue()));
+               builder.increaseSpeed(stat.getValue());
                break;
             case "Jump":
-               nEquip.jump_$eq(getShortMaxIfOverflow(nEquip.jump() + stat.getValue()));
+               builder.increaseJump(stat.getValue());
                break;
             case "MHP":
-               nEquip.hp_$eq(getShortMaxIfOverflow(nEquip.hp() + stat.getValue()));
+               builder.increaseHp(stat.getValue());
                break;
             case "MMP":
-               nEquip.mp_$eq(getShortMaxIfOverflow(nEquip.mp() + stat.getValue()));
+               builder.increaseMp(stat.getValue());
                break;
             case "afterImage":
                break;
          }
       }
-   }
-
-   private static short getRandStat(int defaultValue, int maxRange) {
-      if (defaultValue == 0) {
-         return 0;
-      }
-      int lMaxRange = (int) Math.min(Math.ceil(defaultValue * 0.1), maxRange);
-      return (short) ((defaultValue - lMaxRange) + Math.floor(Randomizer.nextDouble() * (lMaxRange * 2 + 1)));
-   }
-
-   private static short getRandUpgradedStat(int defaultValue, int maxRange) {
-      if (defaultValue == 0) {
-         return 0;
-      }
-      return (short) (defaultValue + Math.floor(Randomizer.nextDouble() * (maxRange + 1)));
+      return builder.build();
    }
 
    private static int getCrystalForLevel(int level) {
@@ -293,22 +267,15 @@ public class MapleItemInformationProvider {
       } else if (range > 11) {
          return 4260008;
       } else {
-         switch (range) {
-            case 5:
-               return 4260001;
-            case 6:
-               return 4260002;
-            case 7:
-               return 4260003;
-            case 8:
-               return 4260004;
-            case 9:
-               return 4260005;
-            case 10:
-               return 4260006;
-            default:
-               return 4260007;
-         }
+         return switch (range) {
+            case 5 -> 4260001;
+            case 6 -> 4260002;
+            case 7 -> 4260003;
+            case 8 -> 4260004;
+            case 9 -> 4260005;
+            case 10 -> 4260006;
+            default -> 4260007;
+         };
       }
    }
 
@@ -664,113 +631,8 @@ public class MapleItemInformationProvider {
       return type[cat - 30];
    }
 
-   protected void applyChaos(Supplier<Integer> getter, Consumer<Integer> setter, int range) {
-      if (getter.get() > 0) {
-         if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-            setter.accept((int) getMaximumShortMaxIfOverflow(getter.get(), (getter.get() + chaosScrollRandomizedStat(range))));
-         } else {
-            setter.accept((int) getMaximumShortMaxIfOverflow(0, (getter.get() + chaosScrollRandomizedStat(range))));
-         }
-      }
-   }
-
-   protected int evaluateChaos(Supplier<Integer> getter, int baseValue, int range) {
-      int temp;
-      if (getter.get() > 0) {
-         if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-            temp = baseValue + chaosScrollRandomizedStat(range);
-         } else {
-            temp = getter.get() + chaosScrollRandomizedStat(range);
-         }
-
-         baseValue = getMaximumShortMaxIfOverflow(temp, baseValue);
-      }
-      return baseValue;
-   }
-
-   public void scrollOptionEquipWithChaos(Equip equip, int range, boolean option) {
-      if (!option) {
-         applyChaos(equip::str, equip::str_$eq, range);
-         applyChaos(equip::dex, equip::dex_$eq, range);
-         applyChaos(equip::_int, equip::_int_$eq, range);
-         applyChaos(equip::luk, equip::luk_$eq, range);
-         applyChaos(equip::acc, equip::acc_$eq, range);
-         applyChaos(equip::avoid, equip::avoid_$eq, range);
-      } else {
-         applyChaos(equip::watk, equip::watk_$eq, range);
-         applyChaos(equip::wdef, equip::wdef_$eq, range);
-         applyChaos(equip::matk, equip::matk_$eq, range);
-         applyChaos(equip::mdef, equip::mdef_$eq, range);
-         applyChaos(equip::speed, equip::speed_$eq, range);
-         applyChaos(equip::jump, equip::jump_$eq, range);
-         applyChaos(equip::hp, equip::hp_$eq, range);
-         applyChaos(equip::mp, equip::mp_$eq, range);
-      }
-   }
-
-   private static class AttributePair {
-      private int currentValue;
-
-      private Supplier<Integer> getter;
-
-      private Consumer<Integer> setter;
-
-      public AttributePair(Supplier<Integer> getter, Consumer<Integer> setter) {
-         this.getter = getter;
-         this.setter = setter;
-         this.currentValue = 0;
-      }
-
-      public int getCurrentValue() {
-         return currentValue;
-      }
-
-      public void setCurrentValue(int currentValue) {
-         this.currentValue = currentValue;
-      }
-
-      public Supplier<Integer> getGetter() {
-         return getter;
-      }
-
-      public Consumer<Integer> getSetter() {
-         return setter;
-      }
-   }
-
-   private void scrollEquipWithChaos(Equip nEquip, int range) {
-         List<AttributePair> attributes = Arrays.asList(
-               new AttributePair(nEquip::str, nEquip::str_$eq),
-               new AttributePair(nEquip::dex, nEquip::dex_$eq),
-               new AttributePair(nEquip::_int, nEquip::_int_$eq),
-               new AttributePair(nEquip::luk, nEquip::luk_$eq),
-               new AttributePair(nEquip::watk, nEquip::watk_$eq),
-               new AttributePair(nEquip::wdef, nEquip::wdef_$eq),
-               new AttributePair(nEquip::matk, nEquip::matk_$eq),
-               new AttributePair(nEquip::mdef, nEquip::mdef_$eq),
-               new AttributePair(nEquip::acc, nEquip::acc_$eq),
-               new AttributePair(nEquip::avoid, nEquip::avoid_$eq),
-               new AttributePair(nEquip::speed, nEquip::speed_$eq),
-               new AttributePair(nEquip::jump, nEquip::jump_$eq),
-               new AttributePair(nEquip::hp, nEquip::hp_$eq),
-               new AttributePair(nEquip::mp, nEquip::mp_$eq)
-         );
-
-      if (YamlConfig.config.server.CHSCROLL_STAT_RATE > 0) {
-         if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-            attributes.forEach(pair -> pair.setCurrentValue(pair.getGetter().get()));
-         } else {
-            attributes.forEach(pair -> pair.setCurrentValue(Short.MIN_VALUE));
-         }
-
-         for (int i = 0; i < YamlConfig.config.server.CHSCROLL_STAT_RATE; i++) {
-            attributes.forEach(pair -> pair.setCurrentValue(evaluateChaos(pair.getGetter(), pair.getCurrentValue(), range)));
-         }
-
-         attributes.forEach(pair -> pair.getSetter().accept(Math.max(0, pair.getCurrentValue())));
-      } else {
-         attributes.forEach(pair -> applyChaos(pair.getGetter(), pair.getSetter(), range));
-      }
+   public Equip scrollOptionEquipWithChaos(Equip equip, int range, boolean option) {
+      return Equip.newBuilder(equip).withChaos(range, option).build();
    }
 
    public boolean canUseCleanSlate(Equip equip) {
@@ -809,18 +671,18 @@ public class MapleItemInformationProvider {
                switch (scrollId) {
                   case 2040727:
                      flag |= ItemConstants.SPIKES;
-                     ItemProcessor.getInstance().setFlag(nEquip, (byte) flag);
+                     nEquip = Equip.newBuilder(nEquip).setFlag(ItemProcessor.getInstance().setFlag(nEquip.id(), (byte) flag)).build();
                      break;
                   case 2041058:
                      flag |= ItemConstants.COLD;
-                     ItemProcessor.getInstance().setFlag(nEquip, (byte) flag);
+                     nEquip = Equip.newBuilder(nEquip).setFlag(ItemProcessor.getInstance().setFlag(nEquip.id(), (byte) flag)).build();
                      break;
                   case 2049000:
                   case 2049001:
                   case 2049002:
                   case 2049003:
                      if (canUseCleanSlate(nEquip)) {
-                        nEquip.slots_$eq((byte) (nEquip.slots() + 1));
+                        nEquip = Equip.newBuilder(nEquip).setSlots((byte) (nEquip.slots() + 1)).build();
                      }
                      break;
                   case 2049100:
@@ -834,113 +696,85 @@ public class MapleItemInformationProvider {
                      break;
                }
                if (!ItemConstants.isCleanSlate(scrollId)) {
+                  EquipBuilder builder = Equip.newBuilder(nEquip);
                   if (!assertGM && !ItemConstants.isModifierScroll(scrollId)) {
-                     nEquip.slots_$eq((byte) (nEquip.slots() - 1));
+                     builder.setSlots((byte) (nEquip.slots() - 1));
                   }
-                  nEquip.level_$eq((byte) (nEquip.level() + 1));
+                  builder.setLevel((byte) (nEquip.level() + 1));
+                  nEquip = builder.build();
                }
             } else {
                if (!YamlConfig.config.server.USE_PERFECT_SCROLLING && !usingWhiteScroll && !ItemConstants.isCleanSlate(scrollId) && !assertGM && !ItemConstants.isModifierScroll(scrollId)) {
-                  nEquip.slots_$eq((byte) (nEquip.slots() - 1));
+                  nEquip = Equip.newBuilder(nEquip).setSlots((byte) (nEquip.slots() - 1)).build();
                }
                if (Randomizer.nextInt(100) < stats.get("cursed")) {
                   return null;
                }
             }
          }
+         equip = nEquip;
       }
       return equip;
    }
 
-   public Item getEquipById(int equipId) {
+   public Equip scrollEquipWithChaos(Equip nEquip, int range) {
+      return Equip.newBuilder(nEquip).withChaos(range).build();
+   }
+
+   public Equip getEquipById(int equipId) {
       return getEquipById(equipId, -1);
    }
 
-   private Item getEquipById(int equipId, int ringId) {
+   private Equip getEquipById(int equipId, int ringId) {
       boolean isElemental = (MapleItemInformationProvider.getInstance().getEquipLevel(equipId, false) > 1);
-      Equip nEquip = new Equip(equipId, (byte) 0, ringId, isElemental);
-      nEquip.quantity_$eq((short) 1);
+
+      EquipBuilder builder = Equip.newBuilder(equipId)
+            .setPosition((short) 0)
+            .setSlots(ringId)
+            .setElemental(isElemental)
+            .setQuantity((short) 1);
+
       Map<String, Integer> stats = this.getEquipStats(equipId);
       if (stats != null) {
          for (Entry<String, Integer> stat : stats.entrySet()) {
             if (stat.getKey().equals("STR")) {
-               nEquip.str_$eq((short) stat.getValue().intValue());
+               builder.setStr((short) stat.getValue().intValue());
             } else if (stat.getKey().equals("DEX")) {
-               nEquip.dex_$eq((short) stat.getValue().intValue());
+               builder.setDex((short) stat.getValue().intValue());
             } else if (stat.getKey().equals("INT")) {
-               nEquip._int_$eq((short) stat.getValue().intValue());
+               builder.setIntelligence((short) stat.getValue().intValue());
             } else if (stat.getKey().equals("LUK")) {
-               nEquip.luk_$eq((short) stat.getValue().intValue());
+               builder.setLuk((short) stat.getValue().intValue());
             } else if (stat.getKey().equals("PAD")) {
-               nEquip.watk_$eq((short) stat.getValue().intValue());
+               builder.setWatk((short) stat.getValue().intValue());
             } else if (stat.getKey().equals("PDD")) {
-               nEquip.wdef_$eq((short) stat.getValue().intValue());
+               builder.setWdef((short) stat.getValue().intValue());
             } else if (stat.getKey().equals("MAD")) {
-               nEquip.matk_$eq((short) stat.getValue().intValue());
+               builder.setMatk((short) stat.getValue().intValue());
             } else if (stat.getKey().equals("MDD")) {
-               nEquip.mdef_$eq((short) stat.getValue().intValue());
+               builder.setMdef((short) stat.getValue().intValue());
             } else if (stat.getKey().equals("ACC")) {
-               nEquip.acc_$eq((short) stat.getValue().intValue());
+               builder.setAcc((short) stat.getValue().intValue());
             } else if (stat.getKey().equals("EVA")) {
-               nEquip.avoid_$eq((short) stat.getValue().intValue());
+               builder.setAvoid((short) stat.getValue().intValue());
             } else if (stat.getKey().equals("Speed")) {
-               nEquip.speed_$eq((short) stat.getValue().intValue());
+               builder.setSpeed((short) stat.getValue().intValue());
             } else if (stat.getKey().equals("Jump")) {
-               nEquip.jump_$eq((short) stat.getValue().intValue());
+               builder.setJump((short) stat.getValue().intValue());
             } else if (stat.getKey().equals("MHP")) {
-               nEquip.hp_$eq((short) stat.getValue().intValue());
+               builder.setHp((short) stat.getValue().intValue());
             } else if (stat.getKey().equals("MMP")) {
-               nEquip.mp_$eq((short) stat.getValue().intValue());
+               builder.setMp((short) stat.getValue().intValue());
             } else if (stat.getKey().equals("tuc")) {
-               nEquip.slots_$eq((byte) stat.getValue().intValue());
+               builder.setSlots((byte) stat.getValue().intValue());
             } else if (isUntradeableRestricted(equipId)) {
-               short flag = nEquip.flag();
-               flag |= ItemConstants.UNTRADEABLE;
-               ItemProcessor.getInstance().setFlag(nEquip, flag);
+               builder.orFlag(ItemConstants.UNTRADEABLE);
             } else if (stats.get("fs") > 0) {
-               short flag = nEquip.flag();
-               flag |= ItemConstants.SPIKES;
-               ItemProcessor.getInstance().setFlag(nEquip, flag);
-               equipCache.put(equipId, nEquip);
+               builder.orFlag(ItemConstants.SPIKES);
             }
          }
       }
-      return nEquip.copy();
-   }
-
-   public Equip randomizeStats(Equip equip) {
-      equip.str_$eq(getRandStat(equip.str(), 5));
-      equip.dex_$eq(getRandStat(equip.dex(), 5));
-      equip._int_$eq(getRandStat(equip._int(), 5));
-      equip.luk_$eq(getRandStat(equip.luk(), 5));
-      equip.matk_$eq(getRandStat(equip.matk(), 5));
-      equip.watk_$eq(getRandStat(equip.watk(), 5));
-      equip.acc_$eq(getRandStat(equip.acc(), 5));
-      equip.avoid_$eq(getRandStat(equip.avoid(), 5));
-      equip.jump_$eq(getRandStat(equip.jump(), 5));
-      equip.speed_$eq(getRandStat(equip.speed(), 5));
-      equip.wdef_$eq(getRandStat(equip.wdef(), 10));
-      equip.mdef_$eq(getRandStat(equip.mdef(), 10));
-      equip.hp_$eq(getRandStat(equip.hp(), 10));
-      equip.mp_$eq(getRandStat(equip.mp(), 10));
-      return equip;
-   }
-
-   public Equip randomizeUpgradeStats(Equip equip) {
-      equip.str_$eq(getRandUpgradedStat(equip.str(), 2));
-      equip.dex_$eq(getRandUpgradedStat(equip.dex(), 2));
-      equip._int_$eq(getRandUpgradedStat(equip._int(), 2));
-      equip.luk_$eq(getRandUpgradedStat(equip.luk(), 2));
-      equip.matk_$eq(getRandUpgradedStat(equip.matk(), 2));
-      equip.watk_$eq(getRandUpgradedStat(equip.watk(), 2));
-      equip.acc_$eq(getRandUpgradedStat(equip.acc(), 2));
-      equip.avoid_$eq(getRandUpgradedStat(equip.avoid(), 2));
-      equip.jump_$eq(getRandUpgradedStat(equip.jump(), 2));
-      equip.wdef_$eq(getRandUpgradedStat(equip.wdef(), 5));
-      equip.mdef_$eq(getRandUpgradedStat(equip.mdef(), 5));
-      equip.hp_$eq(getRandUpgradedStat(equip.hp(), 5));
-      equip.mp_$eq(getRandUpgradedStat(equip.mp(), 5));
-      return equip;
+      return builder.build();
    }
 
    public MapleStatEffect getItemEffect(int itemId) {
@@ -1260,20 +1094,10 @@ public class MapleItemInformationProvider {
    }
 
    public final boolean isTwoHanded(int itemId) {
-      switch (getWeaponType(itemId)) {
-         case GENERAL2H_SWING:
-         case BOW:
-         case CLAW:
-         case CROSSBOW:
-         case POLE_ARM_SWING:
-         case SPEAR_STAB:
-         case SWORD2H:
-         case GUN:
-         case KNUCKLE:
-            return true;
-         default:
-            return false;
-      }
+      return switch (getWeaponType(itemId)) {
+         case GENERAL2H_SWING, BOW, CLAW, CROSSBOW, POLE_ARM_SWING, SPEAR_STAB, SWORD2H, GUN, KNUCKLE -> true;
+         default -> false;
+      };
    }
 
    public boolean isCash(int itemId) {
@@ -1290,9 +1114,8 @@ public class MapleItemInformationProvider {
    }
 
    public boolean isUpgradeable(int itemId) {
-      Item it = this.getEquipById(itemId);
-      Equip eq = (Equip) it;
-      return (eq.slots() > 0 || eq.str() > 0 || eq.dex() > 0 || eq._int() > 0 || eq.luk() > 0 ||
+      Equip eq = this.getEquipById(itemId);
+      return (eq.slots() > 0 || eq.str() > 0 || eq.dex() > 0 || eq.intelligence() > 0 || eq.luk() > 0 ||
             eq.watk() > 0 || eq.matk() > 0 || eq.wdef() > 0 || eq.mdef() > 0 || eq.acc() > 0 ||
             eq.avoid() > 0 || eq.speed() > 0 || eq.jump() > 0 || eq.hp() > 0 || eq.mp() > 0);
    }
@@ -1304,6 +1127,7 @@ public class MapleItemInformationProvider {
       return YamlConfig.config.server.USE_ENFORCE_UNMERCHABLE_PET && ItemConstants.isPet(itemId);
    }
 
+   //TODO JDT update equip?
    public Collection<Item> canWearEquipment(MapleCharacter chr, Collection<Item> items) {
       MapleInventory inv = chr.getInventory(MapleInventoryType.EQUIPPED);
       if (inv.checked()) {
@@ -1312,7 +1136,7 @@ public class MapleItemInformationProvider {
       Collection<Item> itemz = new LinkedList<>();
       if (chr.getJob() == MapleJob.SUPER_GM || chr.getJob() == MapleJob.GM) {
          items.stream().map(item -> (Equip) item).forEach(equip -> {
-            equip.wearing_$eq(true);
+            equip = Equip.newBuilder(equip).setWearing(true).build();
             itemz.add(equip);
          });
          return itemz;
@@ -1325,7 +1149,7 @@ public class MapleItemInformationProvider {
             tdex += equip.dex();
             tstr += equip.str();
             tluk += equip.luk();
-            tint += equip._int();
+            tint += equip.intelligence();
          }
       }
       for (Item item : items) {
@@ -1355,13 +1179,14 @@ public class MapleItemInformationProvider {
                continue;
             }
          }
-         equip.wearing_$eq(true);
+         equip = Equip.newBuilder(equip).setWearing(true).build();
          itemz.add(equip);
       }
       inv.checked(true);
       return itemz;
    }
 
+   //TODO JDT update equip
    public boolean canWearEquipment(MapleCharacter chr, Equip equip, int dst) {
       int id = equip.id();
 
@@ -1372,7 +1197,7 @@ public class MapleItemInformationProvider {
 
       String equipmentSlot = getEquipmentSlot(id);
       if (!EquipSlot.getFromTextSlot(equipmentSlot).isAllowed(dst, isCash(id))) {
-         equip.wearing_$eq(false);
+         equip = Equip.newBuilder(equip).setWearing(false).build();
          String itemName = MapleItemInformationProvider.getInstance().getName(equip.id());
          Server.getInstance().broadcastGMMessage(chr.getWorld(), PacketCreator.create(new YellowTip("[Warning]: " + chr.getName() + " tried to equip " + itemName + " into slot " + dst + ".")));
          AutoBanFactory.PACKET_EDIT.alert(chr, chr.getName() + " tried to forcibly equip an item.");
@@ -1381,7 +1206,7 @@ public class MapleItemInformationProvider {
       }
 
       if (chr.getJob() == MapleJob.SUPER_GM || chr.getJob() == MapleJob.GM) {
-         equip.wearing_$eq(true);
+         equip = Equip.newBuilder(equip).setWearing(true).build();
          return true;
       }
 
@@ -1412,10 +1237,10 @@ public class MapleItemInformationProvider {
       }
 
       if (i > 0) {
-         equip.wearing_$eq(false);
+         equip = Equip.newBuilder(equip).setWearing(false).build();
          return false;
       }
-      equip.wearing_$eq(true);
+      equip = Equip.newBuilder(equip).setWearing(true).build();
       return true;
    }
 

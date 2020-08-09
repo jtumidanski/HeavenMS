@@ -5,16 +5,16 @@ import java.awt.Point;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
+import database.DatabaseConnection;
 import database.administrator.PlayerLifeAdministrator;
 import net.server.channel.Channel;
 import server.life.MapleLifeFactory;
 import server.life.MapleNPC;
 import server.maps.MapleMap;
-import database.DatabaseConnection;
+import tools.I18nMessage;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
-import tools.I18nMessage;
 import tools.packet.spawn.SpawnNPC;
 
 public class PnpcCommand extends Command {
@@ -52,11 +52,11 @@ public class PnpcCommand extends Command {
 
          for (Channel ch : player.getWorldServer().getChannels()) {
             npc = MapleLifeFactory.getNPC(npcId);
-            npc.position_$eq(checkPosition);
-            npc.cy_$eq(yPosition);
-            npc.rx0_$eq(xPosition + 50);
-            npc.rx1_$eq(xPosition - 50);
-            npc.fh_$eq(fh);
+            npc.setPosition(checkPosition);
+            npc.setCy(yPosition);
+            npc.setRx0(xPosition + 50);
+            npc.setRx1(xPosition - 50);
+            npc.setFh(fh);
 
             MapleMap map = ch.getMapFactory().getMap(mapId);
             map.addMapObject(npc);

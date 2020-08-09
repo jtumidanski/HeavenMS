@@ -9,7 +9,6 @@ import client.MapleSkinColor;
 import client.Skill;
 import client.SkillFactory;
 import client.inventory.Item;
-import client.inventory.MapleInventory;
 import client.inventory.MapleInventoryType;
 import client.processor.CharacterProcessor;
 import config.YamlConfig;
@@ -17,6 +16,7 @@ import constants.skills.Magician;
 import constants.skills.Warrior;
 import net.server.Server;
 import server.MapleItemInformationProvider;
+import server.events.RescueGaga;
 import tools.FilePrinter;
 import tools.PacketCreator;
 import tools.packet.AddNewCharacter;
@@ -57,13 +57,13 @@ public class CharacterFactory {
       int[] equips = {1040067, 1041054, 1060056, 1061050, 1072081};
       int[] weapons = {1452005, 1462000};
       int[] startingHpMp = {797, 404};
-      CharacterFactoryRecipe recipe = new CharacterFactoryRecipe(MapleJob.BOWMAN, 30, 100000000, equips[gender], equips[2 + gender], equips[4], weapons[0]);
-      recipe.dex_$eq(25);
-      recipe.remainingAp_$eq(133);
-      recipe.remainingSp_$eq(61);
-      recipe.maxHp_$eq(startingHpMp[0]);
-      recipe.maxMp_$eq(startingHpMp[1]);
-      recipe.meso_$eq(100000);
+      CharacterFactoryRecipe recipe = new CharacterFactoryRecipe(MapleJob.BOWMAN, 30, 100000000, equips[gender], equips[2 + gender], equips[4], weapons[0])
+            .setDex(25)
+            .setRemainingAp(133)
+            .setRemainingSp(61)
+            .setMaxHp(startingHpMp[0])
+            .setMaxMp(startingHpMp[1])
+            .setMeso(100000);
       for (int i = 1; i < weapons.length; i++) {
          giveEquipment(recipe, weapons[i]);
       }
@@ -79,14 +79,13 @@ public class CharacterFactory {
       int[] startingHpMp = {405, 729};
       int[] mpGain = {0, 40, 80, 118, 156, 194, 230, 266, 302, 336, 370};
 
-      CharacterFactoryRecipe recipe = new CharacterFactoryRecipe(MapleJob.MAGICIAN, 30, 101000000, equips[gender], equips[2 + gender], equips[4], weapons[0]);
-
-      recipe.intelligence_$eq(20);
-      recipe.remainingAp_$eq(138);
-      recipe.remainingSp_$eq(67);
-      recipe.maxHp_$eq(startingHpMp[0]);
-      recipe.maxMp_$eq(startingHpMp[1] + mpGain[improveSp]);
-      recipe.meso_$eq(100000);
+      CharacterFactoryRecipe recipe = new CharacterFactoryRecipe(MapleJob.MAGICIAN, 30, 101000000, equips[gender], equips[2 + gender], equips[4], weapons[0])
+            .setIntelligence(20)
+            .setRemainingAp(138)
+            .setRemainingSp(67)
+            .setMaxMp(startingHpMp[0])
+            .setMaxMp(startingHpMp[1] + mpGain[improveSp])
+            .setMeso(100000);
 
       if (gender == 0) {
          giveEquipment(recipe, 1050003);
@@ -102,7 +101,7 @@ public class CharacterFactory {
 
       if (improveSp > 0) {
          improveSp += 5;
-         recipe.remainingSp_$eq(recipe.remainingSp() - improveSp);
+         recipe.increaseRemainingSp(-improveSp);
 
          int toUseSp = 5;
          Optional<Skill> improveMpRecovery = SkillFactory.getSkill(Magician.IMPROVED_MP_RECOVERY);
@@ -125,14 +124,13 @@ public class CharacterFactory {
       int[] equips = {0, 0, 0, 0, 1072294};
       int[] weapons = {1482004, 1492004};
       int[] startingHpMp = {846, 503};
-      CharacterFactoryRecipe recipe = new CharacterFactoryRecipe(MapleJob.PIRATE, 30, 120000000, equips[gender], equips[2 + gender], equips[4], weapons[0]);
-
-      recipe.dex_$eq(20);
-      recipe.remainingAp_$eq(138);
-      recipe.remainingSp_$eq(61);
-      recipe.maxHp_$eq(startingHpMp[0]);
-      recipe.maxMp_$eq(startingHpMp[1]);
-      recipe.meso_$eq(100000);
+      CharacterFactoryRecipe recipe = new CharacterFactoryRecipe(MapleJob.PIRATE, 30, 120000000, equips[gender], equips[2 + gender], equips[4], weapons[0])
+            .setDex(20)
+            .setRemainingAp(138)
+            .setRemainingSp(61)
+            .setMaxHp(startingHpMp[0])
+            .setMaxMp(startingHpMp[1])
+            .setMeso(100000);
 
       giveEquipment(recipe, 1052107);
 
@@ -152,13 +150,13 @@ public class CharacterFactory {
       int[] equips = {1040057, 1041047, 1060043, 1061043, 1072032};
       int[] weapons = {1472008, 1332012};
       int[] startingHpMp = {794, 407};
-      CharacterFactoryRecipe recipe = new CharacterFactoryRecipe(MapleJob.THIEF, 30, 103000000, equips[gender], equips[2 + gender], equips[4], weapons[0]);
-      recipe.dex_$eq(25);
-      recipe.remainingAp_$eq(133);
-      recipe.remainingSp_$eq(61);
-      recipe.maxHp_$eq(startingHpMp[0]);
-      recipe.maxMp_$eq(startingHpMp[1]);
-      recipe.meso_$eq(100000);
+      CharacterFactoryRecipe recipe = new CharacterFactoryRecipe(MapleJob.THIEF, 30, 103000000, equips[gender], equips[2 + gender], equips[4], weapons[0])
+            .setDex(25)
+            .setRemainingAp(133)
+            .setRemainingSp(61)
+            .setMaxHp(startingHpMp[0])
+            .setMaxMp(startingHpMp[1])
+            .setMeso(100000);
 
       for (int i = 1; i < weapons.length; i++) {
          giveEquipment(recipe, weapons[i]);
@@ -177,15 +175,13 @@ public class CharacterFactory {
       int[] weapons = {1302008, 1442001, 1422001, 1312005};
       int[] startingHpMp = {905, 208};
       int[] hpGain = {0, 72, 144, 212, 280, 348, 412, 476, 540, 600, 660};
-      CharacterFactoryRecipe recipe = new CharacterFactoryRecipe(MapleJob.WARRIOR, 30, 102000000, equips[gender], equips[2 + gender], equips[4], weapons[0]);
-      recipe.str_$eq(35);
-      recipe.remainingAp_$eq(123);
-      recipe.remainingSp_$eq(61);
-
-      recipe.maxHp_$eq(startingHpMp[0] + hpGain[improveSp]);
-      recipe.maxMp_$eq(startingHpMp[1]);
-
-      recipe.meso_$eq(100000);
+      CharacterFactoryRecipe recipe = new CharacterFactoryRecipe(MapleJob.WARRIOR, 30, 102000000, equips[gender], equips[2 + gender], equips[4], weapons[0])
+            .setStr(35)
+            .setRemainingAp(123)
+            .setRemainingSp(61)
+            .setMaxMp(startingHpMp[0] + hpGain[improveSp])
+            .setMaxMp(startingHpMp[1])
+            .setMeso(100000);
 
       if (gender == 1) {
          giveEquipment(recipe, 1051010);
@@ -197,7 +193,7 @@ public class CharacterFactory {
 
       if (improveSp > 0) {
          improveSp += 5;
-         recipe.remainingSp_$eq(recipe.remainingSp() - improveSp);
+         recipe.increaseRemainingSp(-improveSp);
 
          int toUseSp = 5;
          Skill improveHpRec = SkillFactory.getSkill(Warrior.IMPROVED_HP_RECOVERY).orElseThrow();
@@ -241,41 +237,11 @@ public class CharacterFactory {
       newCharacter.setName(name);
       newCharacter.setHair(hair);
       newCharacter.setFace(face);
+      newCharacter.getEvents().put("rescueGaga", new RescueGaga(0));
 
-      newCharacter.setLevel(recipe.level());
-      newCharacter.setJob(recipe.job());
-      newCharacter.setMapId(recipe.map());
+      recipe.apply(newCharacter);
 
-      MapleInventory equipped = newCharacter.getInventory(MapleInventoryType.EQUIPPED);
-      MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
-
-      int top = recipe.top(), bottom = recipe.bottom(), shoes = recipe.shoes(), weapon = recipe.weapon();
-
-      if (top > 0) {
-         Item eq_top = ii.getEquipById(top);
-         eq_top.position_((byte) -5);
-         equipped.addItemFromDB(eq_top);
-      }
-
-      if (bottom > 0) {
-         Item eq_bottom = ii.getEquipById(bottom);
-         eq_bottom.position_((byte) -6);
-         equipped.addItemFromDB(eq_bottom);
-      }
-
-      if (shoes > 0) {
-         Item eq_shoes = ii.getEquipById(shoes);
-         eq_shoes.position_((byte) -7);
-         equipped.addItemFromDB(eq_shoes);
-      }
-
-      if (weapon > 0) {
-         Item eq_weapon = ii.getEquipById(weapon);
-         eq_weapon.position_((byte) -11);
-         equipped.addItemFromDB(eq_weapon.copy());
-      }
-
-      if (!CharacterProcessor.getInstance().insertNewChar(newCharacter, recipe)) {
+      if (!CharacterProcessor.getInstance().insertNewChar(newCharacter)) {
          return -2;
       }
       PacketCreator.announce(c, new AddNewCharacter(newCharacter));

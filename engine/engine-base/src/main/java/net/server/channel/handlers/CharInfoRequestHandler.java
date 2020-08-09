@@ -19,9 +19,7 @@ public final class CharInfoRequestHandler extends AbstractPacketHandler<Characte
    public void handlePacket(CharacterInfoRequestPacket packet, MapleClient client) {
       MapleMapObject target = client.getPlayer().getMap().getMapObject(packet.characterId());
       if (target != null) {
-         if (target instanceof MapleCharacter) {
-            MapleCharacter player = (MapleCharacter) target;
-
+         if (target instanceof MapleCharacter player) {
             if (client.getPlayer().getId() != player.getId()) {
                player.exportExcludedItems(client);
             }

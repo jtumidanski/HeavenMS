@@ -7,8 +7,8 @@ import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import accessor.AbstractQueryExecutor;
 import client.MapleAbnormalStatus;
-import database.AbstractQueryExecutor;
 import database.DeleteForCharacter;
 import entity.PlayerDisease;
 import server.life.MobSkill;

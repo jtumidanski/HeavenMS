@@ -33,28 +33,13 @@ public final class SkillEffectHandler extends AbstractPacketHandler<SkillEffectP
    @Override
    public void handlePacket(SkillEffectPacket packet, MapleClient client) {
       switch (packet.skillId()) {
-         case FirePoisonMagician.EXPLOSION:
-         case FirePoisonArchMage.BIG_BANG:
-         case IceLighteningArchMagician.BIG_BANG:
-         case Bishop.BIG_BANG:
-         case BowMaster.HURRICANE:
-         case Marksman.PIERCING_ARROW:
-         case ChiefBandit.CHAKRA:
-         case Brawler.CORKSCREW_BLOW:
-         case Gunslinger.GRENADE:
-         case Corsair.RAPID_FIRE:
-         case WindArcher.HURRICANE:
-         case NightWalker.POISON_BOMB:
-         case ThunderBreaker.CORKSCREW_BLOW:
-         case Paladin.MONSTER_MAGNET:
-         case DarkKnight.MONSTER_MAGNET:
-         case Hero.MONSTER_MAGNET:
-         case Evan.FIRE_BREATH:
-         case Evan.ICE_BREATH:
-            MasterBroadcaster.getInstance().sendToAllInMap(client.getPlayer().getMap(), new ShowSkillEffect(client.getPlayer().getId(), packet.skillId(), packet.level(), packet.flags(), packet.speed(), packet.aids()), false, client.getPlayer());
-            return;
-         default:
-            System.out.println(client.getPlayer() + " entered SkillEffectHandler without being handled using " + packet.skillId() + ".");
+         case FirePoisonMagician.EXPLOSION, FirePoisonArchMage.BIG_BANG, IceLighteningArchMagician.BIG_BANG,
+               Bishop.BIG_BANG, BowMaster.HURRICANE, Marksman.PIERCING_ARROW, ChiefBandit.CHAKRA,
+               Brawler.CORKSCREW_BLOW, Gunslinger.GRENADE, Corsair.RAPID_FIRE, WindArcher.HURRICANE,
+               NightWalker.POISON_BOMB, ThunderBreaker.CORKSCREW_BLOW, Paladin.MONSTER_MAGNET,
+               DarkKnight.MONSTER_MAGNET, Hero.MONSTER_MAGNET, Evan.FIRE_BREATH,
+               Evan.ICE_BREATH -> MasterBroadcaster.getInstance().sendToAllInMap(client.getPlayer().getMap(), new ShowSkillEffect(client.getPlayer().getId(), packet.skillId(), packet.level(), packet.flags(), packet.speed(), packet.aids()), false, client.getPlayer());
+         default -> System.out.println(client.getPlayer() + " entered SkillEffectHandler without being handled using " + packet.skillId() + ".");
       }
    }
 }

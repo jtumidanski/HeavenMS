@@ -5,13 +5,13 @@ import java.awt.Point;
 public interface MapleMapObject {
    int objectId();
 
-   void objectId_$eq(int id);
+   void setObjectId(int id);
 
    MapleMapObjectType type();
 
    Point position();
 
-   void position_$eq(Point position);
+   void setPosition(Point position);
 
    void nullifyPosition();
 }

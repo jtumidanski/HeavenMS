@@ -22,8 +22,7 @@ public final class DamageSummonHandler extends AbstractPacketHandler<DamageSummo
       MapleCharacter player = client.getPlayer();
       MapleMapObject mmo = player.getMap().getMapObject(packet.objectId());
 
-      if (mmo instanceof MapleSummon) {
-         MapleSummon summon = (MapleSummon) mmo;
+      if (mmo instanceof MapleSummon summon) {
 
          summon.addHP(-packet.damage());
          if (summon.getHP() <= 0) {

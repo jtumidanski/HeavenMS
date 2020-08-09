@@ -4,7 +4,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
-import database.AbstractQueryExecutor;
+import accessor.AbstractQueryExecutor;
 
 public class WishListProvider extends AbstractQueryExecutor {
    private static WishListProvider instance;

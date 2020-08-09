@@ -87,39 +87,23 @@ public class MapleCharacterScheduler {
    }
 
    private ScheduledFuture<?> get(Type type) {
-      switch (type) {
-         case DRAGON_BLOOD:
-            return dragonBloodSchedule;
-         case HP_DECREASE:
-            return hpDecreaseTask;
-         case BEHODLER_HEAL:
-            return beholderHealingSchedule;
-         case BEHOLDER_BUFF:
-            return beholderBuffSchedule;
-         case BERSERK:
-            return berserkSchedule;
-         case SKILL_COOL_DOWN:
-            return skillCoolDownTask;
-         case BUFF_EXPIRE:
-            return buffExpireTask;
-         case ITEM_EXPIRE:
-            return itemExpireTask;
-         case DISEASE_EXPIRE:
-            return diseaseExpireTask;
-         case QUEST_EXPIRE:
-            return questExpireTask;
-         case RECOVERY:
-            return recoveryTask;
-         case EXTRA_RECOVERY:
-            return extraRecoveryTask;
-         case CHAIR_RECOVERY:
-            return chairRecoveryTask;
-         case PENDANT_OF_SPIRIT:
-            return pendantOfSpirit;
-         case CARNIVAL_PQ:
-            return cpqSchedule;
-      }
-      return null;
+      return switch (type) {
+         case DRAGON_BLOOD -> dragonBloodSchedule;
+         case HP_DECREASE -> hpDecreaseTask;
+         case BEHODLER_HEAL -> beholderHealingSchedule;
+         case BEHOLDER_BUFF -> beholderBuffSchedule;
+         case BERSERK -> berserkSchedule;
+         case SKILL_COOL_DOWN -> skillCoolDownTask;
+         case BUFF_EXPIRE -> buffExpireTask;
+         case ITEM_EXPIRE -> itemExpireTask;
+         case DISEASE_EXPIRE -> diseaseExpireTask;
+         case QUEST_EXPIRE -> questExpireTask;
+         case RECOVERY -> recoveryTask;
+         case EXTRA_RECOVERY -> extraRecoveryTask;
+         case CHAIR_RECOVERY -> chairRecoveryTask;
+         case PENDANT_OF_SPIRIT -> pendantOfSpirit;
+         case CARNIVAL_PQ -> cpqSchedule;
+      };
    }
 
    private void set(Type type, ScheduledFuture<?> future) {

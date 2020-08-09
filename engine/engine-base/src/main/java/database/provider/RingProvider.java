@@ -5,8 +5,8 @@ import java.util.Optional;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
+import accessor.AbstractQueryExecutor;
 import client.Ring;
-import database.AbstractQueryExecutor;
 import client.database.utility.RingTransformer;
 
 public class RingProvider extends AbstractQueryExecutor {

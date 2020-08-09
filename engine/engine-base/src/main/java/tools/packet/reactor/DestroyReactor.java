@@ -5,7 +5,7 @@ import server.maps.MapleReactor;
 import tools.packet.PacketInput;
 
 public class DestroyReactor implements PacketInput {
-   private MapleReactor reactor;
+   private final MapleReactor reactor;
 
    public DestroyReactor(MapleReactor reactor) {
       this.reactor = reactor;

@@ -152,44 +152,17 @@ public class BuffStatProcessor {
    }
 
    public boolean isSingletonStatup(MapleBuffStat mbs) {
-      switch (mbs) {           //HPREC and MPREC are supposed to be singleton
-         case COUPON_EXP1:
-         case COUPON_EXP2:
-         case COUPON_EXP3:
-         case COUPON_EXP4:
-         case COUPON_DRP1:
-         case COUPON_DRP2:
-         case COUPON_DRP3:
-         case MESO_UP_BY_ITEM:
-         case ITEM_UP_BY_ITEM:
-         case RESPECT_PLAYER_IMMUNE:
-         case RESPECT_MONSTER_IMMUNE:
-         case DEFENSE_ATT:
-         case DEFENSE_STATE:
-         case WEAPON_ATTACK:
-         case WEAPON_DEFENSE:
-         case MAGIC_ATTACK:
-         case MAGIC_DEFENSE:
-         case ACC:
-         case AVOID:
-         case SPEED:
-         case JUMP:
-            return false;
-
-         default:
-            return true;
-      }
+      //HPREC and MPREC are supposed to be singleton
+      return switch (mbs) {
+         case COUPON_EXP1, COUPON_EXP2, COUPON_EXP3, COUPON_EXP4, COUPON_DRP1, COUPON_DRP2, COUPON_DRP3, MESO_UP_BY_ITEM, ITEM_UP_BY_ITEM, RESPECT_PLAYER_IMMUNE, RESPECT_MONSTER_IMMUNE, DEFENSE_ATT, DEFENSE_STATE, WEAPON_ATTACK, WEAPON_DEFENSE, MAGIC_ATTACK, MAGIC_DEFENSE, ACC, AVOID, SPEED, JUMP -> false;
+         default -> true;
+      };
    }
 
    public boolean isPriorityBuffSourceId(int sourceId) {
-      switch(sourceId) {
-         case -2022631:
-         case -2022632:
-         case -2022633:
-            return true;
-
-         default:
-            return false;
-      }
+      return switch (sourceId) {
+         case -2022631, -2022632, -2022633 -> true;
+         default -> false;
+      };
    }
 }

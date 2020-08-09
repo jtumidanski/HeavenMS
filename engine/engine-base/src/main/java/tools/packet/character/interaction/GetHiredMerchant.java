@@ -6,11 +6,11 @@ import server.maps.MapleHiredMerchant;
 import tools.packet.PacketInput;
 
 public class GetHiredMerchant implements PacketInput {
-   private MapleCharacter character;
+   private final MapleCharacter character;
 
-   private MapleHiredMerchant hiredMerchant;
+   private final MapleHiredMerchant hiredMerchant;
 
-   private boolean firstTime;
+   private final boolean firstTime;
 
    public GetHiredMerchant(MapleCharacter character, MapleHiredMerchant hiredMerchant, boolean firstTime) {
       this.character = character;

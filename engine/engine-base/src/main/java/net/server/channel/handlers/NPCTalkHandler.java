@@ -40,8 +40,7 @@ public final class NPCTalkHandler extends AbstractPacketHandler<NPCTalkPacket> {
    @Override
    public void handlePacket(NPCTalkPacket packet, MapleClient client) {
       MapleMapObject obj = client.getPlayer().getMap().getMapObject(packet.objectId());
-      if (obj instanceof MapleNPC) {
-         MapleNPC npc = (MapleNPC) obj;
+      if (obj instanceof MapleNPC npc) {
          if (YamlConfig.config.server.USE_DEBUG) {
             MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("NPC_TALK").with(npc.id()));
          }
@@ -73,8 +72,7 @@ public final class NPCTalkHandler extends AbstractPacketHandler<NPCTalkPacket> {
                }
             }
          }
-      } else if (obj instanceof MaplePlayerNPC) {
-         MaplePlayerNPC playerNPC = (MaplePlayerNPC) obj;
+      } else if (obj instanceof MaplePlayerNPC playerNPC) {
          NPCScriptManager nsm = NPCScriptManager.getInstance();
 
          if (playerNPC.getScriptId() < 9977777 && !nsm.isNpcScriptAvailable(client, "" + playerNPC.getScriptId())) {

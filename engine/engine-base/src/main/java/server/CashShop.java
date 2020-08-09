@@ -8,11 +8,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.locks.Lock;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import client.inventory.BetterItemFactory;
 import client.inventory.Equip;
 import client.inventory.Item;
 import client.inventory.MapleInventoryType;
+import client.inventory.MaplePet;
 import client.processor.PetProcessor;
 import config.YamlConfig;
 import constants.inventory.ItemConstants;
@@ -42,29 +44,20 @@ public class CashShop {
    }
 
    public int getCash(int type) {
-      switch (type) {
-         case 1:
-            return nxCredit;
-         case 2:
-            return maplePoint;
-         case 4:
-            return nxPrepaid;
-      }
+      return switch (type) {
+         case 1 -> nxCredit;
+         case 2 -> maplePoint;
+         case 4 -> nxPrepaid;
+         default -> 0;
+      };
 
-      return 0;
    }
 
    public void gainCash(int type, int cash) {
       switch (type) {
-         case 1:
-            nxCredit += cash;
-            break;
-         case 2:
-            maplePoint += cash;
-            break;
-         case 4:
-            nxPrepaid += cash;
-            break;
+         case 1 -> nxCredit += cash;
+         case 2 -> maplePoint += cash;
+         case 4 -> nxPrepaid += cash;
       }
    }
 
@@ -109,6 +102,16 @@ public class CashShop {
       }
 
       return null;
+   }
+
+   public void updateInventory(Item item) {
+      lock.lock();
+      try {
+         inventory = Stream.concat(inventory.stream().filter(i -> i.id() != item.id()), Stream.of(item))
+               .collect(Collectors.toList());
+      } finally {
+         lock.unlock();
+      }
    }
 
    public void addToInventory(Item item) {
@@ -179,8 +182,8 @@ public class CashShop {
                     /* if(NOT ENOUGH SPACE) { looks like we're not dealing with cash inventory limit whatsoever, k then
                         return null;
                     } */
-
-               css.quantity_$eq((short) (css.quantity() - 1));
+               css = css.setQuantity((short) (css.quantity() - 1));
+               updateInventory(css);
             } else {
                removeFromInventory(css);
             }
@@ -244,28 +247,34 @@ public class CashShop {
          if (ItemConstants.getInventoryType(itemId).equals(MapleInventoryType.EQUIP)) {
             item = MapleItemInformationProvider.getInstance().getEquipById(itemId);
          } else {
-            item = BetterItemFactory.getInstance().create(itemId, (byte) 0, count, petId);
+            MaplePet pet = PetProcessor.getInstance().loadFromDb(itemId, (short) 0, petId);
+            item = Item.newBuilder(itemId)
+                  .setPosition((short) 0)
+                  .setQuantity(count)
+                  .setPet(pet)
+                  .setPetId(petId)
+                  .build();
          }
 
          if (ItemConstants.EXPIRING_ITEMS) {
             if (period == 1) {
                if (itemId == 5211048 || itemId == 5360042) { // 4 Hour 2X coupons, the period is 1, but we don't want them to last a day.
-                  item.expiration_(Server.getInstance().getCurrentTime() + (1000 * 60 * 60 * 4));
+                  item = item.expiration(Server.getInstance().getCurrentTime() + (1000 * 60 * 60 * 4));
                             /*
                             } else if(itemId == 5211047 || itemId == 5360014) { // 3 Hour 2X coupons, unused as of now
                                     item.setExpiration(Server.getInstance().getCurrentTime() + (1000 * 60 * 60 * 3));
                             */
                } else if (itemId == 5211060) { // 2 Hour 3X coupons.
-                  item.expiration_(Server.getInstance().getCurrentTime() + (1000 * 60 * 60 * 2));
+                  item = item.expiration(Server.getInstance().getCurrentTime() + (1000 * 60 * 60 * 2));
                } else {
-                  item.expiration_(Server.getInstance().getCurrentTime() + (1000 * 60 * 60 * 24));
+                  item = item.expiration(Server.getInstance().getCurrentTime() + (1000 * 60 * 60 * 24));
                }
             } else {
-               item.expiration_(Server.getInstance().getCurrentTime() + (1000 * 60 * 60 * 24 * period));
+               item = item.expiration(Server.getInstance().getCurrentTime() + (1000 * 60 * 60 * 24 * period));
             }
          }
 
-         item.sn_$eq(sn);
+         item = item.setSn(sn);
          return item;
       }
    }

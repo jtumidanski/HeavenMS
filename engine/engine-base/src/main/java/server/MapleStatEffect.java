@@ -333,7 +333,7 @@ public class MapleStatEffect {
       }
 
       if (this.getFatigue() != 0) {
-         applyTo.getMount().tiredness_$eq(applyTo.getMount().tiredness() + this.getFatigue());
+         applyTo.modifyMount(mapleMount -> mapleMount.updateTiredness(mapleMount.tiredness() + this.getFatigue()));
       }
 
       if (summonMovementType != null && pos != null) {
@@ -762,48 +762,25 @@ public class MapleStatEffect {
    }
 
    private boolean isGmBuff() {
-      switch (sourceId) {
-         case Beginner.ECHO_OF_HERO:
-         case Noblesse.ECHO_OF_HERO:
-         case Legend.ECHO_OF_HERO:
-         case Evan.ECHO_OF_HERO:
-         case SuperGM.HEAL_PLUS_DISPEL:
-         case SuperGM.HASTE:
-         case SuperGM.HOLY_SYMBOL:
-         case SuperGM.BLESS:
-         case SuperGM.RESURRECTION:
-         case SuperGM.HYPER_BODY:
-            return true;
-         default:
-            return false;
-      }
+      return switch (sourceId) {
+         case Beginner.ECHO_OF_HERO, Noblesse.ECHO_OF_HERO, Legend.ECHO_OF_HERO, Evan.ECHO_OF_HERO,
+               SuperGM.HEAL_PLUS_DISPEL, SuperGM.HASTE, SuperGM.HOLY_SYMBOL, SuperGM.BLESS, SuperGM.RESURRECTION,
+               SuperGM.HYPER_BODY -> true;
+         default -> false;
+      };
    }
 
    private boolean isMonsterBuff() {
       if (!skill) {
          return false;
       }
-      switch (sourceId) {
-         case Page.THREATEN:
-         case FPWizard.SLOW:
-         case ILWizard.SLOW:
-         case FirePoisonMagician.SEAL:
-         case IceLighteningMagician.SEAL:
-         case Priest.DOOM:
-         case Hermit.SHADOW_WEB:
-         case NightLord.NINJA_AMBUSH:
-         case Shadower.NINJA_AMBUSH:
-         case BlazeWizard.SLOW:
-         case BlazeWizard.SEAL:
-         case NightWalker.SHADOW_WEB:
-         case Crusader.ARMOR_CRASH:
-         case DragonKnight.POWER_CRASH:
-         case WhiteKnight.MAGIC_CRASH:
-         case Priest.DISPEL:
-         case SuperGM.HEAL_PLUS_DISPEL:
-            return true;
-      }
-      return false;
+      return switch (sourceId) {
+         case Page.THREATEN, FPWizard.SLOW, ILWizard.SLOW, FirePoisonMagician.SEAL, IceLighteningMagician.SEAL,
+               Priest.DOOM, Hermit.SHADOW_WEB, NightLord.NINJA_AMBUSH, Shadower.NINJA_AMBUSH, BlazeWizard.SLOW,
+               BlazeWizard.SEAL, NightWalker.SHADOW_WEB, Crusader.ARMOR_CRASH, DragonKnight.POWER_CRASH,
+               WhiteKnight.MAGIC_CRASH, Priest.DISPEL, SuperGM.HEAL_PLUS_DISPEL -> true;
+         default -> false;
+      };
    }
 
    private boolean isPartyBuff() {
@@ -986,33 +963,16 @@ public class MapleStatEffect {
       if (!skill) {
          return null;
       }
-      switch (sourceId) {
-         case Ranger.PUPPET:
-         case Sniper.PUPPET:
-         case WindArcher.PUPPET:
-         case Outlaw.OCTOPUS:
-         case Corsair.WRATH_OF_THE_OCTOPI:
-            return SummonMovementType.STATIONARY;
-         case Ranger.SILVER_HAWK:
-         case Sniper.GOLDEN_EAGLE:
-         case Priest.SUMMON_DRAGON:
-         case Marksman.FROST_PREY:
-         case BowMaster.PHOENIX:
-         case Outlaw.GAVIOTA:
-            return SummonMovementType.CIRCLE_FOLLOW;
-         case DarkKnight.BEHOLDER:
-         case FirePoisonArchMage.ELQUINES:
-         case IceLighteningArchMagician.IFRIT:
-         case Bishop.BAHAMUT:
-         case DawnWarrior.SOUL:
-         case BlazeWizard.FLAME:
-         case BlazeWizard.IFRIT:
-         case WindArcher.STORM:
-         case NightWalker.DARKNESS:
-         case ThunderBreaker.LIGHTNING:
-            return SummonMovementType.FOLLOW;
-      }
-      return null;
+      return switch (sourceId) {
+         case Ranger.PUPPET, Sniper.PUPPET, WindArcher.PUPPET, Outlaw.OCTOPUS,
+               Corsair.WRATH_OF_THE_OCTOPI -> SummonMovementType.STATIONARY;
+         case Ranger.SILVER_HAWK, Sniper.GOLDEN_EAGLE, Priest.SUMMON_DRAGON, Marksman.FROST_PREY, BowMaster.PHOENIX,
+               Outlaw.GAVIOTA -> SummonMovementType.CIRCLE_FOLLOW;
+         case DarkKnight.BEHOLDER, FirePoisonArchMage.ELQUINES, IceLighteningArchMagician.IFRIT, Bishop.BAHAMUT,
+               DawnWarrior.SOUL, BlazeWizard.FLAME, BlazeWizard.IFRIT, WindArcher.STORM, NightWalker.DARKNESS,
+               ThunderBreaker.LIGHTNING -> SummonMovementType.FOLLOW;
+         default -> null;
+      };
    }
 
    public boolean isSkill() {

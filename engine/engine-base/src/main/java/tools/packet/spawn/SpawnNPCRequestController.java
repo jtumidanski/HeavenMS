@@ -5,9 +5,9 @@ import server.life.MapleNPC;
 import tools.packet.PacketInput;
 
 public class SpawnNPCRequestController implements PacketInput {
-   private MapleNPC npc;
+   private final MapleNPC npc;
 
-   private boolean miniMap;
+   private final boolean miniMap;
 
    public SpawnNPCRequestController(MapleNPC npc, boolean miniMap) {
       this.npc = npc;

@@ -4,40 +4,18 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
 import client.inventory.Equip;
-import client.inventory.Item;
 import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import client.processor.ItemProcessor;
 import constants.inventory.ItemConstants;
 import server.MapleItemInformationProvider;
+import tools.I18nMessage;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
-import tools.I18nMessage;
 
 public class ProItemCommand extends Command {
    {
       setDescription("");
-   }
-
-   private static void hardSetItemStats(Equip equip, short stat, short speedJump) {
-      equip.str_$eq(stat);
-      equip.dex_$eq(stat);
-      equip._int_$eq(stat);
-      equip.luk_$eq(stat);
-      equip.matk_$eq(stat);
-      equip.watk_$eq(stat);
-      equip.acc_$eq(stat);
-      equip.avoid_$eq(stat);
-      equip.jump_$eq(speedJump);
-      equip.speed_$eq(speedJump);
-      equip.wdef_$eq(stat);
-      equip.mdef_$eq(stat);
-      equip.hp_$eq(stat);
-      equip.mp_$eq(stat);
-
-      short flag = equip.flag();
-      flag |= ItemConstants.UNTRADEABLE;
-      ItemProcessor.getInstance().setFlag(equip, flag);
    }
 
    @Override
@@ -61,11 +39,25 @@ public class ProItemCommand extends Command {
 
       MapleInventoryType type = ItemConstants.getInventoryType(itemId);
       if (type.equals(MapleInventoryType.EQUIP)) {
-         Item it = ii.getEquipById(itemId);
-         it.owner_$eq(player.getName());
-
-         hardSetItemStats((Equip) it, stat, speedJump);
-         MapleInventoryManipulator.addFromDrop(c, it);
+         Equip equip = Equip.newBuilder(ii.getEquipById(itemId))
+               .setOwner(player.getName())
+               .setStr(stat)
+               .setDex(stat)
+               .setIntelligence(stat)
+               .setLuk(stat)
+               .setMatk(stat)
+               .setWatk(stat)
+               .setAcc(stat)
+               .setAvoid(stat)
+               .setJump(speedJump)
+               .setSpeed(speedJump)
+               .setWdef(stat)
+               .setMdef(stat)
+               .setHp(stat)
+               .setMp(stat)
+               .setFlag(ItemProcessor.getInstance().setFlag(itemId, ItemConstants.UNTRADEABLE))
+               .build();
+         MapleInventoryManipulator.addFromDrop(c, equip);
       } else {
          MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("PRO_ITEM_NOT_EQUIP"));
       }

@@ -5,10 +5,9 @@ import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import database.AbstractQueryExecutor;
+import accessor.AbstractQueryExecutor;
 import database.DeleteForCharacter;
 import entity.AreaInfo;
-import database.DatabaseConnection;
 
 public class AreaInfoAdministrator extends AbstractQueryExecutor implements DeleteForCharacter {
    private static AreaInfoAdministrator instance;
@@ -31,14 +30,12 @@ public class AreaInfoAdministrator extends AbstractQueryExecutor implements Dele
    }
 
    public void create(EntityManager entityManager, int characterId, Set<Map.Entry<Short, String>> areas) {
-      DatabaseConnection.getInstance().thing(entityManager, em -> {
-         for (Map.Entry<Short, String> entry : areas) {
-            AreaInfo areaInfo = new AreaInfo();
-            areaInfo.setCharacterId(characterId);
-            areaInfo.setArea(entry.getKey().intValue());
-            areaInfo.setInfo(entry.getValue());
-            entityManager.persist(areaInfo);
-         }
-      });
+      for (Map.Entry<Short, String> entry : areas) {
+         AreaInfo areaInfo = new AreaInfo();
+         areaInfo.setCharacterId(characterId);
+         areaInfo.setArea(entry.getKey().intValue());
+         areaInfo.setInfo(entry.getValue());
+         entityManager.persist(areaInfo);
+      }
    }
 }

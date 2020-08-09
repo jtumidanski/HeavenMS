@@ -31,11 +31,11 @@ public class SpawnPetProcessor {
          try {
             MapleCharacter chr = c.getPlayer();
             Item item = chr.getInventory(MapleInventoryType.CASH).getItem(slot);
-            if (item.pet().isEmpty()) {
+            if (item.pet() == null) {
                return;
             }
 
-            MaplePet pet = item.pet().get();
+            MaplePet pet = item.pet();
             int petid = pet.id();
             if (petid == 5000028 || petid == 5000047) {
                if (chr.haveItem(petid + 1)) {
@@ -61,28 +61,29 @@ public class SpawnPetProcessor {
                }
             }
             if (chr.getPetIndex(pet) != -1) {
-               chr.unequipPet(pet, true);
+               PetProcessor.getInstance().unequipPet(chr, chr.getPetIndex(pet), true);
             } else {
                MaplePet firstPet = chr.getPet(0);
                SkillFactory.executeIfSkillMeetsConditional(chr, 8,
                      (skill, skillLevel) -> skillLevel == 0 && firstPet != null,
-                     (skill, skillLevel) -> chr.unequipPet(firstPet, false));
+                     (skill, skillLevel) -> PetProcessor.getInstance().unequipPet(chr, (byte) 0, false));
                if (lead) {
                   chr.shiftPetsRight();
                }
                Point pos = chr.position();
                pos.y -= 12;
-               pet.pos_$eq(pos);
-               pet.fh_$eq(chr.getMap().getFootholds().findBelow(pet.pos()).id());
-               pet.stance_$eq(0);
-               pet.summoned_$eq(true);
+               pet = MaplePet.newBuilder(pet)
+                     .setPos(pos)
+                     .setFh(chr.getMap().getFootholds().findBelow(pet.pos()).id())
+                     .setStance(0)
+                     .setSummoned(true)
+                     .build();
                PetProcessor.getInstance().saveToDb(pet);
                chr.addPet(pet);
                MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new ShowPet(c.getPlayer(), pet, false, false), true, chr);
                PacketCreator.announce(c, new UpdatePetStats(c.getPlayer().getPets()));
                PacketCreator.announce(c, new EnableActions());
                chr.commitExcludedItems();
-               chr.getClient().getWorldServer().registerPetHunger(chr, chr.getPetIndex(pet));
             }
          } finally {
             c.releaseClient();

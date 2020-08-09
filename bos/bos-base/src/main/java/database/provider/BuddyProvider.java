@@ -5,9 +5,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 
+import accessor.AbstractQueryExecutor;
 import client.BuddyListEntry;
 import client.BuddyListStats;
-import database.AbstractQueryExecutor;
 
 public class BuddyProvider extends AbstractQueryExecutor {
    private static BuddyProvider instance;

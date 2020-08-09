@@ -5,11 +5,11 @@ import net.opcodes.SendOpcode;
 import tools.packet.PacketInput;
 
 public class MarriageResult implements PacketInput {
-   private int marriageId;
+   private final int marriageId;
 
-   private MapleCharacter character;
+   private final MapleCharacter character;
 
-   private boolean wedding;
+   private final boolean wedding;
 
    public MarriageResult(int marriageId, MapleCharacter character, boolean wedding) {
       this.marriageId = marriageId;

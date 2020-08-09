@@ -1,6 +1,7 @@
 package net.server.coordinator.partysearch;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -8,6 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 
 import client.MapleCharacter;
@@ -24,11 +26,11 @@ import net.server.coordinator.world.MapleInviteCoordinator.InviteType;
 import provider.MapleData;
 import provider.MapleDataProviderFactory;
 import provider.MapleDataTool;
+import tools.I18nMessage;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
 import tools.ServerNoticeType;
-import tools.I18nMessage;
 import tools.packet.party.PartySearchInvite;
 
 public class MaplePartySearchCoordinator {
@@ -212,16 +214,17 @@ public class MaplePartySearchCoordinator {
       LeaderSearchMetadata settings = searchSettings.get(leader.getId());
       if (settings != null) {
          int minLevel = settings.minLevel(), maxLevel = settings.maxLevel();
-         Collections.shuffle(settings.searchedJobs());
+         List<MapleJob> jobs = new ArrayList<>(settings.searchedJobs());
+         Collections.shuffle(jobs);
 
          int leaderCid = leader.getId();
          int leaderMapId = leader.getMapId();
-         for (MapleJob searchJob : settings.searchedJobs()) {
-            MapleCharacter chr = fetchPlayer(leaderCid, leaderMapId, searchJob, minLevel, maxLevel);
-            if (chr != null) {
-               return chr;
-            }
-         }
+
+         return jobs.stream()
+               .map(job -> fetchPlayer(leaderCid, leaderMapId, job, minLevel, maxLevel))
+               .filter(Objects::nonNull)
+               .findFirst()
+               .orElse(null);
       }
 
       return null;

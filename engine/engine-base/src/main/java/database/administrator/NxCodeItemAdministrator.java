@@ -4,7 +4,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import database.AbstractQueryExecutor;
+import accessor.AbstractQueryExecutor;
 
 public class NxCodeItemAdministrator extends AbstractQueryExecutor {
    private static NxCodeItemAdministrator instance;

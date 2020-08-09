@@ -1,8 +1,8 @@
 package client.database.utility;
 
-import database.SqlTransformer;
 import entity.Storage;
 import server.MapleStorage;
+import transformer.SqlTransformer;
 
 public class MapleStorageTransformer implements SqlTransformer<MapleStorage, Storage> {
    @Override

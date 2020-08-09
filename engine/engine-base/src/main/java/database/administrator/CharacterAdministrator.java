@@ -6,7 +6,7 @@ import java.util.function.Consumer;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import database.AbstractQueryExecutor;
+import accessor.AbstractQueryExecutor;
 import database.provider.CharacterProvider;
 import client.processor.BuddyListProcessor;
 import entity.Character;

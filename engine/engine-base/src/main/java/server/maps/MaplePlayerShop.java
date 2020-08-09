@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
 
@@ -20,13 +21,13 @@ import net.opcodes.SendOpcode;
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
 import server.MapleTradeUtil;
+import tools.I18nMessage;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
 import tools.ServerNoticeType;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.I18nMessage;
 import tools.packet.character.box.RemovePlayerShop;
 import tools.packet.character.box.UpdatePlayerShopBox;
 import tools.packet.character.interaction.GetPlayerShop;
@@ -54,14 +55,16 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
    private Lock visitorLock = MonitoredReentrantLockFactory.createLock(MonitoredLockType.VISITOR_PLAYER_SHOP, true);
 
    public MaplePlayerShop(MapleCharacter owner, String description, int itemId) {
-      this.position_$eq(owner.position());
+      this.setPosition(owner.position());
       this.owner = owner;
       this.description = description;
       this.itemId = itemId;
    }
 
    private static boolean canBuy(MapleClient c, Item newItem) {
-      return MapleInventoryManipulator.checkSpace(c, newItem.id(), newItem.quantity(), newItem.owner()) && MapleInventoryManipulator.addFromDrop(c, newItem, false);
+      boolean hasSpace = MapleInventoryManipulator.checkSpace(c, newItem.id(), newItem.quantity(), newItem.owner());
+      Optional<Item> item = MapleInventoryManipulator.addFromDrop(c, newItem, false);
+      return hasSpace && item.isPresent();
    }
 
    public static byte[] shopErrorMessage(int error, int type) {
@@ -235,7 +238,7 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
          if (shopItem.doesExist()) {
             if (shopItem.bundles() > 0) {
                Item item = shopItem.item().copy();
-               item.quantity_$eq((short) (shopItem.item().quantity() * shopItem.bundles()));
+               item = item.setQuantity((short) (shopItem.item().quantity() * shopItem.bundles()));
 
                if (!MapleInventory.checkSpot(chr, item)) {
                   MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, I18nMessage.from("HIRED_MERCHANT_TAKE_ITEM_BACK"));
@@ -258,7 +261,7 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
             MaplePlayerShopItem pItem = items.get(item);
             Item newItem = pItem.item().copy();
 
-            newItem.quantity_$eq((short) ((pItem.item().quantity() * quantity)));
+            newItem = newItem.setQuantity((short) ((pItem.item().quantity() * quantity)));
             if (quantity < 1 || !pItem.doesExist() || pItem.bundles() < quantity) {
                PacketCreator.announce(c, new EnableActions());
                return false;
@@ -267,7 +270,7 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
                return false;
             }
 
-            MapleKarmaManipulator.toggleKarmaFlagToUntradeable(newItem);
+            newItem = MapleKarmaManipulator.toggleKarmaFlagToUntradeable(newItem);
 
             visitorLock.lock();
             try {
@@ -292,9 +295,9 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
                         sold.add(soldItem);
                      }
 
-                     pItem.bundles_$eq((short) (pItem.bundles() - quantity));
+                     pItem.setBundles((short) (pItem.bundles() - quantity));
                      if (pItem.bundles() < 1) {
-                        pItem.doesExist_$eq(false);
+                        pItem.setDoesExist(false);
                         if (++boughtNumber == items.size()) {
                            owner.setPlayerShop(null);
                            this.setOpen(false);

@@ -98,7 +98,7 @@ public class PartyPacketFactory extends AbstractPacketFactory {
     */
    protected void partyStatusMessage(MaplePacketLittleEndianWriter writer, PartyStatusMessage packet) {
       writer.write(packet.message());
-      if (packet.fromCharacterName().isDefined()) {
+      if (packet.fromCharacterName().isPresent()) {
          writer.writeMapleAsciiString(packet.fromCharacterName().get());
       }
    }

@@ -6,13 +6,13 @@ import net.opcodes.SendOpcode;
 import tools.packet.PacketInput;
 
 public class ShowPet implements PacketInput {
-   private MapleCharacter character;
+   private final MapleCharacter character;
 
-   private MaplePet pet;
+   private final MaplePet pet;
 
-   private boolean remove;
+   private final boolean remove;
 
-   private boolean hunger;
+   private final boolean hunger;
 
    public ShowPet(MapleCharacter character, MaplePet pet, boolean remove, boolean hunger) {
       this.character = character;

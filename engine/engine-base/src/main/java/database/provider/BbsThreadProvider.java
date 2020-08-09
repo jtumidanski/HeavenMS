@@ -6,7 +6,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 
-import database.AbstractQueryExecutor;
+import accessor.AbstractQueryExecutor;
 import client.database.data.BbsThreadData;
 import client.database.utility.BbsThreadTransformer;
 import entity.bbs.BBSThread;
@@ -34,8 +34,9 @@ public class BbsThreadProvider extends AbstractQueryExecutor {
          BBSThread bbsThread = query.getSingleResult();
          BbsThreadTransformer transformer = new BbsThreadTransformer();
          BbsThreadData threadData = transformer.transform(bbsThread);
-         BbsThreadReplyProvider.getInstance().getByThreadId(entityManager, !localThread ? threadId : threadData.threadId())
-               .forEach(threadData::addReply);
+         threadData = BbsThreadReplyProvider.getInstance().getByThreadId(entityManager, !localThread ? threadId : threadData.threadId())
+               .stream()
+               .reduce(threadData, BbsThreadData::addReply, (a, b) -> b);
          return Optional.of(threadData);
       } catch (NoResultException exception) {
          return Optional.empty();

@@ -20,20 +20,11 @@ public class SkillProcessor {
    }
 
    public boolean dispelSkills(int skillId) {
-      switch (skillId) {
-         case DarkKnight.BEHOLDER:
-         case FirePoisonArchMage.ELQUINES:
-         case IceLighteningArchMagician.IFRIT:
-         case Priest.SUMMON_DRAGON:
-         case Bishop.BAHAMUT:
-         case Ranger.PUPPET:
-         case Ranger.SILVER_HAWK:
-         case Sniper.PUPPET:
-         case Sniper.GOLDEN_EAGLE:
-         case Hermit.SHADOW_PARTNER:
-            return true;
-         default:
-            return false;
-      }
+      return switch (skillId) {
+         case DarkKnight.BEHOLDER, FirePoisonArchMage.ELQUINES, IceLighteningArchMagician.IFRIT, Priest.SUMMON_DRAGON,
+               Bishop.BAHAMUT, Ranger.PUPPET, Ranger.SILVER_HAWK, Sniper.PUPPET, Sniper.GOLDEN_EAGLE,
+               Hermit.SHADOW_PARTNER -> true;
+         default -> false;
+      };
    }
 }

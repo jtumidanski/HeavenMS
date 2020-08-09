@@ -44,11 +44,11 @@ import server.CashShop.CashItem;
 import server.CashShop.CashItemFactory;
 import server.MapleItemInformationProvider;
 import tools.FilePrinter;
+import tools.I18nMessage;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
 import tools.ServerNoticeType;
-import tools.I18nMessage;
 import tools.packet.cashshop.CashShopMessage;
 import tools.packet.cashshop.ShowCash;
 import tools.packet.cashshop.operation.PutIntoCashInventory;
@@ -298,7 +298,7 @@ public final class CashOperationHandler extends AbstractPacketHandler<BaseCashOp
          c.enableCSActions();
          return;
       }
-      if (chr.getInventory(item.inventoryType()).addItem(item) != -1) {
+      if (chr.getInventory(item.inventoryType()).addItem(item).isPresent()) {
          cs.removeFromInventory(item);
          PacketCreator.announce(c, new TakeFromCashInventory(item));
 
@@ -456,7 +456,7 @@ public final class CashOperationHandler extends AbstractPacketHandler<BaseCashOp
             if (itemRing.toItem() instanceof Equip) {
                Equip eqp = (Equip) itemRing.toItem();
                Pair<Integer, Integer> rings = MapleRingProcessor.getInstance().createRing(itemRing.getItemId(), chr, partner);
-               eqp.ringId_$eq(rings.getLeft());
+               eqp = Equip.newBuilder(eqp).setRingId(rings.getLeft()).build();
                cs.addToInventory(eqp);
                PacketCreator.announce(c, new ShowBoughtCashRing(eqp, partner.getName(), c.getAccID()));
                CashShopProcessor.getInstance().gift(partner.getId(), chr.getName(), text, eqp.sn(), rings.getRight());
@@ -480,7 +480,7 @@ public final class CashOperationHandler extends AbstractPacketHandler<BaseCashOp
             if (itemRing.toItem() instanceof Equip) {
                Equip eqp = (Equip) itemRing.toItem();
                Pair<Integer, Integer> rings = MapleRingProcessor.getInstance().createRing(itemRing.getItemId(), chr, partner);
-               eqp.ringId_$eq(rings.getLeft());
+               eqp = Equip.newBuilder(eqp).setRingId(rings.getLeft()).build();
                cs.addToInventory(eqp);
                PacketCreator.announce(c, new ShowBoughtCashItem(eqp, c.getAccID()));
                CashShopProcessor.getInstance().gift(partner.getId(), chr.getName(), text, eqp.sn(), rings.getRight());

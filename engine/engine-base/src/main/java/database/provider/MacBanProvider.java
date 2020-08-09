@@ -4,7 +4,7 @@ import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
-import database.AbstractQueryExecutor;
+import accessor.AbstractQueryExecutor;
 
 public class MacBanProvider extends AbstractQueryExecutor {
    private static MacBanProvider instance;

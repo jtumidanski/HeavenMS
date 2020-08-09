@@ -53,8 +53,7 @@ public class OwlOfMinervaPacketFactory extends AbstractPacketFactory {
          MaplePlayerShopItem item = hme.getLeft();
          AbstractMapleMapObject mo = hme.getRight();
 
-         if (mo instanceof MaplePlayerShop) {
-            MaplePlayerShop ps = (MaplePlayerShop) mo;
+         if (mo instanceof MaplePlayerShop ps) {
             MapleCharacter owner = ps.getOwner();
 
             writer.writeMapleAsciiString(owner.getName());

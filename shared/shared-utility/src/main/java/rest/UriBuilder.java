@@ -9,39 +9,27 @@ public final class UriBuilder {
    private javax.ws.rs.core.UriBuilder builder;
 
    protected static String getHost(RestService service) {
-      switch (service) {
-         case BUDDY:
-            return YamlConfig.config.server.BUDDY_MS_HOST;
-         case CASH_SHOP:
-            return YamlConfig.config.server.CASH_SHOP_MS_HOST;
-         case MASTER:
-            return YamlConfig.config.server.HOST;
-      }
-      return "localhost";
+      return switch (service) {
+         case BUDDY -> YamlConfig.config.server.BUDDY_MS_HOST;
+         case CASH_SHOP -> YamlConfig.config.server.CASH_SHOP_MS_HOST;
+         case MASTER -> YamlConfig.config.server.HOST;
+      };
    }
 
    protected static int getPort(RestService service) {
-      switch (service) {
-         case BUDDY:
-            return YamlConfig.config.server.BUDDY_MS_PORT;
-         case CASH_SHOP:
-            return YamlConfig.config.server.CASH_SHOP_MS_PORT;
-         case MASTER:
-            return YamlConfig.config.server.HOST_PORT;
-      }
-      return 8080;
+      return switch (service) {
+         case BUDDY -> YamlConfig.config.server.BUDDY_MS_PORT;
+         case CASH_SHOP -> YamlConfig.config.server.CASH_SHOP_MS_PORT;
+         case MASTER -> YamlConfig.config.server.HOST_PORT;
+      };
    }
 
    protected static String getPath(RestService service) {
-      switch (service) {
-         case BUDDY:
-            return "bos";
-         case CASH_SHOP:
-            return "cos";
-         case MASTER:
-            return "master";
-      }
-      return "master";
+      return switch (service) {
+         case BUDDY -> "bos";
+         case CASH_SHOP -> "cos";
+         case MASTER -> "master";
+      };
    }
 
    protected UriBuilder(RestService service) {

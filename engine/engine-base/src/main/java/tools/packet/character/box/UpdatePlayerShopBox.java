@@ -5,7 +5,7 @@ import server.maps.MaplePlayerShop;
 import tools.packet.PacketInput;
 
 public class UpdatePlayerShopBox implements PacketInput {
-   private MaplePlayerShop playerShop;
+   private final MaplePlayerShop playerShop;
 
    public UpdatePlayerShopBox(MaplePlayerShop playerShop) {
       this.playerShop = playerShop;

@@ -424,7 +424,7 @@ public class BCrypt {
       if ((int) x < 0 || (int) x > index_64.length) {
          return -1;
       }
-      return index_64[(int) x];
+      return index_64[x];
    }
 
    /**

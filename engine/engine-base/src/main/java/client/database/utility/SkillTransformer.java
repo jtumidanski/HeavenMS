@@ -1,8 +1,8 @@
 package client.database.utility;
 
 import client.database.data.SkillData;
-import database.SqlTransformer;
 import entity.Skill;
+import transformer.SqlTransformer;
 
 public class SkillTransformer implements SqlTransformer<SkillData, Skill> {
    @Override

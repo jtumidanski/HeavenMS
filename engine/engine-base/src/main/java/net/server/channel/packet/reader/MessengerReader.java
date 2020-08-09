@@ -13,19 +13,14 @@ public class MessengerReader implements PacketReader<BaseMessengerPacket> {
    @Override
    public BaseMessengerPacket read(SeekableLittleEndianAccessor accessor) {
       byte mode = accessor.readByte();
-      switch (mode) {
-         case 0x00:
-            return readJoin(accessor, mode);
-         case 0x02:
-            return readClose(mode);
-         case 0x03:
-            return readInvite(accessor, mode);
-         case 0x05:
-            return readDecline(accessor, mode);
-         case 0x06:
-            return readChat(accessor, mode);
-      }
-      return new BaseMessengerPacket(mode);
+      return switch (mode) {
+         case 0x00 -> readJoin(accessor, mode);
+         case 0x02 -> readClose(mode);
+         case 0x03 -> readInvite(accessor, mode);
+         case 0x05 -> readDecline(accessor, mode);
+         case 0x06 -> readChat(accessor, mode);
+         default -> new BaseMessengerPacket(mode);
+      };
    }
 
    private BaseMessengerPacket readChat(SeekableLittleEndianAccessor accessor, byte mode) {

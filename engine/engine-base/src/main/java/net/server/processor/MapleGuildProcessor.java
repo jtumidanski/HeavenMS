@@ -8,6 +8,7 @@ import java.util.stream.Stream;
 
 import client.MapleCharacter;
 import client.MapleClient;
+import database.DatabaseConnection;
 import database.administrator.CharacterAdministrator;
 import database.administrator.GuildAdministrator;
 import database.administrator.NoteAdministrator;
@@ -24,7 +25,6 @@ import net.server.guild.MapleGuildCharacter;
 import net.server.guild.MapleGuildResponse;
 import net.server.guild.MapleGuildSummary;
 import net.server.world.World;
-import database.DatabaseConnection;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;

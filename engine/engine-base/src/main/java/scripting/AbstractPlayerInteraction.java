@@ -16,7 +16,6 @@ import client.MapleJob;
 import client.MapleQuestStatus;
 import client.SkillEntry;
 import client.SkillFactory;
-import client.inventory.BetterItemFactory;
 import client.inventory.Equip;
 import client.inventory.Item;
 import client.inventory.MapleInventory;
@@ -51,12 +50,12 @@ import server.maps.MapleMapObjectType;
 import server.partyquest.PartyQuest;
 import server.partyquest.Pyramid;
 import server.quest.MapleQuest;
+import tools.I18nMessage;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
 import tools.ServerNoticeType;
-import tools.I18nMessage;
 import tools.packet.DojoWarpUp;
 import tools.packet.GetEnergy;
 import tools.packet.field.effect.EnvironmentChange;
@@ -600,23 +599,24 @@ public class AbstractPlayerInteraction {
 
             if (from != null) {
                evolved = PetProcessor.getInstance().loadFromDb(id, (short) 0, petId);
-
                Point pos = getPlayer().position();
                pos.y -= 12;
-               evolved.pos_$eq(pos);
-               evolved.fh_$eq(getPlayer().getMap().getFootholds().findBelow(evolved.pos()).id());
-               evolved.stance_$eq(0);
-               evolved.summoned_$eq(true);
+               int fh = getPlayer().getMap().getFootholds().findBelow(evolved.pos()).id();
+               String name = from.name().compareTo(MapleItemInformationProvider.getInstance().getName(from.id())) != 0 ? from.name() : MapleItemInformationProvider.getInstance().getName(id);
 
-               evolved.name_$eq(from.name().compareTo(MapleItemInformationProvider.getInstance().getName(from.id())) != 0 ? from.name() : MapleItemInformationProvider.getInstance().getName(id));
-               evolved.closeness_$eq(from.closeness());
-               evolved.fullness_$eq(from.fullness());
-               evolved.level_$eq(from.level());
-               evolved.expiration_(System.currentTimeMillis() + expires);
+               evolved = MaplePet.newBuilder(evolved)
+                     .setPos(pos)
+                     .setFh(fh)
+                     .setStance(0)
+                     .setSummoned(true)
+                     .setName(name)
+                     .setCloseness(from.closeness())
+                     .setFullness(from.fullness())
+                     .setLevel(from.level())
+                     .setExpiration(System.currentTimeMillis() + expires)
+                     .build();
                PetProcessor.getInstance().saveToDb(evolved);
             }
-
-            //MapleInventoryManipulator.addById(c, id, (short) 1, null, petId, expires == -1 ? -1 : System.currentTimeMillis() + expires);
          }
 
          MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
@@ -625,25 +625,29 @@ public class AbstractPlayerInteraction {
             item = ii.getEquipById(id);
 
             if (item != null) {
-               Equip it = (Equip) item;
-               if (ItemConstants.isAccessory(item.id()) && it.slots() <= 0) {
-                  it.slots_$eq(3);
+               if (ItemConstants.isAccessory(item.id()) && ((Equip) item).slots() <= 0) {
+                  item = ((Equip) item).setSlots(3);
                }
 
                if (YamlConfig.config.server.USE_ENHANCED_CRAFTING && c.getPlayer().getCS()) {
-                  Equip eqp = (Equip) item;
                   if (!(c.getPlayer().isGM() && YamlConfig.config.server.USE_PERFECT_GM_SCROLL)) {
-                     eqp.slots_$eq((byte) (eqp.slots() + 1));
+                     item = ((Equip) item).setSlots((byte) (((Equip) item).slots() + 1));
                   }
                   item = MapleItemInformationProvider.getInstance().scrollEquipWithId(item, 2049100, true, 2049100, c.getPlayer().isGM());
                }
             }
          } else {
-            item = BetterItemFactory.getInstance().create(id, (short) 0, quantity, petId);
+            MaplePet pet = PetProcessor.getInstance().loadFromDb(id, (short) 0, petId);
+            item = Item.newBuilder(id)
+                  .setPosition((short) 0)
+                  .setQuantity(quantity)
+                  .setPet(pet)
+                  .setPetId(petId)
+                  .build();
          }
 
          if (expires >= 0) {
-            item.expiration_(System.currentTimeMillis() + expires);
+            item = item.expiration(System.currentTimeMillis() + expires);
          }
 
          if (!MapleInventoryManipulator.checkSpace(c, id, quantity, "")) {
@@ -652,12 +656,21 @@ public class AbstractPlayerInteraction {
          }
          if (ItemConstants.getInventoryType(id) == MapleInventoryType.EQUIP) {
             if (randomStats) {
-               MapleInventoryManipulator.addFromDrop(c, ii.randomizeStats((Equip) item), false, petId);
+               Optional<Item> result = MapleInventoryManipulator.addFromDrop(c, Equip.newBuilder((Equip) item).randomizeStats().build(), false, petId);
+               if (result.isPresent()) {
+                  item = result.get();
+               }
             } else {
-               MapleInventoryManipulator.addFromDrop(c, item, false, petId);
+               Optional<Item> result = MapleInventoryManipulator.addFromDrop(c, item, false, petId);
+               if (result.isPresent()) {
+                  item = result.get();
+               }
             }
          } else {
-            MapleInventoryManipulator.addFromDrop(c, item, false, petId);
+            Optional<Item> result = MapleInventoryManipulator.addFromDrop(c, item, false, petId);
+            if (result.isPresent()) {
+               item = result.get();
+            }
          }
       } else {
          MapleInventoryManipulator.removeById(c, ItemConstants.getInventoryType(id), id, -quantity, true, false);
@@ -686,27 +699,15 @@ public class AbstractPlayerInteraction {
    }
 
    public void displayAranIntro() {
-      String intro = "";
-      switch (c.getPlayer().getMapId()) {
-         case 914090010:
-            intro = "Effect/Direction1.img/aranTutorial/Scene0";
-            break;
-         case 914090011:
-            intro = "Effect/Direction1.img/aranTutorial/Scene1" + (c.getPlayer().getGender() == 0 ? "0" : "1");
-            break;
-         case 914090012:
-            intro = "Effect/Direction1.img/aranTutorial/Scene2" + (c.getPlayer().getGender() == 0 ? "0" : "1");
-            break;
-         case 914090013:
-            intro = "Effect/Direction1.img/aranTutorial/Scene3";
-            break;
-         case 914090100:
-            intro = "Effect/Direction1.img/aranTutorial/HandedPoleArm" + (c.getPlayer().getGender() == 0 ? "0" : "1");
-            break;
-         case 914090200:
-            intro = "Effect/Direction1.img/aranTutorial/Maha";
-            break;
-      }
+      String intro = switch (c.getPlayer().getMapId()) {
+         case 914090010 -> "Effect/Direction1.img/aranTutorial/Scene0";
+         case 914090011 -> "Effect/Direction1.img/aranTutorial/Scene1" + (c.getPlayer().getGender() == 0 ? "0" : "1");
+         case 914090012 -> "Effect/Direction1.img/aranTutorial/Scene2" + (c.getPlayer().getGender() == 0 ? "0" : "1");
+         case 914090013 -> "Effect/Direction1.img/aranTutorial/Scene3";
+         case 914090100 -> "Effect/Direction1.img/aranTutorial/HandedPoleArm" + (c.getPlayer().getGender() == 0 ? "0" : "1");
+         case 914090200 -> "Effect/Direction1.img/aranTutorial/Maha";
+         default -> "";
+      };
       showIntro(intro);
    }
 
@@ -943,15 +944,15 @@ public class AbstractPlayerInteraction {
       if (old != null) {
          MapleInventoryManipulator.removeFromSlot(c, MapleInventoryType.EQUIPPED, slot, old.quantity(), false, false);
       }
-      final Item newItem = MapleItemInformationProvider.getInstance().getEquipById(itemId);
-      newItem.position_(slot);
+      Item newItem = MapleItemInformationProvider.getInstance().getEquipById(itemId);
+      newItem = newItem.setPosition(slot);
       c.getPlayer().getInventory(MapleInventoryType.EQUIPPED).addItemFromDB(newItem);
       PacketCreator.announce(c, new ModifyInventoryPacket(false, Collections.singletonList(new ModifyInventory(0, newItem))));
    }
 
    public void spawnMonster(int id, int x, int y) {
       MapleLifeFactory.getMonster(id).ifPresent(monster -> {
-         monster.position_$eq(new Point(x, y));
+         monster.setPosition(new Point(x, y));
          getPlayer().getMap().spawnMonster(monster);
       });
    }
@@ -1108,8 +1109,8 @@ public class AbstractPlayerInteraction {
       long curTime = System.currentTimeMillis();
       for (Item it : getPlayer().getInventory(MapleInventoryType.CASH).list()) {
          if (ItemConstants.isPet(it.id()) && it.expiration() < curTime) {
-            if (it.pet().isDefined()) {
-               list.add(it.pet().get());
+            if (it.pet() != null) {
+               list.add(it.pet());
             }
          }
       }
@@ -1132,42 +1133,24 @@ public class AbstractPlayerInteraction {
 
       MapleCharacter chr = this.getPlayer();
 
-      switch (jobType) {
-         case 1:
-            return chr.getStr() >= 35;
-
-         case 2:
-            return chr.getInt() >= 20;
-
-         case 3:
-         case 4:
-            return chr.getDex() >= 25;
-
-         case 5:
-            return chr.getDex() >= 20;
-
-         default:
-            return true;
-      }
+      return switch (jobType) {
+         case 1 -> chr.getStr() >= 35;
+         case 2 -> chr.getInt() >= 20;
+         case 3, 4 -> chr.getDex() >= 25;
+         case 5 -> chr.getDex() >= 20;
+         default -> true;
+      };
    }
 
    public String getFirstJobStatRequirement(int jobType) {
-      switch (jobType) {
-         case 1:
-            return "STR " + 35;
+      return switch (jobType) {
+         case 1 -> "STR " + 35;
+         case 2 -> "INT " + 20;
+         case 3, 4 -> "DEX " + 25;
+         case 5 -> "DEX " + 20;
+         default -> null;
+      };
 
-         case 2:
-            return "INT " + 20;
-
-         case 3:
-         case 4:
-            return "DEX " + 25;
-
-         case 5:
-            return "DEX " + 20;
-      }
-
-      return null;
    }
 
    public void npcTalk(int npcId, String message) {

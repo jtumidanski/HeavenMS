@@ -32,10 +32,9 @@ public class PetSpeedAction extends MapleQuestAction {
 
       c.lockClient();
       try {
-         PetProcessor.getInstance().addPetFlag(pet, c.getPlayer(), PetFlag.OWNER_SPEED);
+         PetProcessor.getInstance().addPetFlag(chr, (byte) 0, PetFlag.OWNER_SPEED);
       } finally {
          c.unlockClient();
       }
-
    }
 } 

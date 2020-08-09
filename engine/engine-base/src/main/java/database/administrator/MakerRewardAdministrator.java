@@ -2,7 +2,7 @@ package database.administrator;
 
 import javax.persistence.EntityManager;
 
-import database.AbstractQueryExecutor;
+import accessor.AbstractQueryExecutor;
 import entity.maker.MakerRewardData;
 
 public class MakerRewardAdministrator extends AbstractQueryExecutor {

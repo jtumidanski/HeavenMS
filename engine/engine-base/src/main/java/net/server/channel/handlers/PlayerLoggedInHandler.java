@@ -12,27 +12,28 @@ import java.util.stream.Collectors;
 
 import org.apache.mina.core.session.IoSession;
 
+import client.BuddyList;
 import client.CharacterNameAndId;
 import client.KeyBinding;
+import client.MapleAbnormalStatus;
 import client.MapleCharacter;
 import client.MapleClient;
-import client.MapleAbnormalStatus;
 import client.MapleFamily;
 import client.MapleFamilyEntry;
 import client.MapleMount;
 import client.SkillFactory;
-import database.administrator.DueyPackageAdministrator;
-import database.provider.DueyPackageProvider;
 import client.inventory.Equip;
 import client.inventory.Item;
 import client.inventory.MapleInventory;
 import client.inventory.MapleInventoryType;
-import client.inventory.MaplePet;
 import client.processor.BuddyListProcessor;
 import client.processor.CharacterProcessor;
 import config.YamlConfig;
 import constants.game.GameConstants;
 import constants.game.ScriptableNPCConstants;
+import database.DatabaseConnection;
+import database.administrator.DueyPackageAdministrator;
+import database.provider.DueyPackageProvider;
 import net.server.AbstractPacketHandler;
 import net.server.PlayerBuffValueHolder;
 import net.server.Server;
@@ -50,10 +51,8 @@ import net.server.world.MapleParty;
 import net.server.world.MaplePartyCharacter;
 import net.server.world.PartyOperation;
 import net.server.world.World;
-import scala.Option;
 import scripting.event.EventInstanceManager;
 import server.life.MobSkill;
-import database.DatabaseConnection;
 import tools.FilePrinter;
 import tools.MasterBroadcaster;
 import tools.PacketCreator;
@@ -316,12 +315,17 @@ public final class PlayerLoggedInHandler extends AbstractPacketHandler<PlayerLog
                eqpInv.unlockInventory();
             }
 
-            PacketCreator.announce(client, new UpdateBuddyList(player.getBuddyList().getBuddies()));
+            PacketCreator.announce(client, new UpdateBuddyList(player.getBuddyList().buddies().values()));
 
-            Option<CharacterNameAndId> pendingBuddyRequest = client.getPlayer().getBuddyList().pollPendingRequest();
-            if (pendingBuddyRequest.isDefined()) {
-               PacketCreator.announce(client, new RequestAddBuddy(pendingBuddyRequest.get().id(), client.getPlayer().getId(), pendingBuddyRequest.get().name()));
-            }
+            client.getPlayer().modifyBuddyList(buddyList -> {
+               Optional<Pair<BuddyList, CharacterNameAndId>> result = buddyList.pollPendingRequest();
+               if (result.isPresent()) {
+                  PacketCreator.announce(client, new RequestAddBuddy(result.get().getRight().id(), client.getPlayer().getId(), result.get().getRight().name()));
+                  return result.get().getLeft();
+               } else {
+                  return buddyList;
+               }
+            });
 
             PacketCreator.announce(client, new UpdateGender(player.getGender()));
             player.checkMessenger();
@@ -332,12 +336,6 @@ public final class PlayerLoggedInHandler extends AbstractPacketHandler<PlayerLog
             player.checkBerserk(player.isHidden());
 
             if (newcomer) {
-               for (MaplePet pet : player.getPets()) {
-                  if (pet != null) {
-                     world.registerPetHunger(player, player.getPetIndex(pet));
-                  }
-               }
-
                MapleMount mount = player.getMount();
                if (mount.itemId() != 0) {
                   PacketCreator.announce(player, new UpdateMount(player.getId(), mount.level(), mount.exp(), mount.tiredness(), false));

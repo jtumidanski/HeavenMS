@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 
-import database.AbstractQueryExecutor;
+import accessor.AbstractQueryExecutor;
 import client.database.data.NxCouponData;
 import entity.nx.NXCoupon;
 

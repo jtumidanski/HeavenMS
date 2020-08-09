@@ -8,6 +8,7 @@ import javax.persistence.EntityManager;
 
 import client.MapleCharacter;
 import client.MapleClient;
+import database.DatabaseConnection;
 import database.administrator.AccountAdministrator;
 import database.administrator.MtsCartAdministrator;
 import database.administrator.MtsItemAdministrator;
@@ -41,7 +42,6 @@ import net.server.channel.packet.reader.MTSReader;
 import server.CashShop;
 import server.MTSItemInfo;
 import server.MapleItemInformationProvider;
-import database.DatabaseConnection;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
@@ -166,14 +166,16 @@ public final class MTSHandler extends AbstractPacketHandler<BaseMTSPacket> {
    private void transferItem(MapleClient client, int id) {
       DatabaseConnection.getInstance().withConnection(connection -> MtsItemProvider.getInstance().getTransferItem(connection, client.getPlayer().getId(), id)
             .ifPresent(item -> {
-               item.position_(client.getPlayer().getInventory(ItemConstants.getInventoryType(item.id())).getNextFreeSlot());
+               Item updatedItem = Item.newBuilder(item)
+                     .setPosition(client.getPlayer().getInventory(ItemConstants.getInventoryType(item.id())).getNextFreeSlot())
+                     .build();
                MtsItemAdministrator.getInstance().deleteTransferItem(connection, id, client.getPlayer().getId());
 
-               MapleInventoryManipulator.addFromDrop(client, item, false);
+               MapleInventoryManipulator.addFromDrop(client, updatedItem, false);
                client.enableCSActions();
                client.announce(getCart(client.getPlayer().getId()));
                client.announce(getMTS(client.getPlayer().getCurrentTab(), client.getPlayer().getCurrentType(), client.getPlayer().getCurrentPage()));
-               PacketCreator.announce(client, new MTSConfirmTransfer(item.quantity(), item.position()));
+               PacketCreator.announce(client, new MTSConfirmTransfer(updatedItem.quantity(), updatedItem.position()));
                PacketCreator.announce(client, new MTSTransferInventory(getTransfer(client.getPlayer().getId())));
             }));
    }
@@ -247,7 +249,7 @@ public final class MTSHandler extends AbstractPacketHandler<BaseMTSPacket> {
                Equip equip = (Equip) i;
                MtsItemAdministrator.getInstance().createEquip(connection, 1, invType.getType(),
                      equip.id(), postedQuantity, equip.expiration(), equip.giftFrom(), client.getPlayer().getId(), price, equip.slots(),
-                     equip.level(), equip.str(), equip.dex(), equip._int(), equip.luk(), equip.hp(),
+                     equip.level(), equip.str(), equip.dex(), equip.intelligence(), equip.luk(), equip.hp(),
                      equip.mp(), equip.watk(), equip.matk(), equip.wdef(), equip.mdef(), equip.acc(),
                      equip.avoid(), equip.hands(), equip.speed(), equip.jump(), 0, equip.owner(),
                      client.getPlayer().getName(), date, equip.vicious(), equip.flag(), equip.itemExp(),

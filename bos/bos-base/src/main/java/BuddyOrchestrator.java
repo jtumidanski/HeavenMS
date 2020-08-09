@@ -39,10 +39,9 @@ public class BuddyOrchestrator {
       List<Integer> toDelete = myCharacters.parallelStream().filter(id -> masterCharacters.parallelStream().noneMatch(chara -> id.equals(chara.id()))).collect(Collectors.toList());
       List<Character> toAdd = masterCharacters.parallelStream().filter(chara -> !myCharacters.contains(chara.id())).collect(Collectors.toList());
 
-      DatabaseConnection.getInstance().withConnection(entityManager ->
-            DatabaseConnection.getInstance().thing(entityManager, em -> {
-               toDelete.forEach(id -> CharacterAdministrator.getInstance().deleteCharacter(em, id));
-               toAdd.forEach(chara -> CharacterAdministrator.getInstance().addCharacter(em, chara.accountId(), chara.id()));
-            }));
+      DatabaseConnection.getInstance().withConnection(em -> {
+         toDelete.forEach(id -> CharacterAdministrator.getInstance().deleteCharacter(em, id));
+         toAdd.forEach(chara -> CharacterAdministrator.getInstance().addCharacter(em, chara.accountId(), chara.id()));
+      });
    }
 }

@@ -5,10 +5,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
-import database.AbstractQueryExecutor;
+import accessor.AbstractQueryExecutor;
 import database.DeleteForCharacter;
 import entity.InventoryItem;
-import database.DatabaseConnection;
 import tools.Pair;
 
 public class InventoryItemAdministrator extends AbstractQueryExecutor implements DeleteForCharacter {
@@ -42,42 +41,38 @@ public class InventoryItemAdministrator extends AbstractQueryExecutor implements
       entityManager.getTransaction().commit();
    }
 
-   public void deleteForCharacterByType(EntityManager entityManager, int characterId, int type) {
-      DatabaseConnection.getInstance().thing(entityManager, em -> {
-         TypedQuery<Integer> query = em.createQuery("SELECT i.inventoryItemId FROM InventoryItem i WHERE i.characterId = :characterId AND i.type = :type", Integer.class);
-         query.setParameter("characterId", characterId);
-         query.setParameter("type", type);
-         List<Integer> inventoryItemIds = query.getResultList();
+   public void deleteForCharacterByType(EntityManager em, int characterId, int type) {
+      TypedQuery<Integer> query = em.createQuery("SELECT i.inventoryItemId FROM InventoryItem i WHERE i.characterId = :characterId AND i.type = :type", Integer.class);
+      query.setParameter("characterId", characterId);
+      query.setParameter("type", type);
+      List<Integer> inventoryItemIds = query.getResultList();
 
-         if (inventoryItemIds.size() > 0) {
-            Query inventoryEquipQuery = em.createQuery("DELETE FROM InventoryEquipment WHERE inventoryItemId IN :ids");
-            inventoryEquipQuery.setParameter("ids", inventoryItemIds);
-            inventoryEquipQuery.executeUpdate();
+      if (inventoryItemIds.size() > 0) {
+         Query inventoryEquipQuery = em.createQuery("DELETE FROM InventoryEquipment WHERE inventoryItemId IN :ids");
+         inventoryEquipQuery.setParameter("ids", inventoryItemIds);
+         inventoryEquipQuery.executeUpdate();
 
-            Query inventoryItemQuery = em.createQuery("DELETE FROM InventoryItem WHERE inventoryItemId IN :ids");
-            inventoryItemQuery.setParameter("ids", inventoryItemIds);
-            inventoryItemQuery.executeUpdate();
-         }
-      });
+         Query inventoryItemQuery = em.createQuery("DELETE FROM InventoryItem WHERE inventoryItemId IN :ids");
+         inventoryItemQuery.setParameter("ids", inventoryItemIds);
+         inventoryItemQuery.executeUpdate();
+      }
    }
 
    public void deleteForAccountByType(EntityManager entityManager, int accountId, int type) {
-      DatabaseConnection.getInstance().thing(entityManager, em -> {
-         TypedQuery<Integer> query = entityManager.createQuery("SELECT i.inventoryItemId FROM InventoryItem i WHERE i.accountId = :accountId AND i.type = :type", Integer.class);
-         query.setParameter("accountId", accountId);
-         query.setParameter("type", type);
-         List<Integer> inventoryItemIds = query.getResultList();
+      TypedQuery<Integer> query = entityManager.createQuery("SELECT i.inventoryItemId FROM InventoryItem i WHERE i.accountId = :accountId AND i.type = :type", Integer.class);
+      query.setParameter("accountId", accountId);
+      query.setParameter("type", type);
+      List<Integer> inventoryItemIds = query.getResultList();
 
-         if (inventoryItemIds.size() > 0) {
-            Query inventoryEquipQuery = entityManager.createQuery("DELETE FROM InventoryEquipment WHERE inventoryItemId IN :ids");
-            inventoryEquipQuery.setParameter("ids", inventoryItemIds);
-            inventoryEquipQuery.executeUpdate();
+      if (inventoryItemIds.size() > 0) {
+         Query inventoryEquipQuery = entityManager.createQuery("DELETE FROM InventoryEquipment WHERE inventoryItemId IN :ids");
+         inventoryEquipQuery.setParameter("ids", inventoryItemIds);
+         inventoryEquipQuery.executeUpdate();
 
-            Query inventoryItemQuery = entityManager.createQuery("DELETE FROM InventoryItem WHERE inventoryItemId IN :ids");
-            inventoryItemQuery.setParameter("ids", inventoryItemIds);
-            inventoryItemQuery.executeUpdate();
-         }
-      });
+         Query inventoryItemQuery = entityManager.createQuery("DELETE FROM InventoryItem WHERE inventoryItemId IN :ids");
+         inventoryItemQuery.setParameter("ids", inventoryItemIds);
+         inventoryItemQuery.executeUpdate();
+      }
    }
 
    public int create(EntityManager entityManager, int type, int characterId, int accountId, int itemId, int inventoryType,

@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		

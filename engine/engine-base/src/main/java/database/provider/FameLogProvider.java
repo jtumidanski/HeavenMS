@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import database.AbstractQueryExecutor;
+import accessor.AbstractQueryExecutor;
 import tools.Pair;
 
 public class FameLogProvider extends AbstractQueryExecutor {

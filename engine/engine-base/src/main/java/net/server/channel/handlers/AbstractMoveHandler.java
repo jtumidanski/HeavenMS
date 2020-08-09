@@ -13,10 +13,10 @@ public abstract class AbstractMoveHandler<T extends MaplePacket> extends Abstrac
    protected void processMovementList(List<MovementData> movementDataList, AnimatedMapleMapObject target) {
       for (MovementData movementData : movementDataList) {
          if (movementData instanceof AbsoluteMovementData) {
-            target.position_$eq(((AbsoluteMovementData) movementData).position());
-            target.stance_$eq(((AbsoluteMovementData) movementData).stance());
+            target.setPosition(((AbsoluteMovementData) movementData).position());
+            target.setStance(((AbsoluteMovementData) movementData).stance());
          } else if (movementData instanceof RelativeMovementData) {
-            target.stance_$eq(((RelativeMovementData) movementData).stance());
+            target.setStance(((RelativeMovementData) movementData).stance());
          }
       }
    }

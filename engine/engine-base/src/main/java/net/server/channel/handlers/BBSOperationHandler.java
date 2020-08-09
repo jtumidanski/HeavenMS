@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import client.MapleCharacter;
 import client.MapleClient;
+import database.DatabaseConnection;
 import database.administrator.BbsThreadAdministrator;
 import database.administrator.BbsThreadReplyAdministrator;
 import client.database.data.BbsThreadData;
@@ -21,7 +22,6 @@ import net.server.channel.packet.bbs.ListThreadsPacket;
 import net.server.channel.packet.bbs.NewBBSThreadPacket;
 import net.server.channel.packet.bbs.ReplyToThreadPacket;
 import net.server.channel.packet.reader.BBSOperationReader;
-import database.DatabaseConnection;
 import tools.PacketCreator;
 import tools.packet.guild.bbs.GetThreadList;
 import tools.packet.guild.bbs.ShowThread;

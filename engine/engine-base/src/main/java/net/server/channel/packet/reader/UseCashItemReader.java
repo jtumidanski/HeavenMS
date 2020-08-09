@@ -46,56 +46,32 @@ public class UseCashItemReader implements PacketReader<AbstractUseCashItemPacket
       short position = accessor.readShort();
       int itemId = accessor.readInt();
 
-      switch (ConsumableCashItems.Types.getByItemId(itemId)) {
-         case TELEPORTERS:
-            return readTeleportRock(accessor, position, itemId);
-         case STAT_MODIFIERS:
-            return readApOrSpResetPacket(accessor, position, itemId);
-         case ITEM_AUGMENTERS:
-            return readItemAugmenter(accessor, position, itemId);
-         case BROADCASTERS:
-            return readBroadcastTool(accessor, position, itemId);
-         case KITES:
-            return readKite(accessor, position, itemId);
-         case NOTES:
-            return readNote(accessor, position, itemId);
-         case JUKE_BOXES:
-            return new UseJukeboxPacket(position, itemId);
-         case MAP_EFFECTS:
-            return readMapEffect(accessor, position, itemId);
-         case PET_NAME_CHANGE:
-            return readPetNameChange(accessor, position, itemId);
-         case ITEM_BAGS:
-            return new UseItemBagPacket(position, itemId);
-         case OWL_SEARCH:
-            return readOwlSearch(accessor, position, itemId);
-         case PET_CONSUME:
-            return new UsePetConsumePacket(position, itemId);
-         case CHARACTER_EFFECT:
-            return new UseCharacterEffectPacket(position, itemId);
-         case DUEY:
-            return new UseDueyPacket(position, itemId);
-         case CHALKBOARD:
-            return new UseChalkboardPacket(position, itemId, accessor.readMapleAsciiString());
-         case AVATAR_BROADCASTERS:
-            return readAvatarMegaphone(accessor, position, itemId);
-         case CHARACTER_MODIFIERS:
-            return readNameOrWorldChange(accessor, position, itemId);
-         case CHARACTER_CREATORS:
-            return readCharacterCreator(accessor, position, itemId);
-         case MIU_MIU:
-            return new UseMiuMiuPacket(position, itemId);
-         case EXPIRATION_EXTENDERS:
-            return new UseExtendExpirationPacket(position, itemId);
-         case SCISSORS_OF_KARMA:
-            return readScissorsOfKarma(accessor, position, itemId);
-         case HAMMER:
-            return readHammer(accessor, position, itemId);
-         case VEGA_SPELLS:
-            return readVegaSpell(accessor, position, itemId);
-         default:
-            return new UseUnhandledPacket(position, itemId, accessor.toString());
-      }
+      return switch (ConsumableCashItems.Types.getByItemId(itemId)) {
+         case TELEPORTERS -> readTeleportRock(accessor, position, itemId);
+         case STAT_MODIFIERS -> readApOrSpResetPacket(accessor, position, itemId);
+         case ITEM_AUGMENTERS -> readItemAugmenter(accessor, position, itemId);
+         case BROADCASTERS -> readBroadcastTool(accessor, position, itemId);
+         case KITES -> readKite(accessor, position, itemId);
+         case NOTES -> readNote(accessor, position, itemId);
+         case JUKE_BOXES -> new UseJukeboxPacket(position, itemId);
+         case MAP_EFFECTS -> readMapEffect(accessor, position, itemId);
+         case PET_NAME_CHANGE -> readPetNameChange(accessor, position, itemId);
+         case ITEM_BAGS -> new UseItemBagPacket(position, itemId);
+         case OWL_SEARCH -> readOwlSearch(accessor, position, itemId);
+         case PET_CONSUME -> new UsePetConsumePacket(position, itemId);
+         case CHARACTER_EFFECT -> new UseCharacterEffectPacket(position, itemId);
+         case DUEY -> new UseDueyPacket(position, itemId);
+         case CHALKBOARD -> new UseChalkboardPacket(position, itemId, accessor.readMapleAsciiString());
+         case AVATAR_BROADCASTERS -> readAvatarMegaphone(accessor, position, itemId);
+         case CHARACTER_MODIFIERS -> readNameOrWorldChange(accessor, position, itemId);
+         case CHARACTER_CREATORS -> readCharacterCreator(accessor, position, itemId);
+         case MIU_MIU -> new UseMiuMiuPacket(position, itemId);
+         case EXPIRATION_EXTENDERS -> new UseExtendExpirationPacket(position, itemId);
+         case SCISSORS_OF_KARMA -> readScissorsOfKarma(accessor, position, itemId);
+         case HAMMER -> readHammer(accessor, position, itemId);
+         case VEGA_SPELLS -> readVegaSpell(accessor, position, itemId);
+         default -> new UseUnhandledPacket(position, itemId, accessor.toString());
+      };
    }
 
    private AbstractUseCashItemPacket readHammer(SeekableLittleEndianAccessor accessor, short position, int itemId) {
@@ -122,13 +98,10 @@ public class UseCashItemReader implements PacketReader<AbstractUseCashItemPacket
    private AbstractUseCashItemPacket readNameOrWorldChange(SeekableLittleEndianAccessor accessor, short position, int itemId) {
       accessor.readByte();
       accessor.readInt();
-      switch (ConsumableCashItems.CharacterModifiers.getByItemId(itemId)) {
-         case NAME_CHANGE:
-            return new UseNameChangePacket(position, itemId);
-         case WORLD_CHANGE:
-            return new UseWorldChangePacket(position, itemId);
-      }
-      return null;
+      return switch (ConsumableCashItems.CharacterModifiers.getByItemId(itemId)) {
+         case NAME_CHANGE -> new UseNameChangePacket(position, itemId);
+         case WORLD_CHANGE -> new UseWorldChangePacket(position, itemId);
+      };
    }
 
    private AbstractUseCashItemPacket readAvatarMegaphone(SeekableLittleEndianAccessor accessor, short position, int itemId) {
@@ -183,19 +156,11 @@ public class UseCashItemReader implements PacketReader<AbstractUseCashItemPacket
    }
 
    private AbstractUseCashItemPacket readItemAugmenter(SeekableLittleEndianAccessor accessor, short position, int itemId) {
-      switch (ConsumableCashItems.ItemAugmenters.getByItemId(itemId)) {
-         case ITEM_TAG:
-            return readItemTag(accessor, position, itemId);
-         case ITEM_GUARD:
-         case ITEM_GUARD_7:
-         case ITEM_GUARD_30:
-         case ITEM_GUARD_90:
-         case ITEM_GUARD_365:
-            return readItemGuard(accessor, position, itemId);
-         case INCUBATOR:
-            return readIncubator(accessor, position, itemId);
-      }
-      return null;
+      return switch (ConsumableCashItems.ItemAugmenters.getByItemId(itemId)) {
+         case ITEM_TAG -> readItemTag(accessor, position, itemId);
+         case ITEM_GUARD, ITEM_GUARD_7, ITEM_GUARD_30, ITEM_GUARD_90, ITEM_GUARD_365 -> readItemGuard(accessor, position, itemId);
+         case INCUBATOR -> readIncubator(accessor, position, itemId);
+      };
    }
 
    private AbstractUseCashItemPacket readIncubator(SeekableLittleEndianAccessor accessor, short position, int itemId) {

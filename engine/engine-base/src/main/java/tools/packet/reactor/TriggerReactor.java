@@ -5,9 +5,9 @@ import server.maps.MapleReactor;
 import tools.packet.PacketInput;
 
 public class TriggerReactor implements PacketInput {
-   private MapleReactor reactor;
+   private final MapleReactor reactor;
 
-   private int stance;
+   private final int stance;
 
    public TriggerReactor(MapleReactor reactor, int stance) {
       this.reactor = reactor;

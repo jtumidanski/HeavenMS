@@ -13,17 +13,9 @@ public class MapleMapObjectTypeProcessor {
    }
 
    public boolean isNonRangedType(MapleMapObjectType type) {
-      switch (type) {
-         case NPC:
-         case PLAYER:
-         case HIRED_MERCHANT:
-         case PLAYER_NPC:
-         case DRAGON:
-         case MIST:
-         case KITE:
-            return true;
-         default:
-            return false;
-      }
+      return switch (type) {
+         case NPC, PLAYER, HIRED_MERCHANT, PLAYER_NPC, DRAGON, MIST, KITE -> true;
+         default -> false;
+      };
    }
 }

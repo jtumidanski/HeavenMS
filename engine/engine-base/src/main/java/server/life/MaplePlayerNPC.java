@@ -69,13 +69,13 @@ public class MaplePlayerNPC extends AbstractMapleMapObject {
       this.CY = CY;
       this.job = 7777;    // supposed to be developer
 
-      position_$eq(new Point(CX, CY));
-      this.objectId_$eq(oid);
+      setPosition(new Point(CX, CY));
+      setObjectId(oid);
    }
 
    public MaplePlayerNPC(int id, int x, int cy, String name, int hair, int face, int skin, int gender, int dir, int fh, int rx0,
                          int rx1, int scriptId, int worldRank, int overallRank, int worldJobRank, int overallJobRank, int job) {
-      this.objectId_$eq(id);
+      setObjectId(id);
       this.CY = cy;
       this.name = name;
       this.hair = hair;
@@ -92,7 +92,7 @@ public class MaplePlayerNPC extends AbstractMapleMapObject {
       this.worldJobRank = worldJobRank;
       this.overallJobRank = overallJobRank;
       this.job = job;
-      position_$eq(new Point(x, cy));
+      setPosition(new Point(x, cy));
    }
 
    private static void getRunningMetadata() {
@@ -427,7 +427,7 @@ public class MaplePlayerNPC extends AbstractMapleMapObject {
    }
 
    public void updatePlayerNPCPosition(MapleMap map, Point newPos) {
-      position_$eq(newPos);
+      setPosition(newPos);
       RX0 = newPos.x + 50;
       RX1 = newPos.x - 50;
       CY = newPos.y;

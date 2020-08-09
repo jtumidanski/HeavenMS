@@ -5,9 +5,9 @@ import net.server.world.MapleParty;
 import tools.packet.PacketInput;
 
 public class PartyCreated implements PacketInput {
-   private MapleParty party;
+   private final MapleParty party;
 
-   private int partyCharacterId;
+   private final int partyCharacterId;
 
    public PartyCreated(MapleParty party, int partyCharacterId) {
       this.party = party;

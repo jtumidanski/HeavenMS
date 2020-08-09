@@ -5,7 +5,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 
-import database.AbstractQueryExecutor;
+import accessor.AbstractQueryExecutor;
 import client.database.data.AllianceData;
 import client.database.utility.AllianceTransformer;
 import entity.Alliance;

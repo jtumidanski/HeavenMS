@@ -5,9 +5,9 @@ import server.maps.MapleMiniGame;
 import tools.packet.PacketInput;
 
 public class GetMatchCardStart implements PacketInput {
-   private MapleMiniGame miniGame;
+   private final MapleMiniGame miniGame;
 
-   private int loser;
+   private final int loser;
 
    public GetMatchCardStart(MapleMiniGame miniGame, int loser) {
       this.miniGame = miniGame;

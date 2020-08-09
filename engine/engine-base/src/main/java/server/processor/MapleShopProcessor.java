@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import client.MapleClient;
+import database.DatabaseConnection;
 import database.provider.ShopItemProvider;
 import database.provider.ShopProvider;
 import client.inventory.Item;
@@ -14,11 +15,9 @@ import client.inventory.manipulator.MapleInventoryManipulator;
 import client.processor.PetProcessor;
 import constants.inventory.ItemConstants;
 import constants.ShopTransactionOperation;
-import scala.Option;
 import server.MapleItemInformationProvider;
 import server.MapleShop;
 import server.MapleShopItem;
-import database.DatabaseConnection;
 import tools.PacketCreator;
 import tools.packet.shop.ConfirmShopTransaction;
 import tools.packet.shop.GetNPCShop;
@@ -104,8 +103,8 @@ public class MapleShopProcessor {
    }
 
    public void buy(MapleShop shop, MapleClient c, short slot, int itemId, short quantity) {
-      Option<MapleShopItem> itemResult = shop.findBySlot(slot);
-      if (itemResult.isDefined()) {
+      Optional<MapleShopItem> itemResult = shop.findBySlot(slot);
+      if (itemResult.isPresent()) {
          if (itemResult.get().itemId() != itemId) {
             System.out.println("Wrong slot number in shop " + shop.id());
             return;
@@ -217,7 +216,7 @@ public class MapleShopProcessor {
       if (item.quantity() < slotMax) {
          int price = (int) Math.ceil(ii.getUnitPrice(item.id()) * (slotMax - item.quantity()));
          if (c.getPlayer().getMeso() >= price) {
-            item.quantity_$eq(slotMax);
+            item = item.setQuantity(slotMax);
             c.getPlayer().forceUpdateItem(item);
             c.getPlayer().gainMeso(-price, false, true, false);
             PacketCreator.announce(c, new ConfirmShopTransaction(ShopTransactionOperation.DEFAULT_2));

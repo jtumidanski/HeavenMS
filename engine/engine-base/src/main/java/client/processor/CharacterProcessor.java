@@ -13,9 +13,9 @@ import java.util.regex.Pattern;
 import javax.persistence.EntityManager;
 
 import client.KeyBinding;
+import client.MapleAbnormalStatus;
 import client.MapleCharacter;
 import client.MapleClient;
-import client.MapleAbnormalStatus;
 import client.MapleFamily;
 import client.MapleJob;
 import client.MapleMount;
@@ -25,7 +25,6 @@ import client.Ring;
 import client.Skill;
 import client.SkillEntry;
 import client.SkillFactory;
-import client.creator.CharacterFactoryRecipe;
 import client.database.data.CharacterData;
 import client.database.data.CharacterGuildFamilyData;
 import client.database.data.CharacterIdNameAccountId;
@@ -92,7 +91,6 @@ import net.server.guild.MapleGuildCharacter;
 import net.server.processor.MapleGuildProcessor;
 import net.server.world.MaplePartyCharacter;
 import net.server.world.World;
-import scala.jdk.javaapi.CollectionConverters;
 import server.events.RescueGaga;
 import server.life.MobSkill;
 import server.life.MobSkillFactory;
@@ -137,7 +135,7 @@ public class CharacterProcessor {
    }
 
    public CharacterIdNameAccountId getCharacterFromDatabase(String name) {
-      return DatabaseConnection.getInstance().withConnectionResultOpt(connection -> CharacterProvider.getInstance().getByName(connection, name)).orElse(null);
+      return DatabaseConnection.getInstance().withConnectionResult(connection -> CharacterProvider.getInstance().getByName(connection, name).orElse(null)).orElse(null);
    }
 
    public boolean doWorldTransfer(EntityManager entityManager, int characterId, int oldWorld, int newWorld, int worldTransferId) {
@@ -366,7 +364,7 @@ public class CharacterProcessor {
          portal = mapleCharacter.getMap().getPortal(0);
          mapleCharacter.setInitialSpawnPoint(0);
       }
-      mapleCharacter.position_$eq(portal.getPosition());
+      mapleCharacter.setPosition(portal.getPosition());
    }
 
    private void loadPetIgnores(EntityManager entityManager, CharacterData data, MapleCharacter mapleCharacter) {
@@ -394,8 +392,8 @@ public class CharacterProcessor {
          mapleCharacter.getInventory(itemPair.getRight()).addItemFromDB(itemPair.getLeft());
          Item item = itemPair.getLeft();
          if (item.petId() > -1) {
-            if (item.pet().isDefined() && item.pet().get().summoned()) {
-               mapleCharacter.addPet(item.pet().get());
+            if (item.pet() != null && item.pet().summoned()) {
+               mapleCharacter.addPet(item.pet());
             }
             continue;
          }
@@ -406,7 +404,7 @@ public class CharacterProcessor {
             if (equip.ringId() > -1) {
                Ring ring = MapleRingProcessor.getInstance().loadFromDb(equip.ringId());
                if (itemPair.getRight().equals(MapleInventoryType.EQUIPPED)) {
-                  ring.equip();
+                  ring = ring.equip();
                }
 
                mapleCharacter.addPlayerRing(ring);
@@ -487,7 +485,7 @@ public class CharacterProcessor {
 
             FameLogProvider.getInstance().getForCharacter(connection, characterData.id()).forEach(fameLogData -> mapleCharacter.giveFame(fameLogData.getLeft(), fameLogData.getRight().getTime()));
 
-            BuddyListProcessor.getInstance().loadBuddies(characterData.id(), mapleCharacter.getBuddyList());
+            BuddyListProcessor.getInstance().loadBuddies(mapleCharacter);
             mapleCharacter.setStorage(world.getAccountStorage(characterData.accountId()));
 
             mapleCharacter.reapplyLocalStats();
@@ -496,15 +494,12 @@ public class CharacterProcessor {
             int mountId = mapleCharacter.getJobType() * 10000000 + 1004;
 
             MapleMount mapleMount;
+            int mountItemId = 0;
             if (mapleCharacter.getInventory(MapleInventoryType.EQUIPPED).getItem((short) -18) != null) {
-               mapleMount = new MapleMount(mapleCharacter.getInventory(MapleInventoryType.EQUIPPED).getItem((short) -18).id(), mountId);
-            } else {
-               mapleMount = new MapleMount(0, mountId);
+               mountItemId = mapleCharacter.getInventory(MapleInventoryType.EQUIPPED).getItem((short) -18).id();
             }
-            mapleMount.exp_$eq(characterData.mountExp());
-            mapleMount.level_$eq(characterData.mountLevel());
-            mapleMount.tiredness_$eq(characterData.mountTiredness());
-            mapleMount.active_$eq(false);
+
+            mapleMount = new MapleMount(mountItemId, mountId, characterData.mountLevel(), characterData.mountExp(), characterData.mountTiredness(), false);
             mapleCharacter.setMount(mapleMount);
 
             QuickSlotKeyMapProvider.getInstance().getForAccount(connection, characterData.accountId()).ifPresent(keyMap -> {
@@ -639,23 +634,7 @@ public class CharacterProcessor {
    }
 
 
-   public final boolean insertNewChar(MapleCharacter character, CharacterFactoryRecipe recipe) {
-      character.init(recipe.str(), recipe.dex(), recipe.intelligence(), recipe.luk(), recipe.maxHp(), recipe.maxMp(), recipe.meso());
-      character.setMaxHp(recipe.maxHp());
-      character.setMaxMp(recipe.maxMp());
-      character.setLevel(recipe.level());
-      character.setRemainingAp(recipe.remainingAp());
-      character.setRemainingSp(GameConstants.getSkillBook(character.getJob().getId()), recipe.remainingSp());
-      character.setMapId(recipe.map());
-
-      CollectionConverters.asJava(recipe.getStartingSkillLevel()).forEach(entry ->
-            SkillFactory.getSkill(entry.getLeft()).ifPresent(skill -> character.changeSkillLevel(skill, entry.getRight().byteValue(), skill.getMaxLevel(), -1)));
-
-      CollectionConverters.asJava(recipe.getStartingItems()).forEach(entry -> character.getInventory(entry.getRight()).addItem(entry.getLeft()));
-
-      character.getEvents().put("rescueGaga", new RescueGaga(0));
-
-
+   public final boolean insertNewChar(MapleCharacter character) {
       DatabaseConnection.getInstance().withConnection(entityManager -> {
          entityManager.getTransaction().begin();
          int key = CharacterAdministrator.getInstance().create(entityManager, character.getStr(), character.getDex(), character.getLuk(), character.getInt(), character.gmLevel(), character.getSkinColor().getId(),
@@ -718,24 +697,24 @@ public class CharacterProcessor {
    }
 
    public Optional<Byte> canDeleteCharacter(int characterId) {
-      return DatabaseConnection.getInstance().withConnectionResultOpt(connection -> {
+      return DatabaseConnection.getInstance().withConnectionResult(connection -> {
          Optional<CharacterGuildFamilyData> guildFamilyData = CharacterProvider.getInstance().getGuildFamilyInformation(connection, characterId);
          if (guildFamilyData.isEmpty()) {
-            return Optional.of((byte) 0x09);
+            return (byte) 0x09;
          }
          if (guildFamilyData.get().guildId() != 0 && guildFamilyData.get().guildRank() <= 1) {
-            return Optional.of((byte) 0x16);
+            return (byte) 0x16;
          } else if (guildFamilyData.get().familyId() != -1) {
             MapleFamily family = Server.getInstance().getWorld(guildFamilyData.get().world()).getFamily(guildFamilyData.get().familyId());
             if (family != null && family.getTotalMembers() > 1) {
-               return Optional.of((byte) 0x1D);
+               return (byte) 0x1D;
             }
          }
          int pendingWorldTransfers = WorldTransferProvider.getInstance().countOutstandingWorldTransfers(connection, characterId);
          if (pendingWorldTransfers > 0) {
-            return Optional.of((byte) 0x1A);
+            return (byte) 0x1A;
          }
-         return Optional.empty();
+         return null;
       });
    }
 }

@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
-import database.AbstractQueryExecutor;
+import accessor.AbstractQueryExecutor;
 import client.database.data.BbsThreadReplyData;
 import client.database.utility.BbsThreadReplyTransformer;
 import entity.bbs.BBSReply;

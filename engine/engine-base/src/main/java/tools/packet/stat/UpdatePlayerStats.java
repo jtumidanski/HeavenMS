@@ -9,11 +9,11 @@ import tools.Pair;
 import tools.packet.PacketInput;
 
 public class UpdatePlayerStats implements PacketInput {
-   private List<Pair<MapleStat, Integer>> statup;
+   private final List<Pair<MapleStat, Integer>> statup;
 
-   private boolean enableActions;
+   private final boolean enableActions;
 
-   private MapleCharacter mapleCharacter;
+   private final MapleCharacter mapleCharacter;
 
    public UpdatePlayerStats(List<Pair<MapleStat, Integer>> statup, boolean enableActions, MapleCharacter mapleCharacter) {
       this.statup = statup;

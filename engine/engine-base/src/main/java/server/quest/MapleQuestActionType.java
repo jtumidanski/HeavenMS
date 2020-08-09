@@ -9,43 +9,25 @@ public enum MapleQuestActionType {
    }
 
    public static MapleQuestActionType getByWZName(String name) {
-      switch (name) {
-         case "exp":
-            return EXP;
-         case "money":
-            return MESO;
-         case "item":
-            return ITEM;
-         case "skill":
-            return SKILL;
-         case "nextQuest":
-            return NEXT_QUEST;
-         case "pop":
-            return FAME;
-         case "buffItemID":
-            return BUFF;
-         case "petskill":
-            return PET_SKILL;
-         case "no":
-            return NO;
-         case "yes":
-            return YES;
-         case "npc":
-            return NPC;
-         case "lvmin":
-            return MIN_LEVEL;
-         case "normalAutoStart":
-            return NORMAL_AUTO_START;
-         case "pettameness":
-            return PET_TAMENESS;
-         case "petspeed":
-            return PET_SPEED;
-         case "info":
-            return INFO;
-         case "0":
-            return ZERO;
-         default:
-            return UNDEFINED;
-      }
+      return switch (name) {
+         case "exp" -> EXP;
+         case "money" -> MESO;
+         case "item" -> ITEM;
+         case "skill" -> SKILL;
+         case "nextQuest" -> NEXT_QUEST;
+         case "pop" -> FAME;
+         case "buffItemID" -> BUFF;
+         case "petskill" -> PET_SKILL;
+         case "no" -> NO;
+         case "yes" -> YES;
+         case "npc" -> NPC;
+         case "lvmin" -> MIN_LEVEL;
+         case "normalAutoStart" -> NORMAL_AUTO_START;
+         case "pettameness" -> PET_TAMENESS;
+         case "petspeed" -> PET_SPEED;
+         case "info" -> INFO;
+         case "0" -> ZERO;
+         default -> UNDEFINED;
+      };
    }
 }

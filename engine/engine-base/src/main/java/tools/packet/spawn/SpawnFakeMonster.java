@@ -5,9 +5,9 @@ import server.life.MapleMonster;
 import tools.packet.PacketInput;
 
 public class SpawnFakeMonster implements PacketInput {
-   private MapleMonster monster;
+   private final MapleMonster monster;
 
-   private int effectId;
+   private final int effectId;
 
    public SpawnFakeMonster(MapleMonster monster, int effectId) {
       this.monster = monster;

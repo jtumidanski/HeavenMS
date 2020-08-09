@@ -15,25 +15,25 @@ public class PartyOperationReader implements PacketReader<BasePartyOperationPack
    public BasePartyOperationPacket read(SeekableLittleEndianAccessor accessor) {
       int operation = accessor.readByte();
       switch (operation) {
-         case 1: {
+         case 1 -> {
             return new CreatePartyPacket(operation);
          }
-         case 2: {
+         case 2 -> {
             return new LeavePartyPacket(operation);
          }
-         case 3: { // join
+         case 3 -> { // join
             int partyId = accessor.readInt();
             return new JoinPartyPacket(operation, partyId);
          }
-         case 4: { // invite
+         case 4 -> { // invite
             String name = accessor.readMapleAsciiString();
             return new InvitePartyPacket(operation, name);
          }
-         case 5: { // expel
+         case 5 -> { // expel
             int cid = accessor.readInt();
             return new ExpelPartyPacket(operation, cid);
          }
-         case 6: { // change leader
+         case 6 -> { // change leader
             int newLeader = accessor.readInt();
             return new ChangeLeaderPartyPacket(operation, newLeader);
          }

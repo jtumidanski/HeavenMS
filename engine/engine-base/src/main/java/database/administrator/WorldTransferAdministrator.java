@@ -4,7 +4,7 @@ import java.sql.Timestamp;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import database.AbstractQueryExecutor;
+import accessor.AbstractQueryExecutor;
 import entity.WorldTransfer;
 
 public class WorldTransferAdministrator extends AbstractQueryExecutor {

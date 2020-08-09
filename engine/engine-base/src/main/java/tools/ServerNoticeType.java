@@ -20,23 +20,15 @@ public enum ServerNoticeType {
    }
 
    public static ServerNoticeType get(int i) {
-      switch (i) {
-         case 0:
-            return NOTICE;
-         case 1:
-            return POP_UP;
-         case 2:
-            return MEGAPHONE;
-         case 3:
-            return SUPER_MEGAPHONE;
-         case 4:
-            return SCROLL;
-         case 5:
-            return PINK_TEXT;
-         case 6:
-            return LIGHT_BLUE;
-         default:
-            throw new UnsupportedOperationException();
-      }
+      return switch (i) {
+         case 0 -> NOTICE;
+         case 1 -> POP_UP;
+         case 2 -> MEGAPHONE;
+         case 3 -> SUPER_MEGAPHONE;
+         case 4 -> SCROLL;
+         case 5 -> PINK_TEXT;
+         case 6 -> LIGHT_BLUE;
+         default -> throw new UnsupportedOperationException();
+      };
    }
 }

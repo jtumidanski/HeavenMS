@@ -45,8 +45,8 @@ public class ParcelPacketFactory extends AbstractPacketFactory {
       writer.write(packet.operation().getValue());
       if (packet.operation().getValue() == 8) {
          writer.write(0);
-         writer.write(packet.packages().get().size());
-         for (DueyPackage dp : packet.packages().get()) {
+         writer.write(packet.packages().size());
+         for (DueyPackage dp : packet.packages()) {
             writer.writeInt(dp.packageId());
             writer.writeAsciiString(dp.sender());
             for (int i = dp.sender().length(); i < 13; i++) {
@@ -69,7 +69,7 @@ public class ParcelPacketFactory extends AbstractPacketFactory {
             }
 
             writer.write(0);
-            if (dp.item() != null) {
+            if (dp.item().isPresent()) {
                writer.write(1);
                addItemInfo(writer, dp.item().get(), true);
             } else {

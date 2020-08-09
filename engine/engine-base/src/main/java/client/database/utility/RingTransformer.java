@@ -1,7 +1,7 @@
 package client.database.utility;
 
 import client.Ring;
-import database.SqlTransformer;
+import transformer.SqlTransformer;
 
 public class RingTransformer implements SqlTransformer<Ring, entity.Ring> {
    @Override

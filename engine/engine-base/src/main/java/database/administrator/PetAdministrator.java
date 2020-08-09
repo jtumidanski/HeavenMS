@@ -6,7 +6,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
-import database.AbstractQueryExecutor;
+import accessor.AbstractQueryExecutor;
 import client.inventory.manipulator.MapleCashIdGenerator;
 import entity.Pet;
 import server.MapleItemInformationProvider;

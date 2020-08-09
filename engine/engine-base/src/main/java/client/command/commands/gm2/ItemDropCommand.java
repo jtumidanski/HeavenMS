@@ -2,10 +2,11 @@ package client.command.commands.gm2;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import client.inventory.BetterItemFactory;
 import client.inventory.Item;
+import client.inventory.ItemBuilder;
 import client.inventory.MapleInventoryType;
-import client.processor.ItemProcessor;
+import client.inventory.MaplePet;
+import client.processor.PetProcessor;
 import constants.inventory.ItemConstants;
 import server.MapleItemInformationProvider;
 
@@ -22,24 +23,30 @@ public class ItemDropCommand extends AbstractItemProductionCommand {
    @Override
    protected void producePet(MapleClient client, int itemId, short quantity, int petId, long expiration) {
       MapleCharacter player = client.getPlayer();
-      Item toDrop = BetterItemFactory.getInstance().create(itemId, (short) 0, quantity, petId);
-      toDrop.expiration_(expiration);
-
-      toDrop.owner_$eq("");
-      setFlag(player, toDrop);
+      MaplePet pet = PetProcessor.getInstance().loadFromDb(itemId, (short) 0, petId);
+      Item toDrop = Item.newBuilder(itemId)
+            .setPosition((short) 0)
+            .setQuantity(quantity)
+            .setPet(pet)
+            .setPetId(petId)
+            .setExpiration(expiration)
+            .setOwner("")
+            .build();
+      toDrop = setFlag(player, toDrop);
       client.getPlayer().getMap().spawnItemDrop(client.getPlayer(), client.getPlayer(), toDrop, client.getPlayer().position(), true, true);
    }
 
-   private void setFlag(MapleCharacter player, Item toDrop) {
+   private Item setFlag(MapleCharacter player, Item toDrop) {
+      ItemBuilder builder = Item.newBuilder(toDrop);
+
       if (player.gmLevel() < 3) {
          short f = toDrop.flag();
          f |= ItemConstants.ACCOUNT_SHARING;
          f |= ItemConstants.UNTRADEABLE;
          f |= ItemConstants.SANDBOX;
-
-         ItemProcessor.getInstance().setFlag(toDrop, f);
-         toDrop.owner_$eq("TRIAL-MODE");
+         builder.setFlag(f).setOwner("TRIAL-MODE");
       }
+      return builder.build();
    }
 
    @Override
@@ -49,11 +56,11 @@ public class ItemDropCommand extends AbstractItemProductionCommand {
       if (ItemConstants.getInventoryType(itemId) == MapleInventoryType.EQUIP) {
          toDrop = MapleItemInformationProvider.getInstance().getEquipById(itemId);
       } else {
-         toDrop = new Item(itemId, (short) 0, quantity);
+         toDrop = Item.newBuilder(itemId).setPosition((short) 0).setQuantity(quantity).build();
       }
 
-      toDrop.owner_$eq(player.getName());
-      setFlag(player, toDrop);
+      toDrop = Item.newBuilder(toDrop).setOwner(player.getName()).build();
+      toDrop = setFlag(player, toDrop);
       player.getMap().spawnItemDrop(player, player, toDrop, player.position(), true, true);
    }
 }

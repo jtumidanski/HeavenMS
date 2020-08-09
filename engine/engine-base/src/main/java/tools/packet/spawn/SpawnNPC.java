@@ -5,7 +5,7 @@ import server.life.MapleNPC;
 import tools.packet.PacketInput;
 
 public class SpawnNPC implements PacketInput {
-   private MapleNPC npc;
+   private final MapleNPC npc;
 
    public SpawnNPC(MapleNPC npc) {
       this.npc = npc;

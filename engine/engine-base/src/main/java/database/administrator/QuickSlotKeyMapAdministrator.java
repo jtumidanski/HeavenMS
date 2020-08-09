@@ -3,7 +3,7 @@ package database.administrator;
 import java.math.BigInteger;
 import javax.persistence.EntityManager;
 
-import database.AbstractQueryExecutor;
+import accessor.AbstractQueryExecutor;
 import entity.QuickSlotKeyMap;
 
 public class QuickSlotKeyMapAdministrator extends AbstractQueryExecutor {

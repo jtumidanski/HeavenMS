@@ -137,24 +137,12 @@ public class StatEffectProcessor {
    }
 
    public boolean isHerosWill(int skillId) {
-      switch (skillId) {
-         case Hero.HEROS_WILL:
-         case Paladin.HEROS_WILL:
-         case DarkKnight.HEROS_WILL:
-         case FirePoisonArchMage.HEROS_WILL:
-         case IceLighteningArchMagician.HEROS_WILL:
-         case Bishop.HEROS_WILL:
-         case BowMaster.HEROS_WILL:
-         case Marksman.HEROS_WILL:
-         case NightLord.HEROS_WILL:
-         case Shadower.HEROS_WILL:
-         case Buccaneer.PIRATES_RAGE:
-         case Aran.HEROS_WILL:
-            return true;
-
-         default:
-            return false;
-      }
+      return switch (skillId) {
+         case Hero.HEROS_WILL, Paladin.HEROS_WILL, DarkKnight.HEROS_WILL, FirePoisonArchMage.HEROS_WILL,
+               IceLighteningArchMagician.HEROS_WILL, Bishop.HEROS_WILL, BowMaster.HEROS_WILL, Marksman.HEROS_WILL,
+               NightLord.HEROS_WILL, Shadower.HEROS_WILL, Buccaneer.PIRATES_RAGE, Aran.HEROS_WILL -> true;
+         default -> false;
+      };
    }
 
    private MapleStatEffect loadFromData(MapleData source, int sourceId, boolean skill, boolean overTime) {
@@ -259,35 +247,16 @@ public class StatEffectProcessor {
 
             } else if (isRateCoupon(sourceId)) {
                switch (MapleDataTool.getInt("expR", source, 0)) {
-                  case 1:
-                     addBuffStatPairToListIfNotZero(statups, MapleBuffStat.COUPON_EXP1, 1);
-                     break;
-
-                  case 2:
-                     addBuffStatPairToListIfNotZero(statups, MapleBuffStat.COUPON_EXP2, 1);
-                     break;
-
-                  case 3:
-                     addBuffStatPairToListIfNotZero(statups, MapleBuffStat.COUPON_EXP3, 1);
-                     break;
-
-                  case 4:
-                     addBuffStatPairToListIfNotZero(statups, MapleBuffStat.COUPON_EXP4, 1);
-                     break;
+                  case 1 -> addBuffStatPairToListIfNotZero(statups, MapleBuffStat.COUPON_EXP1, 1);
+                  case 2 -> addBuffStatPairToListIfNotZero(statups, MapleBuffStat.COUPON_EXP2, 1);
+                  case 3 -> addBuffStatPairToListIfNotZero(statups, MapleBuffStat.COUPON_EXP3, 1);
+                  case 4 -> addBuffStatPairToListIfNotZero(statups, MapleBuffStat.COUPON_EXP4, 1);
                }
 
                switch (MapleDataTool.getInt("drpR", source, 0)) {
-                  case 1:
-                     addBuffStatPairToListIfNotZero(statups, MapleBuffStat.COUPON_DRP1, 1);
-                     break;
-
-                  case 2:
-                     addBuffStatPairToListIfNotZero(statups, MapleBuffStat.COUPON_DRP2, 1);
-                     break;
-
-                  case 3:
-                     addBuffStatPairToListIfNotZero(statups, MapleBuffStat.COUPON_DRP3, 1);
-                     break;
+                  case 1 -> addBuffStatPairToListIfNotZero(statups, MapleBuffStat.COUPON_DRP1, 1);
+                  case 2 -> addBuffStatPairToListIfNotZero(statups, MapleBuffStat.COUPON_DRP2, 1);
+                  case 3 -> addBuffStatPairToListIfNotZero(statups, MapleBuffStat.COUPON_DRP3, 1);
                }
             } else if (isMonsterCard(sourceId)) {
                int prob = 0, itemUpCode = Integer.MAX_VALUE;
@@ -327,13 +296,8 @@ public class StatEffectProcessor {
                   prob = MapleDataTool.getInt("prob", source, 1);
 
                   switch (itemUpType) {
-                     case 2:
-                        itemUpCode = MapleDataTool.getInt("itemCode", source, 1);
-                        break;
-
-                     case 3:
-                        itemUpCode = MapleDataTool.getInt("itemRange", source, 1);    // 3 digits
-                        break;
+                     case 2 -> itemUpCode = MapleDataTool.getInt("itemCode", source, 1);
+                     case 3 -> itemUpCode = MapleDataTool.getInt("itemRange", source, 1);    // 3 digits
                   }
                }
 

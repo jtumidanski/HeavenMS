@@ -1,14 +1,14 @@
 package client.database.utility;
 
 import java.util.List;
+import java.util.Optional;
 
 import client.inventory.Item;
 import client.inventory.ItemFactory;
 import client.inventory.MapleInventoryType;
-import database.SqlTransformer;
-import scala.Option;
 import server.DueyPackage;
 import tools.Pair;
+import transformer.SqlTransformer;
 
 public class DueyPackageFromResultSetTransformer implements SqlTransformer<DueyPackage, entity.duey.DueyPackage> {
    @Override
@@ -19,15 +19,15 @@ public class DueyPackageFromResultSetTransformer implements SqlTransformer<DueyP
       DueyPackage dueyPackage;
 
       if (!dueyItems.isEmpty()) {     // in a duey package there's only one item
-         dueyPackage = new DueyPackage(packageId, Option.apply(dueyItems.get(0).getLeft()));
+         dueyPackage = new DueyPackage(packageId, Optional.of(dueyItems.get(0).getLeft()));
       } else {
          dueyPackage = new DueyPackage(packageId);
       }
 
-      dueyPackage.sender_$eq(resultSet.getSenderName());
-      dueyPackage.mesos_$eq(resultSet.getMesos());
+      dueyPackage.setSender(resultSet.getSenderName());
+      dueyPackage.setMesos(resultSet.getMesos());
       dueyPackage.setSentTime(resultSet.getTimestamp(), resultSet.getType() == 1);
-      dueyPackage.message_$eq(resultSet.getMessage());
+      dueyPackage.setMessage(resultSet.getMessage());
 
       return dueyPackage;
    }

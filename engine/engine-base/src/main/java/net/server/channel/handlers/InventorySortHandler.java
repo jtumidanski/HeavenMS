@@ -173,20 +173,10 @@ class PairedQuickSort {
 
    void MapleQuickSort(int Esq, int Dir, ArrayList<Item> A, int sort) {
       switch (sort) {
-         case 3:
-            PartitionByLevel(Esq, Dir, A);
-            break;
-
-         case 2:
-            PartitionByName(Esq, Dir, A);
-            break;
-
-         case 1:
-            PartitionByQuantity(Esq, Dir, A);
-            break;
-
-         default:
-            PartitionByItemId(Esq, Dir, A);
+         case 3 -> PartitionByLevel(Esq, Dir, A);
+         case 2 -> PartitionByName(Esq, Dir, A);
+         case 1 -> PartitionByQuantity(Esq, Dir, A);
+         default -> PartitionByItemId(Esq, Dir, A);
       }
 
 

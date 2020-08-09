@@ -5,12 +5,12 @@ import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 
+import database.DatabaseConnection;
 import database.administrator.BossLogDailyAdministrator;
 import database.administrator.BossLogWeeklyAdministrator;
 import database.provider.BossLogDailyProvider;
 import database.provider.BossLogWeeklyProvider;
 import config.YamlConfig;
-import database.DatabaseConnection;
 import tools.Pair;
 
 public class MapleExpeditionBossLog {

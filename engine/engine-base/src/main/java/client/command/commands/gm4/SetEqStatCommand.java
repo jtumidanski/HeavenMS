@@ -8,8 +8,8 @@ import client.inventory.MapleInventory;
 import client.inventory.MapleInventoryType;
 import client.processor.ItemProcessor;
 import constants.inventory.ItemConstants;
-import tools.MessageBroadcaster;
 import tools.I18nMessage;
+import tools.MessageBroadcaster;
 
 public class SetEqStatCommand extends Command {
    {
@@ -31,28 +31,28 @@ public class SetEqStatCommand extends Command {
       for (byte i = 1; i <= equip.getSlotLimit(); i++) {
          try {
             Equip eq = (Equip) equip.getItem(i);
-            if (eq == null) continue;
+            if (eq == null) {
+               continue;
+            }
 
-            eq.wdef_$eq(newStat);
-            eq.acc_$eq(newStat);
-            eq.avoid_$eq(newStat);
-            eq.jump_$eq(newSpdJmp);
-            eq.matk_$eq(newStat);
-            eq.mdef_$eq(newStat);
-            eq.hp_$eq(newStat);
-            eq.mp_$eq(newStat);
-            eq.speed_$eq(newSpdJmp);
-            eq.watk_$eq(newStat);
-            eq.dex_$eq(newStat);
-            eq._int_$eq(newStat);
-            eq.str_$eq(newStat);
-            eq.luk_$eq(newStat);
-
-            short flag = eq.flag();
-            flag |= ItemConstants.UNTRADEABLE;
-            ItemProcessor.getInstance().setFlag(eq, flag);
-
-            player.forceUpdateItem(eq);
+            Equip updated = Equip.newBuilder(eq)
+                  .setWdef(newStat)
+                  .setAcc(newStat)
+                  .setAvoid(newStat)
+                  .setJump(newSpdJmp)
+                  .setMatk(newStat)
+                  .setMdef(newStat)
+                  .setHp(newStat)
+                  .setMp(newStat)
+                  .setSpeed(newSpdJmp)
+                  .setWatk(newStat)
+                  .setDex(newStat)
+                  .setIntelligence(newStat)
+                  .setStr(newStat)
+                  .setLuk(newStat)
+                  .setFlag(ItemProcessor.getInstance().setFlag(eq.id(), (short) (eq.flag() | ItemConstants.UNTRADEABLE)))
+                  .build();
+            player.forceUpdateItem(updated);
          } catch (Exception e) {
             e.printStackTrace();
          }

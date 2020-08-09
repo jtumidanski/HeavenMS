@@ -11,6 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
 
@@ -78,7 +79,9 @@ public class MapleInventory implements Iterable<Item> {
    public static boolean checkSpots(MapleCharacter chr, List<Pair<Item, MapleInventoryType>> items, boolean useProofInv) {
       int invTypesSize = MapleInventoryType.values().length;
       List<Integer> zeroedList = new ArrayList<>(invTypesSize);
-      for (byte i = 0; i < invTypesSize; i++) zeroedList.add(0);
+      for (byte i = 0; i < invTypesSize; i++) {
+         zeroedList.add(0);
+      }
 
       return checkSpots(chr, items, zeroedList, useProofInv);
    }
@@ -156,7 +159,9 @@ public class MapleInventory implements Iterable<Item> {
 
    public static boolean checkSpotsAndOwnership(MapleCharacter chr, List<Pair<Item, MapleInventoryType>> items, boolean useProofInv) {
       List<Integer> zeroedList = new ArrayList<>(5);
-      for (byte i = 0; i < 5; i++) zeroedList.add(0);
+      for (byte i = 0; i < 5; i++) {
+         zeroedList.add(0);
+      }
 
       return checkSpotsAndOwnership(chr, items, zeroedList, useProofInv);
    }
@@ -372,13 +377,8 @@ public class MapleInventory implements Iterable<Item> {
       return ret;
    }
 
-   public short addItem(Item item) {
-      short slotId = addSlot(item);
-      if (slotId == -1) {
-         return -1;
-      }
-      item.position_(slotId);
-      return slotId;
+   public Optional<Item> addItem(Item item) {
+      return addToSlot(item);
    }
 
    public void addItemFromDB(Item item) {
@@ -397,7 +397,7 @@ public class MapleInventory implements Iterable<Item> {
             return;
          }
          if (target == null) {
-            source.position_(dSlot);
+            source = source.setPosition(dSlot);
             inventory.put(dSlot, source);
             inventory.remove(sSlot);
          } else if (target.id() == source.id() && !ItemConstants.isRechargeable(source.id()) && isSameOwner(source, target)) {
@@ -405,10 +405,12 @@ public class MapleInventory implements Iterable<Item> {
                swap(target, source);
             } else if (source.quantity() + target.quantity() > slotMax) {
                short rest = (short) ((source.quantity() + target.quantity()) - slotMax);
-               source.quantity_$eq(rest);
-               target.quantity_$eq(slotMax);
+               // TODO JDT this is an issue
+               source = source.setQuantity(rest);
+               target = target.setQuantity(slotMax);
             } else {
-               target.quantity_$eq((short) (source.quantity() + target.quantity()));
+               // TODO JDT this is an issue
+               target = target.setQuantity((short) (source.quantity() + target.quantity()));
                inventory.remove(sSlot);
             }
          } else {
@@ -423,8 +425,8 @@ public class MapleInventory implements Iterable<Item> {
       inventory.remove(source.position());
       inventory.remove(target.position());
       short swapPos = source.position();
-      source.position_(target.position());
-      target.position_(swapPos);
+      source = source.setPosition(target.position());
+      target = target.setPosition(swapPos);
       inventory.put(source.position(), source);
       inventory.put(target.position(), target);
    }
@@ -447,38 +449,61 @@ public class MapleInventory implements Iterable<Item> {
       if (item == null) {// TODO is it ok not to throw an exception here?
          return;
       }
-      item.quantity_$eq((short) (item.quantity() - quantity));
+      item = item.setQuantity((short) (item.quantity() - quantity));
       if (item.quantity() < 0) {
-         item.quantity_$eq((short) 0);
+         item = item.setQuantity((short) 0);
       }
       if (item.quantity() == 0 && !allowZero) {
          removeSlot(slot);
       }
    }
 
-   protected short addSlot(Item item) {
+   public void update(final Item item) {
       if (item == null) {
-         return -1;
+         return;
       }
 
-      short slotId;
       lock.lock();
       try {
-         slotId = getNextFreeSlot();
+         short slotId = inventory.keySet().stream()
+               .filter(key -> inventory.get(key).id() == item.id())
+               .findFirst()
+               .orElse((short) -1);
          if (slotId < 0) {
-            return -1;
+            return;
          }
 
          inventory.put(slotId, item);
       } finally {
          lock.unlock();
       }
+   }
 
-      if (ItemConstants.isRateCoupon(item.id())) {
+   protected Optional<Item> addToSlot(final Item item) {
+      if (item == null) {
+         return Optional.empty();
+      }
+
+      short slotId;
+      Item itemWithSlot;
+      lock.lock();
+      try {
+         slotId = getNextFreeSlot();
+         if (slotId < 0) {
+            return Optional.empty();
+         }
+
+         itemWithSlot = item.updatePosition(slotId);
+         inventory.put(slotId, itemWithSlot);
+      } finally {
+         lock.unlock();
+      }
+
+      if (ItemConstants.isRateCoupon(itemWithSlot.id())) {
          ThreadManager.getInstance().newTask(() -> owner.updateCouponRates());
       }
 
-      return slotId;
+      return Optional.of(itemWithSlot);
    }
 
    protected void addSlotFromDB(short slot, Item item) {

@@ -14,24 +14,25 @@ public class MapleKarmaManipulator {
       return (item.flag() & karmaFlag) == karmaFlag;
    }
 
-   public static void toggleKarmaFlagToUntradeable(Item item) {
+   public static Item toggleKarmaFlagToUntradeable(Item item) {
       short karmaFlag = getKarmaFlag(item);
       short flag = item.flag();
 
       if ((flag & karmaFlag) == karmaFlag) {
          flag ^= karmaFlag;
          flag |= ItemConstants.UNTRADEABLE;
-
-         ItemProcessor.getInstance().setFlag(item, (byte) flag);
+         return Item.newBuilder(item).setFlag(ItemProcessor.getInstance().setFlag(item.id(), (byte) flag)).build();
       }
+      return item;
    }
 
-   public static void setKarmaFlag(Item item) {
+   public static Item setKarmaFlag(Item item) {
       short karmaFlag = getKarmaFlag(item);
       short flag = item.flag();
 
       flag |= karmaFlag;
       flag &= (~ItemConstants.UNTRADEABLE);
-      ItemProcessor.getInstance().setFlag(item, (byte) flag);
+
+      return Item.newBuilder(item).setFlag(ItemProcessor.getInstance().setFlag(item.id(), (byte) flag)).build();
    }
 }

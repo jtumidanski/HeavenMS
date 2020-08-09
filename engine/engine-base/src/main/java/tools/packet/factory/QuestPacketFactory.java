@@ -1,14 +1,14 @@
 package tools.packet.factory;
 
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.quest.ShowQuestComplete;
+import tools.packet.quest.info.ShowQuestComplete;
 import tools.packet.quest.info.AddQuestTimeLimit;
 import tools.packet.quest.info.QuestError;
 import tools.packet.quest.info.QuestExpire;
 import tools.packet.quest.info.QuestFailure;
 import tools.packet.quest.info.QuestFinish;
 import tools.packet.quest.info.RemoveQuestTimeLimit;
-import tools.packet.quest.info.UpdateQuestInfo;
+import tools.packet.quest.UpdateQuestInfo;
 
 public class QuestPacketFactory extends AbstractPacketFactory {
    private static QuestPacketFactory instance;

@@ -1,5 +1,7 @@
 package net.server.channel.handlers;
 
+import java.util.Optional;
+
 import client.MapleCharacter;
 import client.MapleClient;
 import net.server.AbstractPacketHandler;
@@ -8,7 +10,6 @@ import net.server.channel.packet.reader.DenyPartyRequestReader;
 import net.server.coordinator.world.MapleInviteCoordinator;
 import net.server.coordinator.world.MapleInviteCoordinator.InviteResult;
 import net.server.coordinator.world.MapleInviteCoordinator.InviteType;
-import scala.Option;
 import tools.PacketCreator;
 import tools.packet.party.PartyStatusMessage;
 
@@ -25,7 +26,7 @@ public final class DenyPartyRequestHandler extends AbstractPacketHandler<DenyPar
          MapleCharacter chr = client.getPlayer();
          if (MapleInviteCoordinator.answerInvite(InviteType.PARTY, chr.getId(), characterFrom.getPartyId(), false).result == InviteResult.DENIED) {
             chr.updatePartySearchAvailability(chr.getParty().isEmpty());
-            PacketCreator.announce(characterFrom, new PartyStatusMessage(23, Option.apply(chr.getName())));
+            PacketCreator.announce(characterFrom, new PartyStatusMessage(23, Optional.of(chr.getName())));
          }
       });
    }

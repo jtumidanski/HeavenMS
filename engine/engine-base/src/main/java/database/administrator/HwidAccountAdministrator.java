@@ -5,7 +5,7 @@ import java.util.Calendar;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import database.AbstractQueryExecutor;
+import accessor.AbstractQueryExecutor;
 import entity.HwidAccount;
 
 public class HwidAccountAdministrator extends AbstractQueryExecutor {

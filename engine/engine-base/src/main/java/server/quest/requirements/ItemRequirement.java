@@ -77,6 +77,6 @@ public class ItemRequirement extends MapleQuestRequirement {
 
    public int getItemAmountNeeded(int itemId, boolean complete) {
       Integer amount = items.get(itemId);
-      return Objects.requireNonNullElseGet(amount, () -> complete ? Integer.MAX_VALUE : Integer.MIN_VALUE);
+      return Objects.requireNonNullElse(amount, complete ? Integer.MAX_VALUE : Integer.MIN_VALUE);
    }
 }

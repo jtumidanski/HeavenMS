@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
-import database.AbstractQueryExecutor;
+import accessor.AbstractQueryExecutor;
 import client.database.data.PlayerLifeData;
 import client.database.utility.PlayerLifeTransformer;
 import entity.PLife;

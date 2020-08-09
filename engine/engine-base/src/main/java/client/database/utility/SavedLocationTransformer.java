@@ -1,8 +1,8 @@
 package client.database.utility;
 
 import client.database.data.SavedLocationData;
-import database.SqlTransformer;
 import entity.SavedLocation;
+import transformer.SqlTransformer;
 
 public class SavedLocationTransformer implements SqlTransformer<SavedLocationData, SavedLocation> {
    @Override

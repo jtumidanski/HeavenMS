@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
-import database.AbstractQueryExecutor;
+import accessor.AbstractQueryExecutor;
 import client.database.data.AccountCashShopData;
 import client.database.data.AccountData;
 import client.database.data.AccountLoginData;

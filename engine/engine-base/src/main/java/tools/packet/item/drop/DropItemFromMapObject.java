@@ -8,15 +8,15 @@ import server.maps.MapleMapItem;
 import tools.packet.PacketInput;
 
 public class DropItemFromMapObject implements PacketInput {
-   private MapleCharacter character;
+   private final MapleCharacter character;
 
-   private MapleMapItem mapItem;
+   private final MapleMapItem mapItem;
 
-   private Point dropFrom;
+   private final Point dropFrom;
 
-   private Point dropTo;
+   private final Point dropTo;
 
-   private byte mod;
+   private final byte mod;
 
    public DropItemFromMapObject(MapleCharacter character, MapleMapItem mapItem, Point dropFrom, Point dropTo, byte mod) {
       this.character = character;

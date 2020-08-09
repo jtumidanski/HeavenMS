@@ -34,22 +34,22 @@ public class MapleFootholdTree {
 
    public void insert(MapleFoothold f) {
       if (depth == 0) {
-         if (f.firstX() > maxDropX) {
-            maxDropX = f.firstX();
+         if (f.firstPoint().x > maxDropX) {
+            maxDropX = f.firstPoint().x;
          }
-         if (f.firstX() < minDropX) {
-            minDropX = f.firstX();
+         if (f.firstPoint().x < minDropX) {
+            minDropX = f.firstPoint().x;
          }
-         if (f.secondX() > maxDropX) {
-            maxDropX = f.secondX();
+         if (f.secondPoint().x > maxDropX) {
+            maxDropX = f.secondPoint().x;
          }
-         if (f.secondX() < minDropX) {
-            minDropX = f.secondX();
+         if (f.secondPoint().x < minDropX) {
+            minDropX = f.secondPoint().x;
          }
       }
       if (depth == maxDepth ||
-            (f.firstX() >= p1.x && f.secondX() <= p2.x &&
-                  f.firstY() >= p1.y && f.secondY() <= p2.y)) {
+            (f.firstPoint().x >= p1.x && f.secondPoint().x <= p2.x &&
+                  f.firstPoint().y >= p1.y && f.secondPoint().y <= p2.y)) {
          footholds.add(f);
       } else {
          if (nw == null) {
@@ -58,11 +58,11 @@ public class MapleFootholdTree {
             sw = new MapleFootholdTree(new Point(p1.x, center.y), new Point(center.x, p2.y), depth + 1);
             se = new MapleFootholdTree(center, p2, depth + 1);
          }
-         if (f.secondX() <= center.x && f.secondY() <= center.y) {
+         if (f.secondPoint().x <= center.x && f.secondPoint().y <= center.y) {
             nw.insert(f);
-         } else if (f.firstX() > center.x && f.secondY() <= center.y) {
+         } else if (f.firstPoint().x > center.x && f.secondPoint().y <= center.y) {
             ne.insert(f);
-         } else if (f.secondX() <= center.x && f.firstY() > center.y) {
+         } else if (f.secondPoint().x <= center.x && f.firstPoint().y > center.y) {
             sw.insert(f);
          } else {
             se.insert(f);
@@ -93,8 +93,8 @@ public class MapleFootholdTree {
    private MapleFoothold findWallR(Point p1, Point p2) {
       MapleFoothold ret;
       for (MapleFoothold f : footholds) {
-         if (f.isWall() && f.firstX() >= p1.x && f.firstX() <= p2.x &&
-               f.firstY() >= p1.y && f.secondY() <= p1.y) {
+         if (f.isWall() && f.firstPoint().x >= p1.x && f.firstPoint().x <= p2.x &&
+               f.firstPoint().y >= p1.y && f.secondPoint().y <= p1.y) {
             return f;
          }
       }
@@ -136,31 +136,31 @@ public class MapleFootholdTree {
       List<MapleFoothold> relevants = getRelevants(p);
       List<MapleFoothold> xMatches = new LinkedList<>();
       for (MapleFoothold fh : relevants) {
-         if (fh.firstX() <= p.x && fh.secondX() >= p.x) {
+         if (fh.firstPoint().x <= p.x && fh.secondPoint().x >= p.x) {
             xMatches.add(fh);
          }
       }
       Collections.sort(xMatches);
       for (MapleFoothold fh : xMatches) {
          if (!fh.isWall()) {
-            if (fh.firstY() != fh.secondY()) {
+            if (fh.firstPoint().y != fh.secondPoint().y) {
                int calcY;
-               double s1 = Math.abs(fh.secondY() - fh.firstY());
-               double s2 = Math.abs(fh.secondX() - fh.firstX());
-               double s4 = Math.abs(p.x - fh.firstX());
+               double s1 = Math.abs(fh.secondPoint().y - fh.firstPoint().y);
+               double s2 = Math.abs(fh.secondPoint().x - fh.firstPoint().x);
+               double s4 = Math.abs(p.x - fh.firstPoint().x);
                double alpha = Math.atan(s2 / s1);
                double beta = Math.atan(s1 / s2);
                double s5 = Math.cos(alpha) * (s4 / Math.cos(beta));
-               if (fh.secondY() < fh.firstY()) {
-                  calcY = fh.firstY() - (int) s5;
+               if (fh.secondPoint().y < fh.firstPoint().y) {
+                  calcY = fh.firstPoint().y - (int) s5;
                } else {
-                  calcY = fh.firstY() + (int) s5;
+                  calcY = fh.firstPoint().y + (int) s5;
                }
                if (calcY >= p.y) {
                   return fh;
                }
             } else {
-               if (fh.firstY() >= p.y) {
+               if (fh.firstPoint().y >= p.y) {
                   return fh;
                }
             }

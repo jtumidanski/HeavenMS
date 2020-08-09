@@ -8,11 +8,11 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 
 import client.MapleClient;
+import database.DatabaseConnection;
 import database.provider.ReactorDropProvider;
 import scripting.AbstractScriptManager;
 import server.maps.MapleReactor;
 import server.maps.ReactorDropEntry;
-import database.DatabaseConnection;
 import tools.FilePrinter;
 
 public class ReactorScriptManager extends AbstractScriptManager {

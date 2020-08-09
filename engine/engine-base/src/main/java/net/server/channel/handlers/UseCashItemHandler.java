@@ -78,12 +78,12 @@ import server.maps.MapleMap;
 import server.maps.MaplePlayerShopItem;
 import server.maps.MapleTVEffect;
 import server.processor.MapleShopProcessor;
+import tools.I18nMessage;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
 import tools.ServerNoticeType;
-import tools.I18nMessage;
 import tools.SimpleMessage;
 import tools.packet.cashshop.SendMapleLifeError;
 import tools.packet.cashshop.SendMapleNameLifeError;
@@ -339,12 +339,11 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
    }
 
    private void hammer(MapleClient c, MapleCharacter player, short position, int itemId, short itemSlot) {
-      final Equip equip = (Equip) player.getInventory(MapleInventoryType.EQUIP).getItem(itemSlot);
+      Equip equip = (Equip) player.getInventory(MapleInventoryType.EQUIP).getItem(itemSlot);
       if (equip.vicious() >= 2 || player.getInventory(MapleInventoryType.CASH).findById(5570000) == null) {
          return;
       }
-      equip.vicious_$eq(equip.vicious() + 1);
-      equip.slots_$eq(equip.slots() + 1);
+      equip = Equip.newBuilder(equip).setVicious(equip.vicious() + 1).setSlots(equip.slots() + 1).build();
       remove(c, position, itemId);
       PacketCreator.announce(c, new EnableActions());
       PacketCreator.announce(c, new SendHammer(equip.vicious()));
@@ -359,7 +358,7 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
          return;
       }
 
-      MapleKarmaManipulator.setKarmaFlag(item);
+      item = MapleKarmaManipulator.setKarmaFlag(item);
       player.forceUpdateItem(item);
       remove(c, position, itemId);
       PacketCreator.announce(c, new EnableActions());
@@ -394,23 +393,13 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
          return;
       }
 
-      int createStatus;
-      switch (jobId) {
-         case 0:
-            createStatus = CharacterFactory.getInstance().createWarrior(c, name, face, hair + hairColor, skin, gender, improveSp);
-            break;
-         case 1:
-            createStatus = CharacterFactory.getInstance().createMagician(c, name, face, hair + hairColor, skin, gender, improveSp);
-            break;
-         case 2:
-            createStatus = CharacterFactory.getInstance().createBowman(c, name, face, hair + hairColor, skin, gender, improveSp);
-            break;
-         case 3:
-            createStatus = CharacterFactory.getInstance().createThief(c, name, face, hair + hairColor, skin, gender, improveSp);
-            break;
-         default:
-            createStatus = CharacterFactory.getInstance().createPirate(c, name, face, hair + hairColor, skin, gender, improveSp);
-      }
+      int createStatus = switch (jobId) {
+         case 0 -> CharacterFactory.getInstance().createWarrior(c, name, face, hair + hairColor, skin, gender, improveSp);
+         case 1 -> CharacterFactory.getInstance().createMagician(c, name, face, hair + hairColor, skin, gender, improveSp);
+         case 2 -> CharacterFactory.getInstance().createBowman(c, name, face, hair + hairColor, skin, gender, improveSp);
+         case 3 -> CharacterFactory.getInstance().createThief(c, name, face, hair + hairColor, skin, gender, improveSp);
+         default -> CharacterFactory.getInstance().createPirate(c, name, face, hair + hairColor, skin, gender, improveSp);
+      };
 
       if (createStatus == 0) {
          PacketCreator.announce(c, new SendMapleLifeError(0));   // success!
@@ -468,7 +457,7 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
             Pair<Integer, Boolean> p = PetProcessor.getInstance().canConsume(pet, itemId);
 
             if (p.getRight()) {
-               PetProcessor.getInstance().gainClosenessFullness(pet, player, p.getLeft(), 100, 1);
+               PetProcessor.getInstance().gainClosenessFullness(player, i, p.getLeft(), 100, 1);
                remove(c, position, itemId);
                break;
             }
@@ -505,7 +494,7 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
          PacketCreator.announce(c, new EnableActions());
          return;
       }
-      pet.name_$eq(newName);
+      pet = MaplePet.newBuilder(pet).setName(newName).build();
       PetProcessor.getInstance().saveToDb(pet);
 
       Item item = player.getInventory(MapleInventoryType.CASH).getItem(pet.position());
@@ -618,15 +607,14 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
          return;
       }
       Item eq = player.getInventory(MapleInventoryType.EQUIPPED).getItem((short) equipSlot);
-      eq.owner_$eq(player.getName());
+      eq = Item.newBuilder(eq).setOwner(player.getName()).build();
       player.forceUpdateItem(eq);
       remove(c, position, itemId);
    }
 
    private void sealingLock(MapleClient c, MapleCharacter player, short position, int itemId, byte inventoryType, int equipSlot) {
-      Item eq;
       MapleInventoryType type = MapleInventoryType.getByType(inventoryType);
-      eq = player.getInventory(type).getItem((short) equipSlot);
+      Item eq = player.getInventory(type).getItem((short) equipSlot);
       if (eq == null) { //Check if the type is EQUIPMENT?
          return;
       }
@@ -635,7 +623,7 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
       if (eq.expiration() > -1) {
          return; //No permanent items pls
       }
-      ItemProcessor.getInstance().setFlag(eq, flag);
+      eq = Item.newBuilder(eq).setFlag(ItemProcessor.getInstance().setFlag(eq.id(), flag)).build();
 
       long period = 0;
       if (ConsumableCashItems.ItemAugmenters.ITEM_GUARD_7.is(itemId)) {
@@ -649,7 +637,7 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
       }
 
       if (period > 0) {
-         eq.expiration_(currentServerTime() + (period * 60 * 60 * 24 * 1000));
+         eq = Item.newBuilder(eq).setExpiration(currentServerTime() + (period * 60 * 60 * 24 * 1000)).build();
       }
 
       remove(c, position, itemId);
@@ -710,15 +698,15 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
                   boolean update = false;// cleaner?
                   if (macro.skill1() == from) {
                      update = true;
-                     macro.setSkill1(0);
+                     macro = macro.setSkill1(0);
                   }
                   if (macro.skill2() == from) {
                      update = true;
-                     macro.setSkill2(0);
+                     macro = macro.setSkill2(0);
                   }
                   if (macro.skill3() == from) {
                      update = true;
-                     macro.setSkill3(0);
+                     macro = macro.setSkill3(0);
                   }
                   if (update) {
                      updated = true;

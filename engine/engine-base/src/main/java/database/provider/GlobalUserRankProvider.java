@@ -5,7 +5,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
-import database.AbstractQueryExecutor;
+import accessor.AbstractQueryExecutor;
 import client.database.data.CharacterData;
 import client.database.data.GlobalUserRank;
 import client.database.data.WorldRankData;
@@ -53,7 +53,8 @@ public class GlobalUserRankProvider extends AbstractQueryExecutor {
             currentWorld = characterData.world();
             rankSystem.add(new WorldRankData(characterData.world()));
          }
-         rankSystem.get(characterData.world()).addUserRank(new GlobalUserRank(characterData.name(), characterData.level()));
+
+         rankSystem.set(characterData.world(), rankSystem.get(characterData.world()).addUserRank(new GlobalUserRank(characterData.name(), characterData.level())));
       }
       return rankSystem;
    }
@@ -72,7 +73,7 @@ public class GlobalUserRankProvider extends AbstractQueryExecutor {
 
       rankSystem.add(new WorldRankData(0));
       for (CharacterData characterData : characterDataList) {
-         rankSystem.get(characterData.world()).addUserRank(new GlobalUserRank(characterData.name(), characterData.level()));
+         rankSystem.set(characterData.world(), rankSystem.get(characterData.world()).addUserRank(new GlobalUserRank(characterData.name(), characterData.level())));
       }
       return rankSystem;
    }

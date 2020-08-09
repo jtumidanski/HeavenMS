@@ -77,7 +77,7 @@ public class AssignAPProcessor {
                luk += nEquip.luk();
 
                //if(nEquip.getInt() > 0) eqpIntList.add(nEquip.getInt()); //not needed...
-               int_ += nEquip._int();
+               int_ += nEquip.intelligence();
             }
 
             statUpdate[0] = chr.getStr();

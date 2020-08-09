@@ -1,8 +1,8 @@
 package client.database.utility;
 
 import client.database.data.AllianceData;
-import database.SqlTransformer;
 import entity.Alliance;
+import transformer.SqlTransformer;
 
 public class AllianceTransformer implements SqlTransformer<AllianceData, Alliance> {
    @Override

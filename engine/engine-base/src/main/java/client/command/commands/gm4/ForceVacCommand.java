@@ -27,7 +27,9 @@ public class ForceVacCommand extends Command {
 
          mapItem.lockItem();
          try {
-            if (mapItem.isPickedUp()) continue;
+            if (mapItem.isPickedUp()) {
+               continue;
+            }
 
             if (mapItem.getMeso() > 0) {
                player.gainMeso(mapItem.getMeso(), true);
@@ -41,7 +43,7 @@ public class ForceVacCommand extends Command {
                   continue;
                }
                MapleInventoryManipulator.addById(c, mapItem.getItem().id(), mapItem.getItem().quantity(), null, petId);
-            } else if (MapleInventoryManipulator.addFromDrop(c, mapItem.getItem(), true)) {
+            } else if (MapleInventoryManipulator.addFromDrop(c, mapItem.getItem(), true).isPresent()) {
                if (mapItem.getItemId() == 4031868) {
                   player.updateAriantScore();
                }

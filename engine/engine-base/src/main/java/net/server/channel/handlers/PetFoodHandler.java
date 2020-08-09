@@ -63,7 +63,7 @@ public final class PetFoodHandler extends AbstractPacketHandler<PetFoodPacket> {
                   return;
                }
 
-               PetProcessor.getInstance().gainClosenessFullness(pet, chr, (pet.fullness() <= 75) ? 1 : 0, 30, 1);   // 25+ "emptiness" to get +1 closeness
+               PetProcessor.getInstance().gainClosenessFullness(chr, slot, (pet.fullness() <= 75) ? 1 : 0, 30, 1);   // 25+ "emptiness" to get +1 closeness
                MapleInventoryManipulator.removeFromSlot(client, MapleInventoryType.USE, packet.position(), (short) 1, false);
             } finally {
                useInv.unlockInventory();

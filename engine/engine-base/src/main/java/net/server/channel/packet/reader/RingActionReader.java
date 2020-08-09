@@ -15,23 +15,16 @@ public class RingActionReader implements PacketReader<BaseRingPacket> {
    @Override
    public BaseRingPacket read(SeekableLittleEndianAccessor accessor) {
       byte mode = accessor.readByte();
-      switch (mode) {
-         case 0:
-            return readEngagementProposal(accessor, mode);
-         case 1:
-            return readCancelProposal(mode);
-         case 2:
-            return readRespondToProposal(accessor, mode);
-         case 3:
-            return readBreakEngagement(accessor, mode);
-         case 5:
-            return readInviteToWedding(accessor, mode);
-         case 6:
-            return readOpenWeddingInvitation(accessor, mode);
-         case 9:
-            return readHandleWishList(accessor, mode);
-      }
-      return new BaseRingPacket(mode);
+      return switch (mode) {
+         case 0 -> readEngagementProposal(accessor, mode);
+         case 1 -> readCancelProposal(mode);
+         case 2 -> readRespondToProposal(accessor, mode);
+         case 3 -> readBreakEngagement(accessor, mode);
+         case 5 -> readInviteToWedding(accessor, mode);
+         case 6 -> readOpenWeddingInvitation(accessor, mode);
+         case 9 -> readHandleWishList(accessor, mode);
+         default -> new BaseRingPacket(mode);
+      };
    }
 
    private BaseRingPacket readHandleWishList(SeekableLittleEndianAccessor accessor, byte mode) {

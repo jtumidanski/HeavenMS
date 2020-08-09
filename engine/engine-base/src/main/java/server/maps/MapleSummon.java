@@ -22,7 +22,7 @@ public class MapleSummon extends AbstractAnimatedMapleMapObject {
          }
 
          this.movementType = movementType;
-         position_$eq(pos);
+         setPosition(pos);
       });
    }
 
@@ -60,12 +60,9 @@ public class MapleSummon extends AbstractAnimatedMapleMapObject {
    }
 
    public final boolean isPuppet() {
-      switch (skillId) {
-         case 3111002:
-         case 3211002:
-         case 13111004:
-            return true;
-      }
-      return false;
+      return switch (skillId) {
+         case 3111002, 3211002, 13111004 -> true;
+         default -> false;
+      };
    }
 }

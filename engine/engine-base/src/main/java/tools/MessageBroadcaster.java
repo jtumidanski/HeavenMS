@@ -88,7 +88,7 @@ public class MessageBroadcaster {
    public void sendServerNoticeToAcquaintances(MapleCharacter originator, ServerNoticeType noticeType, UserMessage message) {
       {
          PlayerStorage playerStorage = originator.getClient().getChannelServer().getPlayerStorage();
-         Collection<MapleCharacter> buddies = Arrays.stream(originator.getBuddyList().getBuddyIds())
+         Collection<MapleCharacter> buddies = Arrays.stream(originator.getBuddyList().buddyIds())
                .mapToObj(playerStorage::getCharacterById)
                .flatMap(Optional::stream)
                .filter(MapleCharacter::isLoggedInWorld)

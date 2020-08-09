@@ -7,8 +7,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import client.MapleCharacter;
 import client.MapleAbnormalStatus;
+import client.MapleCharacter;
 import client.status.MonsterStatus;
 import constants.game.GameConstants;
 import net.server.services.task.channel.OverallService;
@@ -73,7 +73,7 @@ public class MobSkillProcessor {
             stats.put(MonsterStatus.MAGIC_DEFENSE_UP, mobSkill.x());
             break;
          case 114:
-            if (mobSkill.lt().isDefined() && mobSkill.rb().isDefined() && skill) {
+            if (mobSkill.lt() != null && mobSkill.rb() != null && skill) {
                List<MapleMapObject> objects = getObjectsInRange(mobSkill, monster, MapleMapObjectType.MONSTER);
                final int hps = (mobSkill.x() / 1000) * (int) (950 + 1050 * Math.random());
                for (MapleMapObject mons : objects) {
@@ -105,7 +105,7 @@ public class MobSkillProcessor {
             disease = MapleAbnormalStatus.SLOW;
             break;
          case 127:
-            if (mobSkill.lt().isDefined() && mobSkill.rb().isDefined() && skill) {
+            if (mobSkill.lt() != null && mobSkill.rb() != null && skill) {
                for (MapleCharacter character : getPlayersInRange(mobSkill, monster)) {
                   character.dispel();
                }
@@ -117,7 +117,7 @@ public class MobSkillProcessor {
             disease = MapleAbnormalStatus.SEDUCE;
             break;
          case 129: // Banish
-            if (mobSkill.lt().isDefined() && mobSkill.rb().isDefined() && skill) {
+            if (mobSkill.lt() != null && mobSkill.rb() != null && skill) {
                banishPlayers.addAll(getPlayersInRange(mobSkill, monster));
             } else {
                banishPlayers.add(player);
@@ -188,13 +188,13 @@ public class MobSkillProcessor {
                         if (bossRushMap) {
                            toSpawn.disableDrops();
                         }
-                        toSpawn.position_$eq(monster.position());
+                        toSpawn.setPosition(monster.position());
                         int yPosition, xPosition;
                         xPosition = (int) monster.position().getX();
                         yPosition = (int) monster.position().getY();
                         switch (mobId) {
                            case 8500003: // Pap bomb high
-                              toSpawn.fh_$eq((int) Math.ceil(Math.random() * 19.0));
+                              toSpawn.setFh((int) Math.ceil(Math.random() * 19.0));
                               yPosition = -590;
                               break;
                            case 8500004: // Pap bomb
@@ -228,7 +228,7 @@ public class MobSkillProcessor {
                               }
                               break;
                         }
-                        toSpawn.position_$eq(new Point(xPosition, yPosition));
+                        toSpawn.setPosition(new Point(xPosition, yPosition));
                         if (toSpawn.id() == 8500004) {
                            map.spawnFakeMonster(toSpawn);
                         } else {
@@ -245,7 +245,7 @@ public class MobSkillProcessor {
             break;
       }
       if (stats.size() > 0) {
-         if (mobSkill.lt().isDefined() && mobSkill.rb().isDefined() && skill) {
+         if (mobSkill.lt() != null && mobSkill.rb() != null && skill) {
             for (MapleMapObject mons : getObjectsInRange(mobSkill, monster, MapleMapObjectType.MONSTER)) {
                ((MapleMonster) mons).applyMonsterBuff(stats, mobSkill.x(), mobSkill.skillId(), mobSkill.duration(), mobSkill, reflection);
             }
@@ -254,7 +254,7 @@ public class MobSkillProcessor {
          }
       }
       if (disease != null) {
-         if (mobSkill.lt().isDefined() && mobSkill.rb().isDefined() && skill) {
+         if (mobSkill.lt() != null && mobSkill.rb() != null && skill) {
             int i = 0;
             for (MapleCharacter character : getPlayersInRange(mobSkill, monster)) {
                if (!character.hasActiveBuff(2321005)) {  // holy shield
@@ -279,8 +279,8 @@ public class MobSkillProcessor {
    }
 
    private Rectangle calculateBoundingBox(MobSkill mobSkill, Point posFrom) {
-      Point mylt = new Point(mobSkill.lt().get().x + posFrom.x, mobSkill.lt().get().y + posFrom.y);
-      Point myrb = new Point(mobSkill.rb().get().x + posFrom.x, mobSkill.rb().get().y + posFrom.y);
+      Point mylt = new Point(mobSkill.lt().x + posFrom.x, mobSkill.lt().y + posFrom.y);
+      Point myrb = new Point(mobSkill.rb().x + posFrom.x, mobSkill.rb().y + posFrom.y);
       return new Rectangle(mylt.x, mylt.y, myrb.x - mylt.x, myrb.y - mylt.y);
    }
 

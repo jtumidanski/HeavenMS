@@ -72,12 +72,12 @@ import server.maps.MapleMiniDungeonInfo;
 import tools.BCrypt;
 import tools.FilePrinter;
 import tools.HexTool;
+import tools.I18nMessage;
 import tools.LogHelper;
 import tools.MapleAESOFB;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
-import tools.I18nMessage;
 import tools.packet.ChangeChannel;
 import tools.packet.cashshop.ShowCash;
 import tools.packet.foreigneffect.ShowHint;
@@ -336,7 +336,7 @@ public class MapleClient {
          return 6;
       }
 
-      Optional<AccountData> accountData = DatabaseConnection.getInstance().withConnectionResultOpt(connection -> AccountProvider.getInstance().getAccountDataByName(connection, login));
+      Optional<AccountData> accountData = DatabaseConnection.getInstance().withConnectionResult(connection -> AccountProvider.getInstance().getAccountDataByName(connection, login).orElse(null));
       if (accountData.isEmpty()) {
          accId = -2;
       } else {

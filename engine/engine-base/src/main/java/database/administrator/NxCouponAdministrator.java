@@ -2,7 +2,7 @@ package database.administrator;
 
 import javax.persistence.EntityManager;
 
-import database.AbstractQueryExecutor;
+import accessor.AbstractQueryExecutor;
 import entity.nx.NXCoupon;
 
 public class NxCouponAdministrator extends AbstractQueryExecutor {

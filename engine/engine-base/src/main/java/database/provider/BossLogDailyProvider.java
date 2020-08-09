@@ -3,7 +3,7 @@ package database.provider;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
-import database.AbstractQueryExecutor;
+import accessor.AbstractQueryExecutor;
 import entity.boss.BossType;
 
 public class BossLogDailyProvider extends AbstractQueryExecutor {

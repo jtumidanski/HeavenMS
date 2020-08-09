@@ -1,0 +1,11 @@
+package tools.packet.quest.info;
+
+import net.opcodes.SendOpcode;
+import tools.packet.PacketInput;
+
+public record AddQuestTimeLimit(Short questId, Integer time) implements PacketInput {
+   @Override
+   public SendOpcode opcode() {
+      return SendOpcode.UPDATE_QUEST_INFO;
+   }
+}

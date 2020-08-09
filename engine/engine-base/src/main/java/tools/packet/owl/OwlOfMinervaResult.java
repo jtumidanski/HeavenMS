@@ -9,9 +9,9 @@ import tools.Pair;
 import tools.packet.PacketInput;
 
 public class OwlOfMinervaResult implements PacketInput {
-   private int itemId;
+   private final int itemId;
 
-   private List<Pair<MaplePlayerShopItem, AbstractMapleMapObject>> hmsAvailable;
+   private final List<Pair<MaplePlayerShopItem, AbstractMapleMapObject>> hmsAvailable;
 
    public OwlOfMinervaResult(int itemId, List<Pair<MaplePlayerShopItem, AbstractMapleMapObject>> hmsAvailable) {
       this.itemId = itemId;

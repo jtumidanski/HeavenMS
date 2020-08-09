@@ -23,12 +23,12 @@ import net.server.channel.packet.reader.MakerActionReader;
 import server.MakerItemFactory;
 import server.MapleItemInformationProvider;
 import tools.FilePrinter;
+import tools.I18nMessage;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
 import tools.ServerNoticeType;
-import tools.I18nMessage;
 import tools.packet.foreigneffect.ShowForeignMakerEffect;
 import tools.packet.maker.MakerCrystalResult;
 import tools.packet.maker.MakerEnableActions;
@@ -143,32 +143,38 @@ public final class MakerSkillHandler extends AbstractPacketHandler<BaseMakerActi
             short createStatus = getCreateStatus(client, recipe);
 
             switch (createStatus) {
-               case -1:// non-available for Maker item id has been tried to forge
+               // non-available for Maker item id has been tried to forge
+               case -1 -> {
                   FilePrinter.printError(FilePrinter.EXPLOITS, "Player " + client.getPlayer().getName() + " tried to craft item id " + toCreate + " using the Maker skill.");
                   MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("MAKER_SKILL_REQUESTED_ITEM_COULD_NOT_BE_CRAFTED"));
                   PacketCreator.announce(client, new MakerEnableActions());
-                  break;
-               case 1: // no items
+               }
+               // no items
+               case 1 -> {
                   MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("MAKER_SKILL_MISSING_REQUIRED_ITEM").with(MapleItemInformationProvider.getInstance().getName(toCreate)));
                   PacketCreator.announce(client, new MakerEnableActions());
-                  break;
-               case 2: // no meso
+               }
+               // no meso
+               case 2 -> {
                   MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("MAKER_SKILL_MINIMUM_MESO_ERROR").with(GameConstants.numberWithCommas(recipe.getCost())));
                   PacketCreator.announce(client, new MakerEnableActions());
-                  break;
-               case 3: // no req level
+               }
+               // no req level
+               case 3 -> {
                   MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("MAKER_SKILL_MINIMUM_LEVEL_ERROR"));
                   PacketCreator.announce(client, new MakerEnableActions());
-                  break;
-               case 4: // no req skill level
+               }
+               // no req skill level
+               case 4 -> {
                   MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("MAKER_SKILL_MINIMUM_MAKER_LEVEL_ERROR"));
                   PacketCreator.announce(client, new MakerEnableActions());
-                  break;
-               case 5: // inventory full
+               }
+               // inventory full
+               case 5 -> {
                   MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("INVENTORY_FULL_ERROR"));
                   PacketCreator.announce(client, new MakerEnableActions());
-                  break;
-               default:
+               }
+               default -> {
                   if (toDisassemble != -1) {
                      MapleInventoryManipulator.removeFromSlot(client, MapleInventoryType.EQUIP, (short) pos, (short) 1, false);
                   } else {
@@ -176,7 +182,6 @@ public final class MakerSkillHandler extends AbstractPacketHandler<BaseMakerActi
                         client.getAbstractPlayerInteraction().gainItem(p.getLeft(), (short) -p.getRight(), false);
                      }
                   }
-
                   int cost = recipe.getCost();
                   if (stimulantId == -1 && reagentIds.isEmpty()) {
                      if (cost > 0) {
@@ -205,7 +210,6 @@ public final class MakerSkillHandler extends AbstractPacketHandler<BaseMakerActi
                      }
                      makerSucceeded = addBoostedMakerItem(client, toCreate, stimulantId, reagentIds);
                   }
-
                   if (type == 3) {
                      PacketCreator.announce(client, new MakerCrystalResult(recipe.getGainItems().get(0).getLeft(), recipe.getReqItems().get(0).getLeft()));
                   } else if (type == 4) {
@@ -213,15 +217,14 @@ public final class MakerSkillHandler extends AbstractPacketHandler<BaseMakerActi
                   } else {
                      PacketCreator.announce(client, new MakerResult(makerSucceeded, recipe.getGainItems().get(0).getLeft(), recipe.getGainItems().get(0).getRight(), recipe.getCost(), recipe.getReqItems(), stimulantId, new LinkedList<>(reagentIds.keySet())));
                   }
-
                   PacketCreator.announce(client, new ShowMakerEffect(makerSucceeded));
                   boolean finalMakerSucceeded = makerSucceeded;
                   MasterBroadcaster.getInstance().sendToAllInMap(client.getPlayer().getMap(),
                         new ShowForeignMakerEffect(client.getPlayer().getId(), finalMakerSucceeded), false, client.getPlayer());
-
                   if (toCreate == 4260003 && type == 3 && client.getPlayer().getQuestStatus(6033) == 1) {
                      client.getAbstractPlayerInteraction().setQuestProgress(6033, 1);
                   }
+               }
             }
          } finally {
             client.releaseClient();
@@ -343,16 +346,15 @@ public final class MakerSkillHandler extends AbstractPacketHandler<BaseMakerActi
          return false;
       }
 
-      Equip eqp = (Equip) item;
-      if (ItemConstants.isAccessory(item.id()) && eqp.slots() <= 0) {
-         eqp.slots_$eq(3);
+      if (ItemConstants.isAccessory(item.id()) && ((Equip) item).slots() <= 0) {
+         item = Equip.newBuilder(((Equip) item)).setSlots(3).build();
       }
 
       if (YamlConfig.config.server.USE_ENHANCED_CRAFTING) {
          if (!(c.getPlayer().isGM() && YamlConfig.config.server.USE_PERFECT_GM_SCROLL)) {
-            eqp.slots_$eq((byte) (eqp.slots() + 1));
+            item = Equip.newBuilder(((Equip) item)).setSlots((byte) (((Equip) item).slots() + 1)).build();
          }
-         item = MapleItemInformationProvider.getInstance().scrollEquipWithId(eqp, 2049100, true, 2049100, c.getPlayer().isGM());
+         item = MapleItemInformationProvider.getInstance().scrollEquipWithId(item, 2049100, true, 2049100, c.getPlayer().isGM());
       }
 
       if (!reagentIds.isEmpty()) {
@@ -377,13 +379,8 @@ public final class MakerSkillHandler extends AbstractPacketHandler<BaseMakerActi
 
                   if (!stat.equals("ReqLevel")) {    // improve req level... really?
                      switch (stat) {
-                        case "MaxHP":
-                           stat = "MHP";
-                           break;
-
-                        case "MaxMP":
-                           stat = "MMP";
-                           break;
+                        case "MaxHP" -> stat = "MHP";
+                        case "MaxMP" -> stat = "MMP";
                      }
                      stats.merge(stat, reagentBuff.getRight() * r.getValue(), Integer::sum);
                   }
@@ -391,19 +388,19 @@ public final class MakerSkillHandler extends AbstractPacketHandler<BaseMakerActi
             }
          }
 
-         MapleItemInformationProvider.improveEquipStats(eqp, stats);
+         MapleItemInformationProvider.improveEquipStats(((Equip) item), stats);
 
          for (Short sh : randStat) {
-            MapleItemInformationProvider.getInstance().scrollOptionEquipWithChaos(eqp, sh, false);
+            item = MapleItemInformationProvider.getInstance().scrollOptionEquipWithChaos(((Equip) item), sh, false);
          }
 
          for (Short sh : randOption) {
-            MapleItemInformationProvider.getInstance().scrollOptionEquipWithChaos(eqp, sh, true);
+            item = MapleItemInformationProvider.getInstance().scrollOptionEquipWithChaos(((Equip) item), sh, true);
          }
       }
 
       if (stimulantId != -1) {
-         eqp = MapleItemInformationProvider.getInstance().randomizeUpgradeStats(eqp);
+         item = Equip.newBuilder(((Equip) item)).randomizeUpgradeStats().build();
       }
 
       MapleInventoryManipulator.addFromDrop(c, item, false, -1);

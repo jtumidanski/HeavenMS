@@ -11,6 +11,7 @@ import javax.persistence.EntityManager;
 
 import client.MapleCharacter;
 import client.MapleClient;
+import database.DatabaseConnection;
 import database.administrator.CharacterAdministrator;
 import database.administrator.FredStorageAdministrator;
 import database.administrator.InventoryItemAdministrator;
@@ -29,7 +30,6 @@ import net.server.Server;
 import net.server.world.World;
 import server.MapleItemInformationProvider;
 import server.maps.MapleHiredMerchant;
-import database.DatabaseConnection;
 import tools.FilePrinter;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;

@@ -5,9 +5,9 @@ import server.maps.MapleMiniGame;
 import tools.packet.PacketInput;
 
 public class MiniGameOwnerWin implements PacketInput {
-   private MapleMiniGame game;
+   private final MapleMiniGame game;
 
-   private boolean forfeit;
+   private final boolean forfeit;
 
    public MiniGameOwnerWin(MapleMiniGame game, boolean forfeit) {
       this.game = game;

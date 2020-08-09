@@ -4,7 +4,7 @@ package database.administrator;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import database.AbstractQueryExecutor;
+import accessor.AbstractQueryExecutor;
 import entity.Marriage;
 
 public class MarriageAdministrator extends AbstractQueryExecutor {

@@ -6,9 +6,9 @@ import server.maps.MapleHiredMerchant;
 import tools.packet.PacketInput;
 
 public class UpdateHiredMerchant implements PacketInput {
-   private MapleCharacter character;
+   private final MapleCharacter character;
 
-   private MapleHiredMerchant hiredMerchant;
+   private final MapleHiredMerchant hiredMerchant;
 
    public UpdateHiredMerchant(MapleCharacter character, MapleHiredMerchant hiredMerchant) {
       this.character = character;

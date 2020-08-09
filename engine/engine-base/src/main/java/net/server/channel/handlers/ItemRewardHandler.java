@@ -43,9 +43,9 @@ public final class ItemRewardHandler extends AbstractPacketHandler<ItemRewardPac
          }
          if (Randomizer.nextInt(rewards.getLeft()) < reward.probability()) {//Is it even possible to get an item with prob 1?
             if (ItemConstants.getInventoryType(reward.itemId()) == MapleInventoryType.EQUIP) {
-               final Item item = ii.getEquipById(reward.itemId());
+               Item item = ii.getEquipById(reward.itemId());
                if (reward.period() != -1) {
-                  item.expiration_(currentServerTime() + (reward.period() * 60 * 60 * 10));
+                  item = Item.newBuilder(item).setExpiration(currentServerTime() + (reward.period() * 60 * 60 * 10)).build();
                }
                MapleInventoryManipulator.addFromDrop(client, item, false);
             } else {

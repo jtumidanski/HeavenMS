@@ -1,6 +1,7 @@
 package server.processor.maps;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import client.MapleCharacter;
@@ -23,7 +24,9 @@ public class MapleHiredMerchantProcessor {
    }
 
    public boolean canBuy(MapleClient c, Item newItem) {
-      return MapleInventoryManipulator.checkSpace(c, newItem.id(), newItem.quantity(), newItem.owner()) && MapleInventoryManipulator.addFromDrop(c, newItem, false);
+      boolean hasSpace = MapleInventoryManipulator.checkSpace(c, newItem.id(), newItem.quantity(), newItem.owner());
+      Optional<Item> result = MapleInventoryManipulator.addFromDrop(c, newItem, false);
+      return hasSpace && result.isPresent();
    }
 
    public boolean check(MapleCharacter chr, List<MaplePlayerShopItem> items) {
@@ -33,7 +36,7 @@ public class MapleHiredMerchantProcessor {
 
    private Pair<Item, MapleInventoryType> getItemMapleInventoryTypePair(MaplePlayerShopItem item) {
       Item it = item.item().copy();
-      it.quantity_$eq((short) (it.quantity() * item.bundles()));
+      it = it.setQuantity((short) (it.quantity() * item.bundles()));
       return new Pair<>(it, it.inventoryType());
    }
 }

@@ -5,11 +5,11 @@ import net.opcodes.SendOpcode;
 import tools.packet.PacketInput;
 
 public class AddOmokBox implements PacketInput {
-   private MapleCharacter character;
+   private final MapleCharacter character;
 
-   private int amount;
+   private final int amount;
 
-   private int type;
+   private final int type;
 
    public AddOmokBox(MapleCharacter character, int amount, int type) {
       this.character = character;

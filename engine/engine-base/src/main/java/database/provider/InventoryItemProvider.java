@@ -6,12 +6,12 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
+import accessor.AbstractQueryExecutor;
 import client.database.data.GetInventoryItems;
 import client.database.utility.InventoryEquipTransformer;
 import client.database.utility.InventoryItemTransformer;
 import client.inventory.Item;
 import client.inventory.MapleInventoryType;
-import database.AbstractQueryExecutor;
 import tools.Pair;
 
 public class InventoryItemProvider extends AbstractQueryExecutor {

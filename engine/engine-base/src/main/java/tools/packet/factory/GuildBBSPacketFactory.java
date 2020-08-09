@@ -28,14 +28,14 @@ public class GuildBBSPacketFactory extends AbstractPacketFactory {
       writer.writeMapleAsciiString(packet.threadData().name());
       writer.writeMapleAsciiString(packet.threadData().startPost());
       writer.writeInt(packet.threadData().icon());
-      if (packet.threadData().getReplyData() != null) {
+      if (packet.threadData().replyData() != null) {
          int replyCount = packet.threadData().replyCount();
          writer.writeInt(replyCount);
-         if (replyCount != packet.threadData().getReplyData().size()) {
+         if (replyCount != packet.threadData().replyData().size()) {
             throw new RuntimeException(String.valueOf(packet.threadData().threadId()));
          }
 
-         packet.threadData().getReplyData().forEach(replyData -> {
+         packet.threadData().replyData().forEach(replyData -> {
             writer.writeInt(replyData.replyId());
             writer.writeInt(replyData.posterCharacterId());
             writer.writeLong(getTime(replyData.timestamp()));

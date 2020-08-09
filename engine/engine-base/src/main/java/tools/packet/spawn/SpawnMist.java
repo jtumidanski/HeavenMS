@@ -5,15 +5,15 @@ import server.maps.MapleMist;
 import tools.packet.PacketInput;
 
 public class SpawnMist implements PacketInput {
-   private int objectId;
+   private final int objectId;
 
-   private int ownerId;
+   private final int ownerId;
 
-   private int skillId;
+   private final int skillId;
 
-   private int level;
+   private final int level;
 
-   private MapleMist mist;
+   private final MapleMist mist;
 
    public SpawnMist(int objectId, int ownerId, int skillId, int level, MapleMist mist) {
       this.objectId = objectId;

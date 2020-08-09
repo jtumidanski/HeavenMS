@@ -18,12 +18,12 @@ import server.MapleItemInformationProvider;
 import server.quest.MapleQuest;
 import server.quest.MapleQuestActionType;
 import tools.FilePrinter;
+import tools.I18nMessage;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
 import tools.Randomizer;
 import tools.ServerNoticeType;
-import tools.I18nMessage;
 import tools.packet.showitemgaininchat.ShowItemGainInChat;
 
 public class ItemAction extends MapleQuestAction {
@@ -42,7 +42,7 @@ public class ItemAction extends MapleQuestAction {
          int count = MapleDataTool.getInt(iEntry.getChildByPath("count"), 1);
          int period = MapleDataTool.getInt(iEntry.getChildByPath("period"), 0);
 
-         Integer prop = null;
+         int prop = -1;
          MapleData propData = iEntry.getChildByPath("prop");
          if (propData != null) {
             prop = MapleDataTool.getInt(propData);
@@ -71,7 +71,7 @@ public class ItemAction extends MapleQuestAction {
 
       int props = 0, rndProps = 0, accProps = 0;
       for (ItemData item : items) {
-         if (item.prop() != null && item.prop() != -1 && canGetItem(item, chr)) {
+         if (item.prop() != -1 && item.prop() != -1 && canGetItem(item, chr)) {
             props += item.prop();
          }
       }
@@ -84,7 +84,7 @@ public class ItemAction extends MapleQuestAction {
          if (!canGetItem(iEntry, chr)) {
             continue;
          }
-         if (iEntry.prop() != null) {
+         if (iEntry.prop() != -1) {
             if (iEntry.prop() == -1) {
                if (extSelection != extNum++) {
                   continue;
@@ -109,15 +109,15 @@ public class ItemAction extends MapleQuestAction {
 
       // must take all needed items before giving others
 
-      for(ItemData iEntry: takeItem) {
+      for (ItemData iEntry : takeItem) {
          int itemId = iEntry.id(), count = iEntry.count();
 
          MapleInventoryType type = ItemConstants.getInventoryType(itemId);
          int quantity = count * -1; // Invert
          if (type.equals(MapleInventoryType.EQUIP)) {
-            if(chr.getInventory(type).countById(itemId) < quantity) {
+            if (chr.getInventory(type).countById(itemId) < quantity) {
                // Not enough in the equip inventory, so check Equipped...
-               if(chr.getInventory(MapleInventoryType.EQUIPPED).countById(itemId) > quantity) {
+               if (chr.getInventory(MapleInventoryType.EQUIPPED).countById(itemId) > quantity) {
                   // Found it equipped, so change the type to equipped.
                   type = MapleInventoryType.EQUIPPED;
                }
@@ -128,7 +128,7 @@ public class ItemAction extends MapleQuestAction {
          PacketCreator.announce(chr, new ShowItemGainInChat(itemId, (short) count));
       }
 
-      for(ItemData iEntry: giveItem) {
+      for (ItemData iEntry : giveItem) {
          int itemId = iEntry.id(), count = iEntry.count(), period = iEntry.period();
          MapleInventoryManipulator.addById(chr.getClient(), itemId, (short) count, "", -1, period > 0 ? (System.currentTimeMillis() + period * 60 * 1000) : -1);
          PacketCreator.announce(chr, new ShowItemGainInChat(itemId, (short) count));
@@ -152,7 +152,7 @@ public class ItemAction extends MapleQuestAction {
          }
 
          MapleInventoryType type = ItemConstants.getInventoryType(item.id());
-         if (item.prop() != null) {
+         if (item.prop() != -1) {
             Item toItem = new Item(item.id(), (short) 0, (short) item.count());
 
             if (item.prop() < 0) {

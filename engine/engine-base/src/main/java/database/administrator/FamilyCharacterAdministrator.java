@@ -5,7 +5,7 @@ import java.util.function.Consumer;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import database.AbstractQueryExecutor;
+import accessor.AbstractQueryExecutor;
 import database.DeleteForCharacter;
 import entity.family.FamilyCharacter;
 

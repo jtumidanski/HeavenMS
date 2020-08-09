@@ -5,11 +5,11 @@ import server.life.MapleMonster;
 import tools.packet.PacketInput;
 
 public class SpawnMonster implements PacketInput {
-   private MapleMonster monster;
+   private final MapleMonster monster;
 
-   private boolean newSpawn;
+   private final boolean newSpawn;
 
-   private int effect;
+   private final int effect;
 
    public SpawnMonster(MapleMonster monster, boolean newSpawn, int effect) {
       this.monster = monster;

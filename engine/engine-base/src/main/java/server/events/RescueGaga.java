@@ -31,15 +31,11 @@ public class RescueGaga extends MapleEvents {
    }
 
    public void giveSkill(MapleCharacter chr) {
-      int skillId = 0;
-      switch (chr.getJobType()) {
-         case 0:
-            skillId = 1013;
-            break;
-         case 1:
-         case 2:
-            skillId = 10001014;
-      }
+      int skillId = switch (chr.getJobType()) {
+         case 0 -> 1013;
+         case 1, 2 -> 10001014;
+         default -> 0;
+      };
 
       long expiration = (System.currentTimeMillis() + 3600 * 24 * 20 * 1000);//20 days
       if (completed < 20) {

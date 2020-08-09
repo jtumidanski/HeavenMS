@@ -6,11 +6,11 @@ import client.MapleCharacter;
 import net.opcodes.SendOpcode;
 
 public class ShowAllCharacterInfo implements PacketInput {
-   private int worldId;
+   private final int worldId;
 
-   private List<MapleCharacter> characterList;
+   private final List<MapleCharacter> characterList;
 
-   private boolean usePic;
+   private final boolean usePic;
 
    public ShowAllCharacterInfo(int worldId, List<MapleCharacter> characterList, boolean usePic) {
       this.worldId = worldId;

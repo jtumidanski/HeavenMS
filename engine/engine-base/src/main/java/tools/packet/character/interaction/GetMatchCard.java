@@ -5,11 +5,11 @@ import server.maps.MapleMiniGame;
 import tools.packet.PacketInput;
 
 public class GetMatchCard implements PacketInput {
-   private MapleMiniGame miniGame;
+   private final MapleMiniGame miniGame;
 
-   private boolean owner;
+   private final boolean owner;
 
-   private int piece;
+   private final int piece;
 
    public GetMatchCard(MapleMiniGame miniGame, boolean owner, int piece) {
       this.miniGame = miniGame;

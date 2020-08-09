@@ -71,7 +71,7 @@ public class MapleMist extends AbstractMapleMapObject {
    }
 
    @Override
-   public void position_$eq(Point position) {
+   public void setPosition(Point position) {
       throw new UnsupportedOperationException();
    }
 

@@ -5,7 +5,7 @@ import server.life.MapleMonster;
 import tools.packet.PacketInput;
 
 public class MakeMonsterReal implements PacketInput {
-   private MapleMonster monster;
+   private final MapleMonster monster;
 
    public MakeMonsterReal(MapleMonster monster) {
       this.monster = monster;

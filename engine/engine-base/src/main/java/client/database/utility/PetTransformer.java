@@ -1,8 +1,8 @@
 package client.database.utility;
 
 import client.database.data.PetData;
-import database.SqlTransformer;
 import entity.Pet;
+import transformer.SqlTransformer;
 
 public class PetTransformer implements SqlTransformer<PetData, Pet> {
    @Override

@@ -36,6 +36,6 @@ public class PetSkillAction extends MapleQuestAction {
 
    @Override
    public void run(MapleCharacter chr, Integer extSelection) {
-      ItemProcessor.getInstance().setFlag(chr.getPet(0), (byte) ItemConstants.getFlagByInt(flag));
+      ItemProcessor.getInstance().setFlag(0, (byte) ItemConstants.getFlagByInt(flag));
    }
 } 

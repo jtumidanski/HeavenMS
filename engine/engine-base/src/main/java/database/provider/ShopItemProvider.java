@@ -6,7 +6,7 @@ import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import database.AbstractQueryExecutor;
+import accessor.AbstractQueryExecutor;
 import constants.inventory.ItemConstants;
 import server.MapleShopItem;
 
@@ -39,7 +39,7 @@ public class ShopItemProvider extends AbstractQueryExecutor {
             MapleShopItem starItem = new MapleShopItem((short) 1, itemId, price, pitch);
             shopItemData.add(starItem);
             if (rechargeableItems.contains(starItem.itemId())) {
-               recharges.remove(Integer.valueOf(starItem.itemId()));
+               recharges.remove(starItem.itemId());
             }
          } else {
             shopItemData.add(new MapleShopItem((short) 1000, itemId, price, pitch));

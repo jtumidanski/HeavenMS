@@ -4,7 +4,7 @@ package database.administrator;
 import java.sql.Timestamp;
 import javax.persistence.EntityManager;
 
-import database.AbstractQueryExecutor;
+import accessor.AbstractQueryExecutor;
 import entity.Report;
 
 public class ReportAdministrator extends AbstractQueryExecutor {

@@ -5,7 +5,7 @@ import server.maps.MapleMiniGame;
 import tools.packet.PacketInput;
 
 public class MiniGameTie implements PacketInput {
-   private MapleMiniGame game;
+   private final MapleMiniGame game;
 
    public MiniGameTie(MapleMiniGame game) {
       this.game = game;

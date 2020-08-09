@@ -78,7 +78,7 @@ public final class CloseRangeDamageHandler extends AbstractDealDamageHandler<Att
       }
 
       MasterBroadcaster.getInstance().sendToAllInMapRange(chr.getMap(),
-            new CloseRangeAttack(chr.getId(), attack.skill(), attack.skillLevel(), attack.stance(), attack.numAttackedAndDamage(), attack.getDamage(), attack.speed(), attack.direction(), attack.display()),
+            new CloseRangeAttack(chr.getId(), attack.skill(), attack.skillLevel(), attack.stance(), attack.numAttackedAndDamage(), attack.allDamage(), attack.speed(), attack.direction(), attack.display()),
             false, chr, true);
       int numFinisherOrbs = 0;
       Integer comboBuff = chr.getBuffedValue(MapleBuffStat.COMBO);
@@ -138,7 +138,7 @@ public final class CloseRangeDamageHandler extends AbstractDealDamageHandler<Att
       }
       if (attack.numAttacked() > 0 && attack.skill() == DragonKnight.SACRIFICE) {
          int totDamageToOneMonster = 0; // sacrifice attacks only 1 mob with 1 attack
-         final Iterator<List<Integer>> dmgIt = attack.getDamage().values().iterator();
+         final Iterator<List<Integer>> dmgIt = attack.allDamage().values().iterator();
          if (dmgIt.hasNext()) {
             totDamageToOneMonster = dmgIt.next().get(0);
          }

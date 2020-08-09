@@ -3,7 +3,7 @@ package database.administrator;
 
 import javax.persistence.EntityManager;
 
-import database.AbstractQueryExecutor;
+import accessor.AbstractQueryExecutor;
 import entity.PLife;
 
 public class PlayerLifeAdministrator extends AbstractQueryExecutor {

@@ -194,7 +194,7 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
          if (attack.skill() == ChiefBandit.MESO_EXPLOSION) {
             int delay = 0;
 
-            for (Integer oned : attack.getDamage().keySet()) {
+            for (Integer oned : attack.allDamage().keySet()) {
                MapleMapObject mapObject = map.getMapObject(oned);
                if (mapObject != null && mapObject.type() == MapleMapObjectType.ITEM) {
                   final MapleMapItem mapItem = (MapleMapItem) mapObject;
@@ -227,7 +227,7 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
                }
             }
          }
-         for (Integer oned : attack.getDamage().keySet()) {
+         for (Integer oned : attack.allDamage().keySet()) {
             final MapleMonster monster = map.getMonsterByOid(oned);
             if (monster != null) {
                double distance = player.position().distanceSq(monster.position());
@@ -263,7 +263,7 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
                }
 
                int totDamageToOneMonster = 0;
-               List<Integer> onedList = attack.getDamage().get(oned);
+               List<Integer> onedList = attack.allDamage().get(oned);
 
                if (attack.magic()) {
                   if (monster.isBuffed(MonsterStatus.MAGIC_IMMUNITY)) {
@@ -473,19 +473,11 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
                            if (skillLv > 0) {
                               AbstractPlayerInteraction api = player.getAbstractPlayerInteraction();
 
-                              int shellId;
-                              switch (skillLv) {
-                                 case 1:
-                                    shellId = 4000019;
-                                    break;
-
-                                 case 2:
-                                    shellId = 4000000;
-                                    break;
-
-                                 default:
-                                    shellId = 4000016;
-                              }
+                              int shellId = switch (skillLv) {
+                                 case 1 -> 4000019;
+                                 case 2 -> 4000000;
+                                 default -> 4000016;
+                              };
 
                               if (api.haveItem(shellId, 1)) {
                                  api.gainItem(shellId, (short) -1, false);

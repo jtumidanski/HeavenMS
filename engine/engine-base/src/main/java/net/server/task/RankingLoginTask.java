@@ -6,12 +6,12 @@ import java.util.function.Supplier;
 import javax.persistence.EntityManager;
 
 import client.MapleJob;
+import database.DatabaseConnection;
 import database.administrator.CharacterAdministrator;
 import client.database.data.CharacterRankData;
 import database.provider.CharacterProvider;
 import config.YamlConfig;
 import net.server.Server;
-import database.DatabaseConnection;
 import tools.TriConsumer;
 
 public class RankingLoginTask implements Runnable {

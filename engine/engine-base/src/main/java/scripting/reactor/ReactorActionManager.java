@@ -169,7 +169,7 @@ public class ReactorActionManager extends AbstractPlayerInteraction {
                if (ItemConstants.getInventoryType(d.itemId()) != MapleInventoryType.EQUIP) {
                   drop = new Item(d.itemId(), (short) 0, (short) 1);
                } else {
-                  drop = ii.randomizeStats((Equip) ii.getEquipById(d.itemId()));
+                  drop = Equip.newBuilder(ii.getEquipById(d.itemId())).randomizeStats().build();
                }
 
                reactor.getMap().dropFromReactor(getPlayer(), reactor, drop, dropPos, (short) d.questId());
@@ -201,7 +201,7 @@ public class ReactorActionManager extends AbstractPlayerInteraction {
                   drop = new Item(d.itemId(), (short) 0, (short) 1);
                } else {
                   MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
-                  drop = ii.randomizeStats((Equip) ii.getEquipById(d.itemId()));
+                  drop = Equip.newBuilder(ii.getEquipById(d.itemId())).randomizeStats().build();
                }
 
                r.getMap().dropFromReactor(getPlayer(), r, drop, dropPos, (short) d.questId());

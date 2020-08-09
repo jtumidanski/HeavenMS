@@ -22,7 +22,6 @@ import net.server.processor.MaplePartyProcessor;
 import net.server.world.MapleParty;
 import net.server.world.PartyOperation;
 import net.server.world.World;
-import scala.Option;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
@@ -91,7 +90,7 @@ public final class PartyOperationHandler extends AbstractPacketHandler<BaseParty
                if (MapleInviteCoordinator.createInvite(InviteType.PARTY, player, party.getId(), invited.getId())) {
                   PacketCreator.announce(invited, new PartyInvite(party.getId(), player.getName()));
                } else {
-                  PacketCreator.announce(player, new PartyStatusMessage(22, Option.apply(invited.getName())));
+                  PacketCreator.announce(player, new PartyStatusMessage(22, Optional.of(invited.getName())));
                }
             } else {
                PacketCreator.announce(player, new PartyStatusMessage(17));

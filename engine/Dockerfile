@@ -1,4 +1,4 @@
-FROM groovy:2.5.8-jdk13
+FROM groovy:3.0.5-jdk14
 USER root
 
 WORKDIR /
@@ -11,4 +11,4 @@ ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.5.0/wait
 
 RUN chmod +x /wait
 
-CMD /wait && java -jar /engine/engine-base-1.0-SNAPSHOT.jar -Dwzpath=wz
+CMD /wait && java --enable-preview -jar /engine/engine-base-1.0-SNAPSHOT.jar -Dwzpath=wz

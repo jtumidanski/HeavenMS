@@ -2,21 +2,21 @@ package server.processor;
 
 import java.util.function.BiConsumer;
 
+import accessor.AbstractQueryExecutor;
 import client.MapleCharacter;
 import client.inventory.Item;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import client.inventory.manipulator.MapleKarmaManipulator;
 import config.YamlConfig;
-import database.AbstractQueryExecutor;
 import net.server.coordinator.world.MapleInviteCoordinator;
 import server.MapleTrade;
 import server.MapleTradeResult;
 import server.MapleTradeUtil;
+import tools.I18nMessage;
 import tools.LogHelper;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
-import tools.I18nMessage;
 import tools.packet.character.interaction.GetTradeResult;
 import tools.packet.character.interaction.GetTradeStart;
 import tools.packet.character.interaction.TradeChat;
@@ -124,7 +124,7 @@ public class MapleTradeProcessor extends AbstractQueryExecutor {
       boolean show = YamlConfig.config.server.USE_DEBUG;
 
       for (Item item : referenceTrade.getExchangeItems()) {
-         MapleKarmaManipulator.toggleKarmaFlagToUntradeable(item);
+         item = MapleKarmaManipulator.toggleKarmaFlagToUntradeable(item);
          MapleInventoryManipulator.addFromDrop(referenceTrade.getOwner().getClient(), item, show);
       }
 

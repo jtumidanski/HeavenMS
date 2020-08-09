@@ -43,35 +43,16 @@ public final class UseCatchItemHandler extends AbstractPacketHandler<UseCatchIte
          return;
       }
       switch (itemId) {
-         case 2270000:
-            usePheromonePerfume(client, chr, monsterId, itemId, mob);
-            break;
-         case 2270001:
-            usePouch(client, chr, abm, monsterId, itemId, mob);
-            break;
-         case 2270002:
-            useElementRock(client, chr, abm, monsterId, itemId, mob);
-            break;
-         case 2270003:
-            useCliffsMagicCane(client, chr, monsterId, itemId, mob);
-            break;
-         case 2270005:
-            useFirstTransparentMarble(client, chr, monsterId, itemId, mob);
-            break;
-         case 2270006:
-            useSecondTransparentMarble(client, chr, monsterId, itemId, mob);
-            break;
-         case 2270007:
-            useThirdTransparentMarble(client, chr, monsterId, itemId, mob);
-            break;
-         case 2270004:
-            usePurificationMarble(client, chr, monsterId, itemId, mob);
-            break;
-         case 2270008:
-            useFishNet(client, chr, abm, monsterId, itemId, mob);
-            break;
-         default:
-            defaultCatchItem(client, chr, abm, monsterId, itemId, mob);
+         case 2270000 -> usePheromonePerfume(client, chr, monsterId, itemId, mob);
+         case 2270001 -> usePouch(client, chr, abm, monsterId, itemId, mob);
+         case 2270002 -> useElementRock(client, chr, abm, monsterId, itemId, mob);
+         case 2270003 -> useCliffsMagicCane(client, chr, monsterId, itemId, mob);
+         case 2270005 -> useFirstTransparentMarble(client, chr, monsterId, itemId, mob);
+         case 2270006 -> useSecondTransparentMarble(client, chr, monsterId, itemId, mob);
+         case 2270007 -> useThirdTransparentMarble(client, chr, monsterId, itemId, mob);
+         case 2270004 -> usePurificationMarble(client, chr, monsterId, itemId, mob);
+         case 2270008 -> useFishNet(client, chr, abm, monsterId, itemId, mob);
+         default -> defaultCatchItem(client, chr, abm, monsterId, itemId, mob);
       }
    }
 

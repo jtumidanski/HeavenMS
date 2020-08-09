@@ -14,12 +14,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import client.MapleCharacter;
+import database.DatabaseConnection;
 import database.provider.ReactorDropProvider;
 import provider.MapleData;
 import provider.MapleDataProvider;
 import provider.MapleDataProviderFactory;
 import provider.MapleDataTool;
-import database.DatabaseConnection;
 
 public class MapleSkillBookInformationProvider {
    private final static MapleSkillBookInformationProvider instance = new MapleSkillBookInformationProvider();

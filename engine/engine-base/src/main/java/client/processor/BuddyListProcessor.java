@@ -1,8 +1,12 @@
 package client.processor;
 
+import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Deque;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -32,12 +36,12 @@ import rest.buddy.Character;
 import rest.buddy.GetBuddiesResponse;
 import rest.buddy.UpdateBuddy;
 import rest.buddy.UpdateCharacter;
-import scala.Option;
 import tools.FilePrinter;
 import tools.I18nMessage;
 import tools.LambdaNoOp;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
+import tools.Pair;
 import tools.ServerNoticeType;
 import tools.packet.buddy.RequestAddBuddy;
 import tools.packet.buddy.UpdateBuddyCapacity;
@@ -91,28 +95,38 @@ public class BuddyListProcessor {
    /**
     * Loads the buddy list for the character supplied.
     *
-    * @param characterId the id of the character
-    * @param buddyList   the buddy list to populate
+    * @param character the character
     */
-   public void loadBuddies(int characterId, BuddyList buddyList) {
-      UriBuilder.service(RestService.BUDDY).path("characters").path(characterId).path("buddies").getRestClient(GetBuddiesResponse.class)
-            .success((responseCode, response) -> populateBuddyList(buddyList, response))
-            .failure(responseCode -> FilePrinter.printError(FilePrinter.BUDDY_ORCHESTRATOR, "Failed to load buddies for character " + characterId))
+   public void loadBuddies(MapleCharacter character) {
+      BuddyList result;
+      UriBuilder.service(RestService.BUDDY).path("characters").path(character.getId()).path("buddies").getRestClient(GetBuddiesResponse.class)
+            .success((responseCode, response) -> character.modifyBuddyList(buddyList -> populateBuddyList(buddyList, response)))
+            .failure(responseCode -> FilePrinter.printError(FilePrinter.BUDDY_ORCHESTRATOR, "Failed to load buddies for character " + character.getId()))
             .get();
    }
 
-   protected void populateBuddyList(BuddyList buddyList, GetBuddiesResponse response) {
-      DatabaseConnection.getInstance().withConnection(entityManager -> {
-         response.buddies().parallelStream().forEach(buddy -> {
-            String name = getCharacterNameFromDatabase(buddy.id());
-            buddyList.put(new BuddyListEntry(name, buddy.group(), buddy.id(), -1, true));
-         });
+   protected BuddyList populateBuddyList(BuddyList buddyList, GetBuddiesResponse response) {
+      Map<Integer, BuddyListEntry> entries = new HashMap<>();
+      Deque<CharacterNameAndId> requests = new ArrayDeque<>();
 
-         response.pending().parallelStream().forEach(buddy -> {
-            String name = getCharacterNameFromDatabase(buddy.id());
-            buddyList.addRequest(new CharacterNameAndId(buddy.id(), name));
-         });
+      DatabaseConnection.getInstance().withConnection(entityManager -> {
+         entries.putAll(
+               response.buddies().parallelStream()
+                     .map(buddy -> {
+                        String name = getCharacterNameFromDatabase(buddy.id());
+                        return new BuddyListEntry(name, buddy.group(), buddy.id(), -1, true);
+                     })
+                     .collect(Collectors.toMap(BuddyListEntry::characterId, buddyListEntry -> buddyListEntry)));
+         requests.addAll(
+               response.pending().parallelStream()
+                     .map(buddy -> {
+                        String name = getCharacterNameFromDatabase(buddy.id());
+                        return new CharacterNameAndId(buddy.id(), name);
+                     })
+                     .collect(Collectors.toUnmodifiableList()));
       });
+
+      return new BuddyList(buddyList.capacity(), entries, requests);
    }
 
    /**
@@ -186,7 +200,6 @@ public class BuddyListProcessor {
          return; //hax.
       }
 
-      BuddyList buddyList = character.getBuddyList();
       World world = character.getClient().getWorldServer();
 
       CharNameAndIdData otherCharMin;
@@ -217,15 +230,16 @@ public class BuddyListProcessor {
                   MessageBroadcaster.getInstance().sendServerNotice(character, ServerNoticeType.POP_UP, I18nMessage.from("BUDDY_SERVICE_BUDDIES_LIST_IS_FULL").with(addName));
                } else if (result.errorCode() == AddBuddyResult$.MODULE$.OK() || result.errorCode() == AddBuddyResult$.MODULE$.BUDDY_ALREADY_REQUESTED()) {
 
-                  int displayChannel = -1;
+                  int displayChannel;
                   if (result.errorCode().equals(AddBuddyResult$.MODULE$.BUDDY_ALREADY_REQUESTED()) && channel != -1) {
                      displayChannel = channel;
                      notifyRemoteChannel(character.getClient(), channel, otherCharMin.id(), BuddyListOperation.ADDED);
                   } else {
+                     displayChannel = -1;
                      otherChar.ifPresent(otherPlayer -> addBuddyRequest(otherPlayer, character.getId(), character.getName(), channel));
                   }
-                  buddyList.put(new BuddyListEntry(otherCharMin.name(), group, otherCharMin.id(), displayChannel, true));
-                  PacketCreator.announce(character.getClient(), new UpdateBuddyList(buddyList.getBuddies()));
+                  character.modifyBuddyList(buddyList -> buddyList.put(new BuddyListEntry(otherCharMin.name(), group, otherCharMin.id(), displayChannel, true)));
+                  PacketCreator.announce(character.getClient(), new UpdateBuddyList(character.getBuddyList().buddies().values()));
                }
             })
             .failure(responseCode -> operationFailure(character, "Failed to add buddy " + addName + " for character " + character.getId()))
@@ -234,11 +248,11 @@ public class BuddyListProcessor {
    }
 
    protected void addBuddyRequest(MapleCharacter character, int cidFrom, String nameFrom, int channelFrom) {
-      character.getBuddyList().put(new BuddyListEntry(nameFrom, "Default Group", cidFrom, channelFrom, false));
+      character.modifyBuddyList(buddyList -> buddyList.put(new BuddyListEntry(nameFrom, "Default Group", cidFrom, channelFrom, false)));
       if (character.getBuddyList().hasPendingRequest()) {
          PacketCreator.announce(character, new RequestAddBuddy(cidFrom, character.getId(), nameFrom));
       } else {
-         character.getBuddyList().addRequest(new CharacterNameAndId(cidFrom, nameFrom));
+         character.modifyBuddyList(buddyList -> buddyList.addRequest(new CharacterNameAndId(cidFrom, nameFrom)));
       }
    }
 
@@ -270,8 +284,8 @@ public class BuddyListProcessor {
                   .failure(responseCode -> operationFailure(character, "Unable to accept buddy " + character.getId() + " for character " + otherId))
                   .update(new UpdateBuddy(0, false));
 
-            character.getBuddyList().put(new BuddyListEntry(otherName.get(), "Default Group", otherId, channel, true));
-            PacketCreator.announce(character.getClient(), new UpdateBuddyList(character.getBuddyList().getBuddies()));
+            character.modifyBuddyList(buddyList -> buddyList.put(new BuddyListEntry(otherName.get(), "Default Group", otherId, channel, true)));
+            PacketCreator.announce(character.getClient(), new UpdateBuddyList(character.getBuddyList().buddies().values()));
             BuddyListProcessor.getInstance().notifyRemoteChannel(character.getClient(), channel, otherId, BuddyListOperation.ADDED);
          }
       }
@@ -279,10 +293,15 @@ public class BuddyListProcessor {
    }
 
    protected void nextPendingRequest(MapleClient client) {
-      Option<CharacterNameAndId> pendingBuddyRequest = client.getPlayer().getBuddyList().pollPendingRequest();
-      if (pendingBuddyRequest.isDefined()) {
-         PacketCreator.announce(client, new RequestAddBuddy(pendingBuddyRequest.get().id(), client.getPlayer().getId(), pendingBuddyRequest.get().name()));
-      }
+      client.getPlayer().modifyBuddyList(buddyList -> {
+         Optional<Pair<BuddyList, CharacterNameAndId>> result = buddyList.pollPendingRequest();
+         if (result.isPresent()) {
+            PacketCreator.announce(client, new RequestAddBuddy(result.get().getRight().id(), client.getPlayer().getId(), result.get().getRight().name()));
+            return result.get().getLeft();
+         } else {
+            return buddyList;
+         }
+      });
    }
 
    protected String getCharacterNameFromDatabase(int characterId) {
@@ -311,9 +330,8 @@ public class BuddyListProcessor {
       if (bl.containsVisible(otherCharacterId)) {
          notifyRemoteChannel(character.getClient(), character.getWorldServer().find(otherCharacterId), otherCharacterId, BuddyListOperation.DELETED);
       }
-
-      bl.remove(otherCharacterId);
-      PacketCreator.announce(character.getClient(), new UpdateBuddyList(character.getBuddyList().getBuddies()));
+      character.modifyBuddyList(buddyList -> buddyList.remove(otherCharacterId));
+      PacketCreator.announce(character.getClient(), new UpdateBuddyList(character.getBuddyList().buddies().values()));
       nextPendingRequest(character.getClient());
    }
 
@@ -344,7 +362,7 @@ public class BuddyListProcessor {
    }
 
    protected void updateCapacitySuccess(MapleCharacter character, int capacity, Runnable onSuccess) {
-      character.getBuddyList().capacity_$eq(capacity);
+      character.modifyBuddyList(buddyList -> buddyList.updateCapacity(capacity));
       PacketCreator.announce(character.getClient(), new UpdateBuddyCapacity(capacity));
       onSuccess.run();
    }
@@ -356,18 +374,19 @@ public class BuddyListProcessor {
     */
    public void onLogin(MapleCharacter character) {
       BuddyList buddyList = character.getBuddyList();
-      int[] buddyIds = buddyList.getBuddyIds();
+      int[] buddyIds = buddyList.buddyIds();
       World world = character.getWorldServer();
 
       updateBuddies(world, character.getId(), character.getClient().getChannel(), buddyIds, false);
-      multiBuddyFind(world, character.getId(), buddyIds).forEach(onlineBuddy -> updateChannelForBuddy(buddyList, onlineBuddy));
-      PacketCreator.announce(character.getClient(), new UpdateBuddyList(buddyList.getBuddies()));
+      buddyList = multiBuddyFind(world, character.getId(), buddyIds)
+            .reduce(buddyList, this::updateChannelForBuddy, (a, b) -> b);
+      PacketCreator.announce(character.getClient(), new UpdateBuddyList(buddyList.buddies().values()));
    }
 
-   protected void updateChannelForBuddy(BuddyList buddyList, CharacterIdChannelPair onlineBuddy) {
-      BuddyListEntry buddyListEntry = buddyList.get(onlineBuddy.getCharacterId());
-      buddyListEntry.channel_$eq(onlineBuddy.getChannel());
-      buddyList.put(buddyListEntry);
+   protected BuddyList updateChannelForBuddy(BuddyList buddyList, CharacterIdChannelPair onlineBuddy) {
+      BuddyListEntry buddyListEntry = buddyList.get(onlineBuddy.getCharacterId())
+            .updateChannel(onlineBuddy.getChannel());
+      return buddyList.put(buddyListEntry);
    }
 
    protected Stream<CharacterIdChannelPair> multiBuddyFind(World world, int charIdFrom, int[] characterIds) {
@@ -400,7 +419,7 @@ public class BuddyListProcessor {
     * @param character the character logging out
     */
    public void onLogoff(MapleCharacter character) {
-      updateBuddies(character.getWorldServer(), character.getId(), character.getClient().getChannel(), character.getBuddyList().getBuddyIds(), true);
+      updateBuddies(character.getWorldServer(), character.getId(), character.getClient().getChannel(), character.getBuddyList().buddyIds(), true);
    }
 
    protected void updateBuddies(World world, int characterId, int channel, int[] buddies, boolean offline) {
@@ -412,16 +431,17 @@ public class BuddyListProcessor {
                return buddyListEntry != null && buddyListEntry.visible();
             })
             .forEach(character -> {
-               BuddyListEntry buddyListEntry = character.getBuddyList().get(characterId);
+               BuddyListEntry initialEntry = character.getBuddyList().get(characterId);
+               BuddyListEntry buddyListEntry;
                int mcChannel;
                if (offline) {
-                  buddyListEntry.channel_$eq((byte) -1);
+                  buddyListEntry = initialEntry.updateChannel((byte) -1);
                   mcChannel = -1;
                } else {
-                  buddyListEntry.channel_$eq(channel);
+                  buddyListEntry = initialEntry.updateChannel(channel);
                   mcChannel = (byte) (channel - 1);
                }
-               character.getBuddyList().put(buddyListEntry);
+               character.modifyBuddyList(buddyList -> buddyList.put(buddyListEntry));
                PacketCreator.announce(character, new UpdateBuddyChannel(buddyListEntry.characterId(), mcChannel));
             });
    }
@@ -432,13 +452,13 @@ public class BuddyListProcessor {
          switch (operation) {
             case ADDED:
                if (buddylist.contains(cidFrom)) {
-                  buddylist.put(new BuddyListEntry(name, "Default Group", cidFrom, channel, true));
+                  addChar.modifyBuddyList(buddyList -> buddyList.put(new BuddyListEntry(name, "Default Group", cidFrom, channel, true)));
                   PacketCreator.announce(addChar, new UpdateBuddyChannel(cidFrom, (byte) (channel - 1)));
                }
                break;
             case DELETED:
                if (buddylist.contains(cidFrom)) {
-                  buddylist.put(new BuddyListEntry(name, "Default Group", cidFrom, (byte) -1, buddylist.get(cidFrom).visible()));
+                  addChar.modifyBuddyList(buddyList -> buddyList.put(new BuddyListEntry(name, "Default Group", cidFrom, (byte) -1, buddylist.get(cidFrom).visible())));
                   PacketCreator.announce(addChar, new UpdateBuddyChannel(cidFrom, (byte) -1));
                }
                break;

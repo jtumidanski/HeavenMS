@@ -1,12 +1,13 @@
 package client.database.utility;
 
 import client.database.data.GetInventoryItems;
-import client.inventory.BetterItemFactory;
 import client.inventory.Item;
 import client.inventory.MapleInventoryType;
+import client.inventory.MaplePet;
 import client.processor.ItemProcessor;
-import database.SqlTransformer;
+import client.processor.PetProcessor;
 import tools.Pair;
+import transformer.SqlTransformer;
 
 public class InventoryItemTransformer implements SqlTransformer<Pair<Item, MapleInventoryType>, GetInventoryItems> {
    @Override
@@ -18,12 +19,17 @@ public class InventoryItemTransformer implements SqlTransformer<Pair<Item, Maple
          if (inventoryType.equals(MapleInventoryType.EQUIP) || inventoryType.equals(MapleInventoryType.EQUIPPED)) {
             return new Pair<>(equipTransformer.transform(resultSet), inventoryType);
          } else {
-            Item item = BetterItemFactory.getInstance().create(resultSet.itemId(), (byte) resultSet.position(),
-                  (short) resultSet.quantity(), resultSet.petId());
-            item.owner_$eq(resultSet.owner());
-            item.expiration_(resultSet.expiration());
-            item.giftFrom_$eq(resultSet.giftFrom());
-            ItemProcessor.getInstance().setFlag(item, (short) resultSet.flag());
+            MaplePet pet = PetProcessor.getInstance().loadFromDb(resultSet.itemId(), (short) 0, resultSet.petId());
+            Item item = Item.newBuilder(resultSet.itemId())
+                  .setPosition((short) resultSet.position())
+                  .setQuantity((short) resultSet.quantity())
+                  .setPet(pet)
+                  .setPetId(resultSet.petId())
+                  .setOwner(resultSet.owner())
+                  .setExpiration(resultSet.expiration())
+                  .setGiftFrom(resultSet.giftFrom())
+                  .setFlag(ItemProcessor.getInstance().setFlag(resultSet.itemId(), (short) resultSet.flag()))
+                  .build();
             return new Pair<>(item, inventoryType);
          }
       }

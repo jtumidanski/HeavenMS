@@ -178,10 +178,9 @@ public class MapleGuild {
 
    @Override
    public boolean equals(Object other) {
-      if (!(other instanceof MapleGuildCharacter)) {
+      if (!(other instanceof MapleGuildCharacter o)) {
          return false;
       }
-      MapleGuildCharacter o = (MapleGuildCharacter) other;
       return (o.getId() == id && o.getName().equals(name));
    }
 

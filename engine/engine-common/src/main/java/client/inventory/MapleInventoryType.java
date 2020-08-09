@@ -25,18 +25,13 @@ public enum MapleInventoryType {
    }
 
    public static MapleInventoryType getByWZName(String name) {
-      switch (name) {
-         case "Install":
-            return SETUP;
-         case "Consume":
-            return USE;
-         case "Etc":
-            return ETC;
-         case "Cash":
-         case "Pet":
-            return CASH;
-      }
-      return UNDEFINED;
+      return switch (name) {
+         case "Install" -> SETUP;
+         case "Consume" -> USE;
+         case "Etc" -> ETC;
+         case "Cash", "Pet" -> CASH;
+         default -> UNDEFINED;
+      };
    }
 
    public byte getType() {

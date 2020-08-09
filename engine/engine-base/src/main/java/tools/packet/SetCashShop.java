@@ -4,7 +4,7 @@ import client.MapleClient;
 import net.opcodes.SendOpcode;
 
 public class SetCashShop implements PacketInput {
-   private MapleClient client;
+   private final MapleClient client;
 
    public SetCashShop(MapleClient client) {
       this.client = client;

@@ -51,7 +51,7 @@ public final class MagicDamageHandler extends AbstractDealDamageHandler<AttackPa
 
       PacketInput packet;
       int charge = (attack.skill() == Evan.FIRE_BREATH || attack.skill() == Evan.ICE_BREATH || attack.skill() == FirePoisonArchMage.BIG_BANG || attack.skill() == IceLighteningArchMagician.BIG_BANG || attack.skill() == Bishop.BIG_BANG) ? attack.charge() : -1;
-      packet = new MagicAttack(chr.getId(), attack.skill(), attack.skillLevel(), attack.stance(), attack.numAttackedAndDamage(), attack.getDamage(), charge, attack.speed(), attack.direction(), attack.display());
+      packet = new MagicAttack(chr.getId(), attack.skill(), attack.skillLevel(), attack.stance(), attack.numAttackedAndDamage(), attack.allDamage(), charge, attack.speed(), attack.direction(), attack.display());
 
 
       MasterBroadcaster.getInstance().sendToAllInMapRange(chr.getMap(), packet, false, chr, true);
@@ -63,7 +63,7 @@ public final class MagicDamageHandler extends AbstractDealDamageHandler<AttackPa
       // MP Eater, works with right job
       int mpEaterSkillId = (chr.getJob().getId() - (chr.getJob().getId() % 10)) * 10000;
       SkillFactory.executeIfHasSkill(chr, mpEaterSkillId, (skill, skillLevel) -> {
-         for (Integer singleDamage : attack.getDamage().keySet()) {
+         for (Integer singleDamage : attack.allDamage().keySet()) {
             skill.getEffect(skillLevel).applyPassive(chr, chr.getMap().getMapObject(singleDamage), 0);
          }
       });

@@ -7,17 +7,17 @@ import net.opcodes.SendOpcode;
 import tools.packet.PacketInput;
 
 public class GetAvatarMegaphone implements PacketInput {
-   private MapleCharacter character;
+   private final MapleCharacter character;
 
-   private String medal;
+   private final String medal;
 
-   private int channel;
+   private final int channel;
 
-   private int itemId;
+   private final int itemId;
 
-   private List<String> messages;
+   private final List<String> messages;
 
-   private boolean ear;
+   private final boolean ear;
 
    public GetAvatarMegaphone(MapleCharacter character, String medal, int channel, int itemId, List<String> messages, boolean ear) {
       this.character = character;

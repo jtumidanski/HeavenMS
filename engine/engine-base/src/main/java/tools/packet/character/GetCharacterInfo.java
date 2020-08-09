@@ -5,7 +5,7 @@ import net.opcodes.SendOpcode;
 import tools.packet.PacketInput;
 
 public class GetCharacterInfo implements PacketInput {
-   private MapleCharacter character;
+   private final MapleCharacter character;
 
    public GetCharacterInfo(MapleCharacter character) {
       this.character = character;

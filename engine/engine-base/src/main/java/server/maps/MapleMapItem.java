@@ -20,7 +20,7 @@ public class MapleMapItem extends AbstractMapleMapObject {
    private Lock itemLock = MonitoredReentrantLockFactory.createLock(MonitoredLockType.MAP_ITEM);
 
    public MapleMapItem(Item item, Point position, MapleMapObject dropper, MapleCharacter owner, MapleClient ownerClient, byte type, boolean playerDrop) {
-      position_$eq(position);
+      setPosition(position);
       this.item = item;
       this.dropper = dropper;
       this.characterOwnerId = owner.getId();
@@ -33,7 +33,7 @@ public class MapleMapItem extends AbstractMapleMapObject {
    }
 
    public MapleMapItem(Item item, Point position, MapleMapObject dropper, MapleCharacter owner, MapleClient ownerClient, byte type, boolean playerDrop, int questId) {
-      position_$eq(position);
+      setPosition(position);
       this.item = item;
       this.dropper = dropper;
       this.characterOwnerId = owner.getId();
@@ -47,7 +47,7 @@ public class MapleMapItem extends AbstractMapleMapObject {
    }
 
    public MapleMapItem(int meso, Point position, MapleMapObject dropper, MapleCharacter owner, MapleClient ownerClient, byte type, boolean playerDrop) {
-      position_$eq(position);
+      setPosition(position);
       this.item = null;
       this.dropper = dropper;
       this.characterOwnerId = owner.getId();

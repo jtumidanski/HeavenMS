@@ -5,7 +5,7 @@ import server.maps.MapleDragon;
 import tools.packet.PacketInput;
 
 public class SpawnDragon implements PacketInput {
-   private MapleDragon dragon;
+   private final MapleDragon dragon;
 
    public SpawnDragon(MapleDragon dragon) {
       this.dragon = dragon;

@@ -183,24 +183,19 @@ public class CashShopProcessor {
 
       cashShop.addNote();
       CashShop.CashItem cItem = CashShop.CashItemFactory.getItem(gift.sn());
-      Item item = cItem.toItem();
-      Equip equip = null;
-      item.giftFrom_$eq(gift.from());
+      Item item = Item.newBuilder(cItem.toItem()).setGiftFrom(gift.from()).build();
       if (item.inventoryType().equals(MapleInventoryType.EQUIP)) {
-         equip = (Equip) item;
-         equip.ringId_$eq(gift.ringId());
-         result = new Gift(equip, gift.message());
-      } else {
-         result = new Gift(item, gift.message());
+         item = Equip.newBuilder((Equip) item).setRingId(gift.ringId()).build();
       }
+      result = new Gift(item, gift.message());
 
       if (CashShop.CashItemFactory.isPackage(cItem.getItemId())) { //Packages never contains a ring
          for (Item packageItem : CashShop.CashItemFactory.getPackage(cItem.getItemId())) {
-            packageItem.giftFrom_$eq(gift.from());
-            cashShop.addToInventory(packageItem);
+            Item updatedItem = Item.newBuilder(packageItem).setGiftFrom(gift.from()).build();
+            cashShop.addToInventory(updatedItem);
          }
       } else {
-         cashShop.addToInventory(equip == null ? item : equip);
+         cashShop.addToInventory(item);
       }
       return result;
    }

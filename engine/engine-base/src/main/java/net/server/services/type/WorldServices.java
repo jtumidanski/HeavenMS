@@ -8,7 +8,7 @@ import net.server.services.task.world.CharacterSaveService;
 public enum WorldServices implements ServiceType {
    SAVE_CHARACTER(CharacterSaveService.class);
 
-   private Class<? extends BaseService> s;
+   private final Class<? extends BaseService> s;
 
    WorldServices(Class<? extends BaseService> service) {
       s = service;

@@ -6,9 +6,10 @@ import java.util.stream.Collectors;
 
 import client.MapleCharacter;
 import client.MapleClient;
+import client.database.data.AllianceData;
+import database.DatabaseConnection;
 import database.administrator.AllianceAdministrator;
 import database.administrator.AllianceGuildAdministrator;
-import client.database.data.AllianceData;
 import database.provider.AllianceGuildProvider;
 import database.provider.AllianceProvider;
 import net.server.Server;
@@ -18,12 +19,11 @@ import net.server.guild.MapleGuild;
 import net.server.guild.MapleGuildCharacter;
 import net.server.world.MapleParty;
 import net.server.world.MaplePartyCharacter;
-import database.DatabaseConnection;
+import tools.I18nMessage;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
-import tools.I18nMessage;
 import tools.packet.PacketInput;
 import tools.packet.alliance.AllianceInvite;
 import tools.packet.alliance.AllianceNotice;
@@ -59,8 +59,8 @@ public class MapleAllianceProcessor {
       List<Integer> guilds = guildMasters.stream().map(MapleCharacter::getGuildId).collect(Collectors.toList());
       MapleAlliance alliance = createAllianceOnDb(guilds, name);
       if (alliance != null) {
-         alliance.capacity_$eq(guilds.size());
-         guilds.forEach(alliance::addGuild);
+         alliance = alliance.increaseCapacity(guilds.size());
+         alliance = alliance.setGuilds(guilds);
 
          int id = alliance.id();
          try {
@@ -126,27 +126,19 @@ public class MapleAllianceProcessor {
       if (id <= 0) {
          return Optional.empty();
       }
-      MapleAlliance alliance = new MapleAlliance(null, -1);
-      DatabaseConnection.getInstance().withConnection(connection -> {
-         AllianceProvider.getInstance().getAllianceData(connection, id).ifPresent(data -> setData(id, alliance, data));
-         AllianceGuildProvider.getInstance().getGuildsForAlliance(connection, id).forEach(alliance::addGuild);
+
+      return DatabaseConnection.getInstance().withConnectionResult(connection -> {
+         Optional<AllianceData> result = AllianceProvider.getInstance().getAllianceData(connection, id);
+         if (result.isEmpty()) {
+            return null;
+         }
+
+         AllianceData allianceData = result.get();
+         List<Integer> guilds = AllianceGuildProvider.getInstance().getGuildsForAlliance(connection, id);
+
+         String[] ranks = new String[]{allianceData.rank1(), allianceData.rank2(), allianceData.rank3(), allianceData.rank4(), allianceData.rank5()};
+         return new MapleAlliance(allianceData.name(), id, allianceData.capacity(), allianceData.notice(), ranks, guilds);
       });
-      return Optional.of(alliance);
-   }
-
-   private void setData(int id, MapleAlliance alliance, AllianceData data) {
-      alliance.id_$eq(id);
-      alliance.capacity_$eq(data.capacity());
-      alliance.name_$eq(data.name());
-      alliance.notice_$eq(data.notice());
-
-      String[] ranks = new String[5];
-      ranks[0] = data.rank1();
-      ranks[1] = data.rank2();
-      ranks[2] = data.rank3();
-      ranks[3] = data.rank4();
-      ranks[4] = data.rank5();
-      alliance.rankTitles_$eq(ranks);
    }
 
    public void disbandAlliance(int allianceId) {

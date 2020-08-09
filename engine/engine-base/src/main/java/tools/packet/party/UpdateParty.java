@@ -7,13 +7,13 @@ import net.server.world.PartyOperation;
 import tools.packet.PacketInput;
 
 public class UpdateParty implements PacketInput {
-   private int forChannel;
+   private final int forChannel;
 
-   private MapleParty party;
+   private final MapleParty party;
 
-   private PartyOperation operation;
+   private final PartyOperation operation;
 
-   private MaplePartyCharacter target;
+   private final MaplePartyCharacter target;
 
    public UpdateParty(int forChannel, MapleParty party, PartyOperation operation, MaplePartyCharacter target) {
       this.forChannel = forChannel;

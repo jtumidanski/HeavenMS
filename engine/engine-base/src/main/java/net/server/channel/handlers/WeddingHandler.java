@@ -137,7 +137,7 @@ public final class WeddingHandler extends AbstractPacketHandler<BaseWeddingPacke
 
                                  marriage.saveGiftItemsToDb(client, groomWishList, cid);
 
-                                 MapleKarmaManipulator.toggleKarmaFlagToUntradeable(newItem);
+                                 newItem = MapleKarmaManipulator.toggleKarmaFlagToUntradeable(newItem);
                                  marriage.setIntProperty(groomWishListProp, giftCount + 1);
 
                                  PacketCreator.announce(client, new WeddingGiftResult((byte) 0xB, marriage.getWishListItems(groomWishList), Collections.singletonList(newItem)));

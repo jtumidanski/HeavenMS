@@ -4,7 +4,7 @@ import client.MapleCharacter;
 import client.MapleClient;
 
 public class SimpleMessage implements UserMessage {
-   private String message;
+   private final String message;
 
    protected SimpleMessage(String message) {
       this.message = message;

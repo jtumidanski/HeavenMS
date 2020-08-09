@@ -12,9 +12,9 @@ import client.inventory.ItemFactory;
 import client.inventory.MapleInventory;
 import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
+import database.DatabaseConnection;
 import scripting.event.EventInstanceManager;
 import scripting.event.EventManager;
-import database.DatabaseConnection;
 import tools.Pair;
 
 public class MapleMarriage extends EventInstanceManager {

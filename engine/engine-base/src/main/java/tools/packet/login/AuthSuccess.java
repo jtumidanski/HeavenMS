@@ -5,7 +5,7 @@ import net.opcodes.SendOpcode;
 import tools.packet.PacketInput;
 
 public class AuthSuccess implements PacketInput {
-   private MapleClient client;
+   private final MapleClient client;
 
    public AuthSuccess(MapleClient client) {
       this.client = client;

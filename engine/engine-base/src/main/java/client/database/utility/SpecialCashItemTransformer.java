@@ -1,8 +1,8 @@
 package client.database.utility;
 
-import database.SqlTransformer;
 import entity.SpecialCashItem;
 import server.CashShop;
+import transformer.SqlTransformer;
 
 public class SpecialCashItemTransformer implements SqlTransformer<CashShop.SpecialCashItem, SpecialCashItem> {
    @Override

@@ -987,7 +987,7 @@ public class Server {
    public void addGuildToAlliance(int aId, int guildId) {
       MapleAlliance alliance = alliances.get(aId);
       if (alliance != null) {
-         alliance.addGuild(guildId);
+         alliances.put(aId, alliance.addGuild(guildId));
          MapleGuildProcessor.getInstance().setGuildAllianceId(guildId, aId);
       }
    }
@@ -995,7 +995,7 @@ public class Server {
    public void removeGuildFromAlliance(int aId, int guildId) {
       MapleAlliance alliance = alliances.get(aId);
       if (alliance != null) {
-         alliance.removeGuild(guildId);
+         alliances.put(aId, alliance.removeGuild(guildId));
          MapleGuildProcessor.getInstance().setGuildAllianceId(guildId, 0);
       }
    }
@@ -1003,7 +1003,7 @@ public class Server {
    public boolean setAllianceRanks(int aId, String[] ranks) {
       MapleAlliance alliance = alliances.get(aId);
       if (alliance != null) {
-         alliance.rankTitles_$eq(ranks);
+         alliances.put(aId, alliance.setRankTitles(ranks));
          return true;
       }
       return false;
@@ -1012,7 +1012,7 @@ public class Server {
    public boolean setAllianceNotice(int aId, String notice) {
       MapleAlliance alliance = alliances.get(aId);
       if (alliance != null) {
-         alliance.notice_$eq(notice);
+         alliances.put(aId, alliance.setNotice(notice));
          return true;
       }
       return false;
@@ -1021,7 +1021,7 @@ public class Server {
    public boolean increaseAllianceCapacity(int aId, int inc) {
       MapleAlliance alliance = alliances.get(aId);
       if (alliance != null) {
-         alliance.increaseCapacity(inc);
+         alliances.put(aId, alliance.increaseCapacity(inc));
          return true;
       }
       return false;

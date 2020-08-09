@@ -5,7 +5,7 @@ import net.opcodes.SendOpcode;
 import tools.packet.PacketInput;
 
 public class TradeInvite implements PacketInput {
-   private MapleCharacter character;
+   private final MapleCharacter character;
 
    public TradeInvite(MapleCharacter character) {
       this.character = character;

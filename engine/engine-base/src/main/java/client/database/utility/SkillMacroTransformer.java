@@ -1,8 +1,8 @@
 package client.database.utility;
 
 import client.database.data.SkillMacroData;
-import database.SqlTransformer;
 import entity.SkillMacro;
+import transformer.SqlTransformer;
 
 public class SkillMacroTransformer implements SqlTransformer<SkillMacroData, SkillMacro> {
    @Override
