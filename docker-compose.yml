@@ -1,7 +1,9 @@
 version: '3'
 services:
   db:
-    build: database/.
+    build:
+      context: .
+      dockerfile: db.Dockerfile
     command: --default-authentication-plugin=mysql_native_password
     restart: always
     volumes:
@@ -15,7 +17,9 @@ services:
       - '3306'
     container_name: ms-db
   bos:
-    build: bos/.
+    build:
+      context: .
+      dockerfile: bos.Dockerfile
     depends_on:
       - "db"
       - "engine"
@@ -29,7 +33,9 @@ services:
       - ./config.yaml:/config.yaml:ro
     container_name: ms-bos
   cos:
-    build: cos/.
+    build:
+      context: .
+      dockerfile: cos.Dockerfile
     depends_on:
       - "db"
       - "engine"
@@ -44,7 +50,9 @@ services:
     container_name: ms-cos
   engine:
     user: root
-    build: engine/.
+    build:
+      context: .
+      dockerfile: engine.Dockerfile
     depends_on:
       - "db"
     ports:
