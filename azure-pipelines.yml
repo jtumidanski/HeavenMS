@@ -49,21 +49,25 @@ stages:
             publishJUnitResults: false
             options: '-DskipTests'
             goals: 'install'
-        - task: PublishPipelineArtifact@1
+        - task: PublishBuildArtifacts@1
           inputs:
-            targetPath: '$(Pipeline.Workspace)'
-            artifact: 'solution-jar'
-            publishLocation: 'pipeline'
+            PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+            ArtifactName: 'drop'
+            publishLocation: 'Container'
+- stage: BuildContainer
+  displayName: Build Container
+  jobs:  
   - job: BuildContainer
     displayName: Build Container
     pool:
       vmImage: 'ubuntu-latest'
     steps:
-      - task: DownloadPipelineArtifact@2
+      - task: DownloadBuildArtifacts@0
         inputs:
           buildType: 'current'
-          artifactName: 'solution-jar'
-          targetPath: '$(Pipeline.Workspace)'
+          downloadType: 'single'
+          artifactName: 'drop'
+          downloadPath: '$(System.ArtifactsDirectory)'
       - task: Docker@2
         displayName: Build and push an image to container registry
         inputs:
