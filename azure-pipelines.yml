@@ -1,6 +1,7 @@
-# Docker
-# Build and push an image to Azure Container Registry
-# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
 
 trigger:
   branches:
@@ -17,41 +18,59 @@ resources:
   repositories:
     - repository: AppCore # The name used to reference this repository in the checkout step
       type: github
-      endpoint: MyGitHubServiceConnection
+      endpoint: jtumidanski
       name: jtumidanski/app-core
       trigger:
         - main
     - repository: self
 
-variables:
-  # Container registry service connection established during pipeline creation
-  dockerRegistryServiceConnection: '6785a84c-c1b4-4562-b6a6-6accd92e953f'
-  imageRepository: 'ms-engine'
-  containerRegistry: 'heavenms.azurecr.io'
-  dockerfilePath: '$(Build.SourcesDirectory)/engine/Dockerfile'
-  tag: '$(Build.BuildId)'
-  
-  # Agent VM image name
-  vmImageName: 'ubuntu-latest'
-
 stages:
 - stage: Build
-  displayName: Build and push stage
+  displayName: Build
   jobs:  
   - job: Build
     displayName: Build
     pool:
-      vmImage: $(vmImageName)
+      vmImage: 'macos-latest'
     steps:
-    - checkout: self
-    - checkout: AppCore
-    - script: dir $(Build.SourcesDirectory)
-    - task: Docker@2
-      displayName: Build and push an image to container registry
-      inputs:
-        command: buildAndPush
-        repository: $(imageRepository)
-        dockerfile: $(dockerfilePath)
-        containerRegistry: $(dockerRegistryServiceConnection)
-        tags: |
-          $(tag)
+        - checkout: AppCore
+        - task: Maven@3
+          inputs:
+            mavenPomFile: 'app-core/pom.xml'
+            mavenOptions: '-Xmx3072m'
+            publishJUnitResults: false
+            options: '-DskipTests'
+            goals: 'install'
+        - checkout: self
+        - task: Maven@3
+          inputs:
+            mavenPomFile: 'HeavenMS/pom.xml'
+            mavenOptions: '-Xmx3072m'
+            publishJUnitResults: false
+            options: '-DskipTests'
+            goals: 'install'
+        - task: PublishPipelineArtifact@1
+          inputs:
+            targetPath: '$(Pipeline.Workspace)'
+            artifact: 'solution-jar'
+            publishLocation: 'pipeline'
+  - job: BuildContainer
+    displayName: Build Container
+    pool:
+      vmImage: 'ubuntu-latest'
+      demands:
+    steps:
+      - task: DownloadPipelineArtifact@2
+        inputs:
+          buildType: 'current'
+          artifactName: 'solution-jar'
+          targetPath: '$(Pipeline.Workspace)'
+      - task: Docker@2
+        displayName: Build and push an image to container registry
+        inputs:
+          command: buildAndPush
+          repository: $(imageRepository)
+          dockerfile: $(dockerfilePath)
+          containerRegistry: $(dockerRegistryServiceConnection)
+          tags: |
+            $(tag)
