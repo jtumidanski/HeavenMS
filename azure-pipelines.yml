@@ -49,6 +49,9 @@ stages:
             publishJUnitResults: false
             options: '-DskipTests'
             goals: 'install'
+          env:
+            JAVA_HOME: $(JAVA_HOME_8_X64)
+            PATH: $(JAVA_HOME_8_X64)/bin:$(PATH)
         - checkout: self
         - task: Maven@3
           inputs:
@@ -57,6 +60,9 @@ stages:
             publishJUnitResults: false
             options: '-DskipTests'
             goals: 'install'
+          env:
+            JAVA_HOME: $(JAVA_HOME_8_X64)
+            PATH: $(JAVA_HOME_8_X64)/bin:$(PATH)
         - task: PublishBuildArtifacts@1
           inputs:
             PathtoPublish: '$(Build.ArtifactStagingDirectory)'
