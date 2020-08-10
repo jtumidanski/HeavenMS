@@ -58,7 +58,6 @@ stages:
     displayName: Build Container
     pool:
       vmImage: 'ubuntu-latest'
-      demands:
     steps:
       - task: DownloadPipelineArtifact@2
         inputs:
