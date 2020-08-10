@@ -24,6 +24,14 @@ resources:
         - main
     - repository: self
 
+variables:
+  # Container registry service connection established during pipeline creation
+  dockerRegistryServiceConnection: '6785a84c-c1b4-4562-b6a6-6accd92e953f'
+  imageRepository: 'ms-engine'
+  containerRegistry: 'heavenms.azurecr.io'
+  dockerfilePath: '$(Build.SourcesDirectory)/HeavenMS/engine/Dockerfile'
+  tag: '$(Build.BuildId)'
+
 stages:
 - stage: Build
   displayName: Build
