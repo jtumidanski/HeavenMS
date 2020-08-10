@@ -65,7 +65,7 @@ stages:
             PATH: $(JAVA_HOME_14_X64)/bin:$(PATH)
         - task: PublishBuildArtifacts@1
           inputs:
-            PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+            PathtoPublish: '$(Build.SourcesDirectory)'
             ArtifactName: 'drop'
             publishLocation: 'Container'
 - stage: BuildContainer
@@ -81,7 +81,7 @@ stages:
           buildType: 'current'
           downloadType: 'single'
           artifactName: 'drop'
-          downloadPath: '$(System.ArtifactsDirectory)'
+          downloadPath: '$(System.SourcesDirectory)'
       - task: Docker@2
         displayName: Build and push an image to container registry
         inputs:
