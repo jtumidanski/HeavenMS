@@ -3,7 +3,7 @@ package server.maps;
 import java.awt.Point;
 
 public abstract class AbstractMapleMapObject implements MapleMapObject {
-   private Point position;
+   private Point position = new Point();
 
    private Integer objectId;
 

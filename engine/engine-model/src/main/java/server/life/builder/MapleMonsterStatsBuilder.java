@@ -14,41 +14,41 @@ import server.life.SelfDestruction;
 import tools.Pair;
 
 public class MapleMonsterStatsBuilder {
-   private Integer hp;
+   private int hp;
 
-   private Boolean isFriendly;
+   private boolean isFriendly;
 
-   private Integer paDamage;
+   private int paDamage;
 
-   private Integer pdDamage;
+   private int pdDamage;
 
-   private Integer maDamage;
+   private int maDamage;
 
-   private Integer mdDamage;
+   private int mdDamage;
 
-   private Integer mp;
+   private int mp;
 
-   private Integer exp;
+   private int exp;
 
-   private Integer level;
+   private int level;
 
-   private Integer removeAfter;
+   private int removeAfter;
 
-   private Boolean isBoss;
+   private boolean isBoss;
 
-   private Boolean isExplosiveReward;
+   private boolean isExplosiveReward;
 
-   private Boolean isFFALoot;
+   private boolean isFFALoot;
 
-   private Boolean isUndead;
+   private boolean isUndead;
 
    private String name;
 
-   private Integer buffToGive;
+   private int buffToGive;
 
-   private Integer cp;
+   private int cp;
 
-   private Boolean removeOnMiss;
+   private boolean removeOnMiss;
 
    private Pair<Integer, Integer> cool;
 
@@ -56,15 +56,15 @@ public class MapleMonsterStatsBuilder {
 
    private SelfDestruction selfDestruction;
 
-   private Boolean firstAttack;
+   private boolean firstAttack;
 
-   private Integer dropPeriod;
+   private int dropPeriod;
 
    private Map<String, Integer> animationTime;
 
-   private Byte tagColor;
+   private byte tagColor;
 
-   private Byte tagBackgroundColor;
+   private byte tagBackgroundColor;
 
    private List<Integer> revives;
 
@@ -72,11 +72,11 @@ public class MapleMonsterStatsBuilder {
 
    private BanishInfo banish;
 
-   private Integer fixedStance;
+   private int fixedStance;
 
    private Map<Element, ElementalEffectiveness> resistance;
 
-   private Boolean changeable;
+   private boolean changeable;
 
    public MapleMonsterStatsBuilder() {
       loseItemList = new ArrayList<>();

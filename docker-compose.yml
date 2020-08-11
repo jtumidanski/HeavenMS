@@ -17,9 +17,7 @@ services:
       - '3306'
     container_name: ms-db
   bos:
-    build:
-      context: .
-      dockerfile: bos.Dockerfile
+    image: ms-bos:latest
     depends_on:
       - "db"
       - "engine"
@@ -33,9 +31,7 @@ services:
       - ./config.yaml:/config.yaml:ro
     container_name: ms-bos
   cos:
-    build:
-      context: .
-      dockerfile: cos.Dockerfile
+    image: ms-cos:latest
     depends_on:
       - "db"
       - "engine"
@@ -61,12 +57,14 @@ services:
       - '7575:7575'
       - '7576:7576'
       - '7577:7577'
+      - '5005:5005'
     expose:
       - '8080'
       - '8484'
       - '7575'
       - '7576'
       - '7577'
+      - '5005'
     environment:
       WAIT_HOSTS: db:3306
     volumes:

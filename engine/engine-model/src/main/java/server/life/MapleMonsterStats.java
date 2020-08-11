@@ -6,16 +6,14 @@ import java.util.Map;
 import server.life.builder.MapleMonsterStatsBuilder;
 import tools.Pair;
 
-public record MapleMonsterStats(String name, Integer hp, Integer mp, Integer exp, Integer level, Integer paDamage,
-                                Integer pdDamage, Integer maDamage, Integer mdDamage, Boolean isFriendly,
-                                Integer removeAfter, Boolean isBoss, Boolean isExplosiveReward, Boolean isFFALoot,
-                                Boolean isUndead, Integer buffToGive, Integer cp, Boolean removeOnMiss,
-                                Boolean changeable,
-                                Map<String, Integer> animationTimes, Map<Element, ElementalEffectiveness> resistances,
-                                List<LoseItem> loseItemList, List<Pair<Integer, Integer>> skills,
-                                List<Integer> revives, Byte tagColor, Byte tagBackgroundColor, Integer fixedStance,
-                                Boolean firstAttack, BanishInfo banish, Integer dropPeriod,
-                                SelfDestruction selfDestruction, Pair<Integer, Integer> cool) {
+public record MapleMonsterStats(String name, int hp, int mp, int exp, int level, int paDamage, int pdDamage,
+                                int maDamage, int mdDamage, boolean isFriendly, int removeAfter, boolean isBoss,
+                                boolean isExplosiveReward, boolean isFFALoot, boolean isUndead, int buffToGive, int cp,
+                                boolean removeOnMiss, boolean changeable, Map<String, Integer> animationTimes,
+                                Map<Element, ElementalEffectiveness> resistances, List<LoseItem> loseItemList,
+                                List<Pair<Integer, Integer>> skills, List<Integer> revives, byte tagColor,
+                                byte tagBackgroundColor, int fixedStance, boolean firstAttack, BanishInfo banish,
+                                int dropPeriod, SelfDestruction selfDestruction, Pair<Integer, Integer> cool) {
    public Integer getAnimationTime(String name) {
       return animationTimes().getOrDefault(name, 500);
    }

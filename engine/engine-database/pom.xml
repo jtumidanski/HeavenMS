@@ -6,7 +6,6 @@
         <artifactId>parent-database</artifactId>
         <groupId>ms</groupId>
         <version>1.0-SNAPSHOT</version>
-        <relativePath>../../parent/parent-database/pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
