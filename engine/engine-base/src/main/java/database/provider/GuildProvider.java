@@ -7,6 +7,10 @@ import javax.persistence.TypedQuery;
 
 import accessor.AbstractQueryExecutor;
 import client.database.data.GuildData;
+import client.database.data.GuildRankData;
+import database.transformer.GuildDataTransformer;
+import database.transformer.GuildRankDataTransformer;
+import entity.Guild;
 
 public class GuildProvider extends AbstractQueryExecutor {
    private static GuildProvider instance;
@@ -34,21 +38,14 @@ public class GuildProvider extends AbstractQueryExecutor {
    }
 
    public Optional<GuildData> getGuildDataById(EntityManager entityManager, int guildId) {
-      TypedQuery<GuildData> query = entityManager.createQuery("" +
-            "SELECT NEW client.database.data.GuildData(g.name, g.gp, g.logo, g.logoColor, g.logoBackground, " +
-            "g.logoBackgroundColor, g.capacity, g.rank1Title, g.rank2Title, g.rank3Title, g.rank4Title, g.rank5Title, " +
-            "g.leader, g.notice, g.signature, g.allianceId) " +
-            "FROM Guild g WHERE g.guildId = :guildId", GuildData.class);
+      TypedQuery<Guild> query = entityManager.createQuery("SELECT g FROM Guild g WHERE g.guildId = :guildId", Guild.class);
       query.setParameter("guildId", guildId);
-      return getSingleOptional(query);
+      return getSingleOptional(query, new GuildDataTransformer());
    }
 
-   public List<GuildData> getGuildRankData(EntityManager entityManager) {
-      TypedQuery<GuildData> query = entityManager.createQuery(
-            "SELECT NEW client.database.data.GuildData(g.name, g.gp, g.logoBackground, g.logoBackgroundColor, g.logo, g.logoColor) " +
-                  "FROM Guild g " +
-                  "ORDER BY g.gp DESC", GuildData.class);
+   public List<GuildRankData> getGuildRankData(EntityManager entityManager) {
+      TypedQuery<Guild> query = entityManager.createQuery("SELECT g FROM Guild g ORDER BY g.gp DESC", Guild.class);
       query.setMaxResults(50);
-      return query.getResultList();
+      return getResultList(query, new GuildRankDataTransformer());
    }
 }

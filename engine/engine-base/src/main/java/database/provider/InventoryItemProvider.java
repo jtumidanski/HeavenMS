@@ -8,8 +8,8 @@ import javax.persistence.TypedQuery;
 
 import accessor.AbstractQueryExecutor;
 import client.database.data.GetInventoryItems;
-import client.database.utility.InventoryEquipTransformer;
-import client.database.utility.InventoryItemTransformer;
+import database.transformer.InventoryEquipTransformer;
+import database.transformer.InventoryItemTransformer;
 import client.inventory.Item;
 import client.inventory.MapleInventoryType;
 import tools.Pair;

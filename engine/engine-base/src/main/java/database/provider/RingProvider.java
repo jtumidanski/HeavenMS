@@ -7,7 +7,7 @@ import javax.persistence.TypedQuery;
 
 import accessor.AbstractQueryExecutor;
 import client.Ring;
-import client.database.utility.RingTransformer;
+import database.transformer.RingTransformer;
 
 public class RingProvider extends AbstractQueryExecutor {
    private static RingProvider instance;

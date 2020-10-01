@@ -6,7 +6,7 @@ import javax.persistence.TypedQuery;
 
 import accessor.AbstractQueryExecutor;
 import client.database.data.FamilyData;
-import client.database.utility.FamilyDataFromResultSetTransformer;
+import database.transformer.FamilyDataFromResultSetTransformer;
 import entity.family.FamilyCharacter;
 
 public class FamilyCharacterProvider extends AbstractQueryExecutor {

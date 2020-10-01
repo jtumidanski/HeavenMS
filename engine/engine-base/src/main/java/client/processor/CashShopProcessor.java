@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 
 import client.MapleCharacter;
-import client.database.data.AccountCashShopData;
 import client.inventory.Equip;
 import client.inventory.Item;
 import client.inventory.ItemFactory;
@@ -69,13 +68,12 @@ public class CashShopProcessor {
       ItemFactory factory = getItemFactoryForJob(jobType);
 
       DatabaseConnection.getInstance().withConnection(connection -> {
-         AccountCashShopData cashShopData = AccountProvider.getInstance().getAccountCashShopData(connection, accountId);
-         cashShop.gainCash(1, cashShopData.nxCredit());
-         cashShop.gainCash(2, cashShopData.maplePoint());
-         cashShop.gainCash(4, cashShopData.nxPrepaid());
-
+         AccountProvider.getInstance().getAccountCashShopData(connection, accountId).ifPresent(cashShopData -> {
+            cashShop.gainCash(1, cashShopData.nxCredit());
+            cashShop.gainCash(2, cashShopData.maplePoint());
+            cashShop.gainCash(4, cashShopData.nxPrepaid());
+         });
          factory.loadItems(accountId, false).forEach(item -> cashShop.addToInventory(item.getLeft()));
-
          getWishList(characterId).forEach(cashShop::addToWishList);
       });
 

@@ -9,7 +9,7 @@ import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import accessor.AbstractQueryExecutor;
-import client.database.utility.DueyPackageFromResultSetTransformer;
+import database.transformer.DueyPackageFromResultSetTransformer;
 import server.DueyPackage;
 import tools.Pair;
 

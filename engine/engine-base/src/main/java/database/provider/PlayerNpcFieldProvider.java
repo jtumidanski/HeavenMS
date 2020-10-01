@@ -6,7 +6,7 @@ import javax.persistence.TypedQuery;
 
 import accessor.AbstractQueryExecutor;
 import client.database.data.PlayerNpcFieldData;
-import client.database.utility.PlayerNpcFieldTransformer;
+import database.transformer.PlayerNpcFieldTransformer;
 import entity.PlayerNpcField;
 
 public class PlayerNpcFieldProvider extends AbstractQueryExecutor {

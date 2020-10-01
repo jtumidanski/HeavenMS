@@ -210,7 +210,7 @@ public class BuddyListProcessor {
          otherCharMin = new CharNameAndIdData(otherChar.get().getName(), otherChar.get().getId());
       } else {
          channel = world.find(addName);
-         otherCharMin = DatabaseConnection.getInstance().withConnectionResult(connection -> CharacterProvider.getInstance().getCharacterInfoForName(connection, addName)).orElse(null);
+         otherCharMin = DatabaseConnection.getInstance().withConnectionResult(connection -> CharacterProvider.getInstance().getCharacterInfoForName(connection, addName).orElse(null)).orElse(null);
       }
 
       if (otherCharMin == null) {

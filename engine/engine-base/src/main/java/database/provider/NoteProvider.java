@@ -7,7 +7,7 @@ import javax.persistence.TypedQuery;
 
 import accessor.AbstractQueryExecutor;
 import client.database.data.NoteData;
-import client.database.utility.NoteTransformer;
+import database.transformer.NoteTransformer;
 import entity.Note;
 
 public class NoteProvider extends AbstractQueryExecutor {

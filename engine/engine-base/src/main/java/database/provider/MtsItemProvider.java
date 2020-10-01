@@ -9,8 +9,8 @@ import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import accessor.AbstractQueryExecutor;
-import client.database.utility.MtsItemInfoTransformer;
-import client.database.utility.TransferItemTransformer;
+import database.transformer.MtsItemInfoTransformer;
+import database.transformer.TransferItemTransformer;
 import client.inventory.Item;
 import entity.mts.MtsItem;
 import server.MTSItemInfo;

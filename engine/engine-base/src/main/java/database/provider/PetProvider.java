@@ -6,7 +6,7 @@ import javax.persistence.TypedQuery;
 
 import accessor.AbstractQueryExecutor;
 import client.database.data.PetData;
-import client.database.utility.PetTransformer;
+import database.transformer.PetTransformer;
 import entity.Pet;
 
 public class PetProvider extends AbstractQueryExecutor {
@@ -23,7 +23,7 @@ public class PetProvider extends AbstractQueryExecutor {
    }
 
    public PetData loadPet(EntityManager entityManager, int petId) {
-      TypedQuery<Pet> query = entityManager.createQuery("SELECT p.name, p.level, p.closeness, p.fullness, p.summoned, p.flag FROM Pet p WHERE p.petId = :petId", Pet.class);
+      TypedQuery<Pet> query = entityManager.createQuery("SELECT p FROM Pet p WHERE p.petId = :petId", Pet.class);
       query.setParameter("petId", petId);
       return getSingleWithDefault(query, new PetTransformer(), null);
    }

@@ -14,6 +14,10 @@ import accessor.AbstractQueryExecutor;
 import client.database.data.AccountCashShopData;
 import client.database.data.AccountData;
 import client.database.data.AccountLoginData;
+import database.transformer.AccountCashShopDataTransformer;
+import database.transformer.AccountDataTransformer;
+import database.transformer.AccountLoginDataTransformer;
+import entity.Account;
 
 public class AccountProvider extends AbstractQueryExecutor {
    private static AccountProvider instance;
@@ -46,10 +50,10 @@ public class AccountProvider extends AbstractQueryExecutor {
       return query.getSingleResult();
    }
 
-   public AccountLoginData getLoginData(EntityManager entityManager, int accountId) {
-      TypedQuery<AccountLoginData> query = entityManager.createQuery("SELECT NEW client.database.data.AccountLoginData(a.loggedIn, a.lastLogin, a.birthday) FROM Account a WHERE a.id = :id", AccountLoginData.class);
+   public Optional<AccountLoginData> getLoginData(EntityManager entityManager, int accountId) {
+      TypedQuery<Account> query = entityManager.createQuery("SELECT a FROM Account a WHERE a.id = :id", Account.class);
       query.setParameter("id", accountId);
-      return query.getSingleResult();
+      return getSingleOptional(query, new AccountLoginDataTransformer());
    }
 
    public Calendar getTempBanCalendar(EntityManager entityManager, int accountId) {
@@ -85,16 +89,16 @@ public class AccountProvider extends AbstractQueryExecutor {
       return query.getSingleResult();
    }
 
-   public AccountCashShopData getAccountCashShopData(EntityManager entityManager, int accountId) {
-      TypedQuery<AccountCashShopData> query = entityManager.createQuery("SELECT NEW client.database.data.AccountCashShopData(a.nxCredit, a.maplePoint, a.nxPrepaid) FROM Account a WHERE a.id = :id", AccountCashShopData.class);
+   public Optional<AccountCashShopData> getAccountCashShopData(EntityManager entityManager, int accountId) {
+      TypedQuery<Account> query = entityManager.createQuery("SELECT a FROM Account a WHERE a.id = :id", Account.class);
       query.setParameter("id", accountId);
-      return query.getSingleResult();
+      return getSingleOptional(query, new AccountCashShopDataTransformer());
    }
 
    public Optional<AccountData> getAccountDataByName(EntityManager entityManager, String name) {
-      TypedQuery<AccountData> query = entityManager.createQuery("SELECT NEW client.database.data.AccountData(a.id, a.name, a.password, a.gender, a.banned, a.pin, a.pic, a.characterSlots, a.tos, a.language, a.country) FROM Account a WHERE a.name = :name", AccountData.class);
+      TypedQuery<Account> query = entityManager.createQuery("SELECT a FROM Account a WHERE a.name = :name", Account.class);
       query.setParameter("name", name);
-      return getSingleOptional(query);
+      return getSingleOptional(query, new AccountDataTransformer());
    }
 
    public long getAccountCount(EntityManager entityManager) {
@@ -103,9 +107,9 @@ public class AccountProvider extends AbstractQueryExecutor {
    }
 
    public Optional<AccountData> getAccountDataById(EntityManager entityManager, int accountId) {
-      TypedQuery<AccountData> query = entityManager.createQuery("SELECT NEW client.database.data.AccountData(a.id, a.name, a.password, a.gender, a.banned, a.pin, a.pic, a.characterSlots, a.tos, a.language, a.country) FROM Account a WHERE a.id = :id", AccountData.class);
+      TypedQuery<Account> query = entityManager.createQuery("SELECT a FROM Account a WHERE a.id = :id", Account.class);
       query.setParameter("id", accountId);
-      return getSingleOptional(query);
+      return getSingleOptional(query, new AccountDataTransformer());
    }
 
    public List<Integer> getAllAccountIds(EntityManager entityManager) {

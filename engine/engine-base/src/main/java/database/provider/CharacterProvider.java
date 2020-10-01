@@ -8,13 +8,21 @@ import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import accessor.AbstractQueryExecutor;
+import client.CharacterIdAndAccount;
+import client.CharacterNameAndLevel;
 import client.database.data.CharNameAndIdData;
 import client.database.data.CharacterData;
 import client.database.data.CharacterGuildData;
 import client.database.data.CharacterGuildFamilyData;
 import client.database.data.CharacterIdNameAccountId;
 import client.database.data.CharacterRankData;
-import client.database.utility.CharacterFromResultSetTransformer;
+import database.transformer.CharNameAndIdDataTransformer;
+import database.transformer.CharacterFromResultSetTransformer;
+import database.transformer.CharacterGuildDataTransformer;
+import database.transformer.CharacterGuildFamilyDataTransformer;
+import database.transformer.CharacterIdAndAccountTransformer;
+import database.transformer.CharacterIdNameAccountIdTransformer;
+import database.transformer.CharacterNameAndLevelTransformer;
 import entity.Character;
 import tools.Pair;
 
@@ -32,8 +40,8 @@ public class CharacterProvider extends AbstractQueryExecutor {
    }
 
    public List<CharacterIdNameAccountId> getAllCharacters(EntityManager entityManager) {
-      TypedQuery<CharacterIdNameAccountId> query = entityManager.createQuery("SELECT NEW client.database.data.CharacterIdNameAccountId(c.id, c.accountId, c.name) FROM Character c", CharacterIdNameAccountId.class);
-      return query.getResultList();
+      TypedQuery<Character> query = entityManager.createQuery("SELECT c FROM Character c", Character.class);
+      return getResultList(query, new CharacterIdNameAccountIdTransformer());
    }
 
    public Optional<Integer> getCharacterForNameAndWorld(EntityManager entityManager, String name, int worldId) {
@@ -44,16 +52,16 @@ public class CharacterProvider extends AbstractQueryExecutor {
    }
 
    public List<CharNameAndIdData> getCharacterInfoForWorld(EntityManager entityManager, int accountId, int worldId) {
-      TypedQuery<CharNameAndIdData> query = entityManager.createQuery("SELECT NEW client.database.data.CharNameAndIdData(c.name, c.id) FROM Character c WHERE c.accountId = :accountId AND c.world = :worldId", CharNameAndIdData.class);
+      TypedQuery<Character> query = entityManager.createQuery("SELECT c FROM Character c WHERE c.accountId = :accountId AND c.world = :worldId", Character.class);
       query.setParameter("accountId", accountId);
       query.setParameter("worldId", worldId);
-      return query.getResultList();
+      return getResultList(query, new CharNameAndIdDataTransformer());
    }
 
-   public CharNameAndIdData getCharacterInfoForName(EntityManager entityManager, String name) {
-      TypedQuery<CharNameAndIdData> query = entityManager.createQuery("SELECT NEW client.database.data.CharNameAndIdData(c.name, c.id) FROM Character c WHERE c.name LIKE :name", CharNameAndIdData.class);
+   public Optional<CharNameAndIdData> getCharacterInfoForName(EntityManager entityManager, String name) {
+      TypedQuery<Character> query = entityManager.createQuery("SELECT c FROM Character c WHERE c.name LIKE :name", Character.class);
       query.setParameter("name", name);
-      return getSingleWithDefault(query, null);
+      return getSingleOptional(query, new CharNameAndIdDataTransformer());
    }
 
    public int countReborns(EntityManager entityManager, int characterId) {
@@ -69,32 +77,23 @@ public class CharacterProvider extends AbstractQueryExecutor {
    }
 
    public Optional<CharacterGuildData> getGuildDataForCharacter(EntityManager entityManager, int characterId, int accountId) {
-      TypedQuery<CharacterGuildData> query = entityManager.createQuery(
-            "SELECT NEW client.database.data.CharacterGuildData(c.id, c.guildId, c.guildRank, c.name, c.allianceRank, c.level, c.job) " +
-                  "FROM Character c WHERE c.id = :id AND c.accountId = :accountId AND c.guildId > 0", CharacterGuildData.class);
+      TypedQuery<Character> query = entityManager.createQuery("SELECT c FROM Character c WHERE c.id = :id AND c.accountId = :accountId AND c.guildId > 0", Character.class);
       query.setParameter("id", characterId);
       query.setParameter("accountId", accountId);
-      return getSingleOptional(query);
+      return getSingleOptional(query, new CharacterGuildDataTransformer());
    }
 
 
    public List<CharacterGuildData> getGuildCharacterData(EntityManager entityManager, int guildId) {
-      TypedQuery<CharacterGuildData> query = entityManager.createQuery(
-            "SELECT NEW client.database.data.CharacterGuildData(c.id, c.guildId, c.guildRank, c.name, c.allianceRank, c.level, c.job) " +
-                  "FROM Character c WHERE c.guildId = :guildId ORDER BY c.guildRank ASC, c.name ASC", CharacterGuildData.class);
+      TypedQuery<Character> query = entityManager.createQuery("SELECT c FROM Character c WHERE c.guildId = :guildId ORDER BY c.guildRank ASC, c.name ASC", Character.class);
       query.setParameter("guildId", guildId);
-      return query.getResultList();
+      return getResultList(query, new CharacterGuildDataTransformer());
    }
 
-   public Optional<Pair<Integer, Integer>> getIdAndAccountIdForName(EntityManager entityManager, String name) {
-      Query query = entityManager.createQuery("SELECT c.id, c.accountId FROM Character c WHERE c.name = :name");
+   public Optional<CharacterIdAndAccount> getIdAndAccountIdForName(EntityManager entityManager, String name) {
+      TypedQuery<Character> query = entityManager.createQuery("SELECT c FROM Character c WHERE c.name = :name", Character.class);
       query.setParameter("name", name);
-      try {
-         Object[] result = (Object[]) query.getSingleResult();
-         return Optional.of(new Pair<>((int) result[0], (int) result[1]));
-      } catch (NoResultException exception) {
-         return Optional.empty();
-      }
+      return getSingleOptional(query, new CharacterIdAndAccountTransformer());
    }
 
    public Integer getAccountIdForName(EntityManager entityManager, String name) {
@@ -146,9 +145,9 @@ public class CharacterProvider extends AbstractQueryExecutor {
    }
 
    public Optional<CharacterIdNameAccountId> getByName(EntityManager entityManager, String name) {
-      TypedQuery<CharacterIdNameAccountId> query = entityManager.createQuery("SELECT NEW client.database.data.CharacterIdNameAccountId(c.id, c.accountId, c.name) FROM Character c WHERE c.name = :name", CharacterIdNameAccountId.class);
+      TypedQuery<Character> query = entityManager.createQuery("SELECT c FROM Character c WHERE c.name = :name", Character.class);
       query.setParameter("name", name);
-      return Optional.of(query.getSingleResult());
+      return getSingleOptional(query, new CharacterIdNameAccountIdTransformer());
    }
 
    public List<CharacterRankData> getRankByJob(EntityManager entityManager, int worldId, int jobId) {
@@ -184,16 +183,13 @@ public class CharacterProvider extends AbstractQueryExecutor {
       return getResultList(query, new CharacterFromResultSetTransformer());
    }
 
-   public Optional<CharacterData> getHighestLevelOtherCharacterData(EntityManager entityManager, int accountId, int characterId) {
-      TypedQuery<CharacterData> query = entityManager.createQuery(
-            "SELECT NEW client.database.data.CharacterData(c.name, c.level) " +
-                  "FROM Character c " +
-                  "WHERE c.accountId = :accountId AND c.id != :id " +
-                  "ORDER BY c.level DESC", CharacterData.class);
+   public Optional<CharacterNameAndLevel> getHighestLevelOtherCharacterData(EntityManager entityManager, int accountId, int characterId) {
+      TypedQuery<Character> query = entityManager.createQuery(
+            "SELECT c FROM Character c WHERE c.accountId = :accountId AND c.id != :id ORDER BY c.level DESC", Character.class);
       query.setParameter("accountId", accountId);
       query.setParameter("id", characterId);
       query.setMaxResults(1);
-      return getSingleOptional(query);
+      return getSingleOptional(query, new CharacterNameAndLevelTransformer());
    }
 
    public int getCharactersInWorld(EntityManager entityManager, int accountId, int worldId) {
@@ -214,11 +210,8 @@ public class CharacterProvider extends AbstractQueryExecutor {
    }
 
    public Optional<CharacterGuildFamilyData> getGuildFamilyInformation(EntityManager entityManager, int characterId) {
-      TypedQuery<CharacterGuildFamilyData> query = entityManager.createQuery(
-            "SELECT NEW client.database.data.CharacterGuildFamilyData(c.world, c.guildId, c.guildRank, c.familyId) " +
-                  "FROM Character c " +
-                  "WHERE c.id = :id", CharacterGuildFamilyData.class);
+      TypedQuery<Character> query = entityManager.createQuery("SELECT c FROM Character c WHERE c.id = :id", Character.class);
       query.setParameter("id", characterId);
-      return Optional.of(query.getSingleResult());
+      return getSingleOptional(query, new CharacterGuildFamilyDataTransformer());
    }
 }

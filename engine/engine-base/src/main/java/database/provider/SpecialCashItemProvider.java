@@ -5,7 +5,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
 import accessor.AbstractQueryExecutor;
-import client.database.utility.SpecialCashItemTransformer;
+import database.transformer.SpecialCashItemTransformer;
 import entity.SpecialCashItem;
 import server.CashShop;
 

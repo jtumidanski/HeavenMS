@@ -6,7 +6,7 @@ import javax.persistence.TypedQuery;
 
 import accessor.AbstractQueryExecutor;
 import client.database.data.NxCodeItemData;
-import client.database.utility.NxCodeItemTransformer;
+import database.transformer.NxCodeItemTransformer;
 import entity.nx.NxCodeItem;
 
 public class NxCodeItemProvider extends AbstractQueryExecutor {

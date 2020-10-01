@@ -6,7 +6,7 @@ import javax.persistence.TypedQuery;
 
 import accessor.AbstractQueryExecutor;
 import client.database.data.QuestData;
-import client.database.utility.QuestStatusTransformer;
+import database.transformer.QuestStatusTransformer;
 import entity.quest.QuestStatus;
 
 public class QuestStatusProvider extends AbstractQueryExecutor {

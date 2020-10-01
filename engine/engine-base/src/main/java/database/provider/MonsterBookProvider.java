@@ -7,6 +7,8 @@ import javax.persistence.TypedQuery;
 
 import accessor.AbstractQueryExecutor;
 import client.database.data.MonsterBookData;
+import database.transformer.MonsterBookDataTransformer;
+import entity.MonsterBook;
 
 public class MonsterBookProvider extends AbstractQueryExecutor {
    private static MonsterBookProvider instance;
@@ -22,9 +24,9 @@ public class MonsterBookProvider extends AbstractQueryExecutor {
    }
 
    public List<MonsterBookData> getDataForCharacter(EntityManager entityManager, int characterId) {
-      TypedQuery<MonsterBookData> query = entityManager.createQuery("SELECT NEW client.database.data.MonsterBookData(m.cardId, m.level) FROM MonsterBook m WHERE m.characterId = :characterId ORDER BY m.cardId ASC", MonsterBookData.class);
+      TypedQuery<MonsterBook> query = entityManager.createQuery("SELECT m FROM MonsterBook m WHERE m.characterId = :characterId ORDER BY m.cardId ASC", MonsterBook.class);
       query.setParameter("characterId", characterId);
-      return query.getResultList();
+      return getResultList(query, new MonsterBookDataTransformer());
    }
 
    public int[] getCardTierSize(EntityManager entityManager) {

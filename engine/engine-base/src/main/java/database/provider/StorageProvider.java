@@ -6,7 +6,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
 import accessor.AbstractQueryExecutor;
-import client.database.utility.MapleStorageTransformer;
+import database.transformer.MapleStorageTransformer;
 import entity.Storage;
 import server.MapleStorage;
 

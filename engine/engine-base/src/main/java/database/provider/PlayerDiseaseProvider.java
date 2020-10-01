@@ -6,7 +6,7 @@ import javax.persistence.TypedQuery;
 
 import accessor.AbstractQueryExecutor;
 import client.database.data.PlayerDiseaseData;
-import client.database.utility.PlayerDiseaseTransformer;
+import database.transformer.PlayerDiseaseTransformer;
 import entity.PlayerDisease;
 
 public class PlayerDiseaseProvider extends AbstractQueryExecutor {

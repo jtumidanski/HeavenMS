@@ -8,7 +8,7 @@ import javax.persistence.TypedQuery;
 
 import accessor.AbstractQueryExecutor;
 import client.database.data.BbsThreadData;
-import client.database.utility.BbsThreadTransformer;
+import database.transformer.BbsThreadTransformer;
 import entity.bbs.BBSThread;
 
 public class BbsThreadProvider extends AbstractQueryExecutor {

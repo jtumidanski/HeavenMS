@@ -6,6 +6,8 @@ import javax.persistence.TypedQuery;
 
 import accessor.AbstractQueryExecutor;
 import client.database.data.CoolDownData;
+import database.transformer.CoolDownDataTransformer;
+import entity.CoolDown;
 
 public class CoolDownProvider extends AbstractQueryExecutor {
    private static CoolDownProvider instance;
@@ -21,8 +23,8 @@ public class CoolDownProvider extends AbstractQueryExecutor {
    }
 
    public List<CoolDownData> getForCharacter(EntityManager entityManager, int characterId) {
-      TypedQuery<CoolDownData> query = entityManager.createQuery("SELECT NEW client.database.data.CoolDownData(c.skillId, c.startTime, c.length) FROM CoolDown c WHERE c.characterId = :characterId", CoolDownData.class);
+      TypedQuery<CoolDown> query = entityManager.createQuery("SELECT c FROM CoolDown c WHERE c.characterId = :characterId", CoolDown.class);
       query.setParameter("characterId", characterId);
-      return query.getResultList();
+      return getResultList(query, new CoolDownDataTransformer());
    }
 }

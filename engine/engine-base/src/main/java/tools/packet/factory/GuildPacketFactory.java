@@ -4,7 +4,7 @@ import java.util.Collection;
 
 import client.MapleCharacter;
 import client.database.data.GlobalUserRank;
-import client.database.data.GuildData;
+import client.database.data.GuildRankData;
 import net.server.guild.MapleGuildCharacter;
 import tools.StringUtil;
 import tools.data.output.MaplePacketLittleEndianWriter;
@@ -196,7 +196,7 @@ public class GuildPacketFactory extends AbstractPacketFactory {
       }
       writer.writeInt(packet.ranks().size()); //number of entries
 
-      for (GuildData guildData : packet.ranks()) {
+      for (GuildRankData guildData : packet.ranks()) {
          writer.writeMapleAsciiString(guildData.name());
          writer.writeInt(guildData.gp());
          writer.writeInt(guildData.logo());

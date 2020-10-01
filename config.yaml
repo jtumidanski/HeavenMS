@@ -192,7 +192,7 @@ server:
   LOGIN_ATTEMPT_DURATION: 120         #Period in seconds the login attempt remains registered on the system.
 
   #Ip Configuration
-  HOST: ms-engine
+  HOST: 192.168.1.109
   HOST_PORT: 8080
   BUDDY_MS_HOST: ms-bos
   BUDDY_MS_PORT: 8081

@@ -9,7 +9,7 @@ import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import accessor.AbstractQueryExecutor;
-import client.database.utility.PlayerNpcFromResultSetTransformer;
+import database.transformer.PlayerNpcFromResultSetTransformer;
 import entity.PlayerNpc;
 import server.life.MaplePlayerNPC;
 import tools.Pair;

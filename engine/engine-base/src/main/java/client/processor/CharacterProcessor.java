@@ -451,7 +451,7 @@ public class CharacterProcessor {
          }));
 
          AreaInfoProvider.getInstance().getAreaInfo(connection, characterData.id())
-               .forEach(areaInfo -> mapleCharacter.getAreaInfos().put(areaInfo.getLeft(), areaInfo.getRight()));
+               .forEach(areaInfo -> mapleCharacter.getAreaInfos().put(areaInfo.area().shortValue(), areaInfo.info()));
 
          EventStatProvider.getInstance().getInfo(connection, characterData.id()).stream()
                .filter(info -> info.getLeft().contentEquals("rescueGaga"))

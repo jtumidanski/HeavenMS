@@ -1,8 +1,12 @@
 package client.database.data;
 
-public record GetInventoryItems(int inventoryType, int itemId, int position, int quantity, int petId, String owner,
-                                long expiration, String giftFrom, int flag, int acc, int avoid, int dex, int hands,
-                                int hp, int intelligence, int jump, int vicious, int luk, int matk, int mdef, int mp,
-                                int speed, int str, int watk, int wdef, int upgradeSlots, int level, int itemExp,
-                                int itemLevel, int ringId, int characterId) {
+public record GetInventoryItems(Integer inventoryType, Integer itemId, Integer position, Integer quantity,
+                                Integer petId, String owner,
+                                Long expiration, String giftFrom, Integer flag, Integer acc, Integer avoid, Integer dex,
+                                Integer hands,
+                                Integer hp, Integer intelligence, Integer jump, Integer vicious, Integer luk,
+                                Integer matk, Integer mdef, Integer mp,
+                                Integer speed, Integer str, Integer watk, Integer wdef, Integer upgradeSlots,
+                                Integer level, Float itemExp,
+                                Integer itemLevel, Integer ringId, Integer characterId) {
 }

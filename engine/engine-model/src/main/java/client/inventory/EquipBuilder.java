@@ -57,6 +57,7 @@ public class EquipBuilder<R extends Equip, B extends EquipBuilder<R, B>> extends
 
    public EquipBuilder(int id) {
       super(id);
+      ringId = -1;
    }
 
    public EquipBuilder(R other) {

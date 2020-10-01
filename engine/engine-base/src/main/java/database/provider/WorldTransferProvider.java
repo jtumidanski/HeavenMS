@@ -7,7 +7,7 @@ import javax.persistence.TypedQuery;
 
 import accessor.AbstractQueryExecutor;
 import client.database.data.PendingWorldTransfers;
-import client.database.utility.PendingWorldTransferTransformer;
+import database.transformer.PendingWorldTransferTransformer;
 import entity.WorldTransfer;
 
 public class WorldTransferProvider extends AbstractQueryExecutor {

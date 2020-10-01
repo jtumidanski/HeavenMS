@@ -8,6 +8,8 @@ import javax.persistence.TypedQuery;
 
 import accessor.AbstractQueryExecutor;
 import client.database.data.PendingNameChanges;
+import database.transformer.PendingNameChangesTransformer;
+import entity.NameChange;
 
 public class NameChangeProvider extends AbstractQueryExecutor {
    private static NameChangeProvider instance;
@@ -29,19 +31,13 @@ public class NameChangeProvider extends AbstractQueryExecutor {
    }
 
    public List<PendingNameChanges> getPendingNameChanges(EntityManager entityManager) {
-      TypedQuery<PendingNameChanges> query = entityManager.createQuery(
-            "SELECT NEW client.database.data.PendingNameChanges(n.id, n.characterId, n.old, n.newName) " +
-                  "FROM NameChange n " +
-                  "WHERE n.completionTime IS NULL", PendingNameChanges.class);
-      return query.getResultList();
+      TypedQuery<NameChange> query = entityManager.createQuery("SELECT n FROM NameChange n WHERE n.completionTime IS NULL", NameChange.class);
+      return getResultList(query, new PendingNameChangesTransformer());
    }
 
    public Optional<PendingNameChanges> getPendingNameChangeForCharacter(EntityManager entityManager, int characterId) {
-      TypedQuery<PendingNameChanges> query = entityManager.createQuery(
-            "SELECT NEW client.database.data.PendingNameChanges(n.id, n.characterId, n.old, n.newName) " +
-                  "FROM NameChange n " +
-                  "WHERE n.characterId = :characterId AND n.completionTime IS NULL", PendingNameChanges.class);
+      TypedQuery<NameChange> query = entityManager.createQuery("SELECT n FROM NameChange n WHERE n.characterId = :characterId AND n.completionTime IS NULL", NameChange.class);
       query.setParameter("characterId", characterId);
-      return getSingleOptional(query);
+      return getSingleOptional(query, new PendingNameChangesTransformer());
    }
 }

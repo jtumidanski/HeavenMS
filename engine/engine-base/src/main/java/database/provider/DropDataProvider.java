@@ -5,6 +5,10 @@ import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
 import accessor.AbstractQueryExecutor;
+import database.transformer.MonsterDropEntryTransformer;
+import database.transformer.MonsterGlobalDropEntryTransformer;
+import entity.DropData;
+import entity.DropDataGlobal;
 import server.life.MonsterDropEntry;
 import server.life.MonsterGlobalDropEntry;
 
@@ -29,19 +33,13 @@ public class DropDataProvider extends AbstractQueryExecutor {
    }
 
    public List<MonsterDropEntry> getDropDataForMonster(EntityManager entityManager, int monsterId) {
-      TypedQuery<MonsterDropEntry> query = entityManager.createQuery(
-            "SELECT NEW server.life.MonsterDropEntry(d.itemId, d.chance, d.minimumQuantity, d.maximumQuantity, d.questId) " +
-                  "FROM DropData d " +
-                  "WHERE d.dropperId = :dropperId", MonsterDropEntry.class);
+      TypedQuery<DropData> query = entityManager.createQuery("SELECT d FROM DropData d WHERE d.dropperId = :dropperId", DropData.class);
       query.setParameter("dropperId", monsterId);
-      return query.getResultList();
+      return getResultList(query, new MonsterDropEntryTransformer());
    }
 
    public List<MonsterGlobalDropEntry> getGlobalDropData(EntityManager entityManager) {
-      TypedQuery<MonsterGlobalDropEntry> query = entityManager.createQuery(
-            "SELECT NEW server.life.MonsterGlobalDropEntry(d.itemId, d.chance, d.continent, d.minimumQuantity, d.maximumQuantity, d.questId) " +
-                  "FROM DropDataGlobal d " +
-                  "WHERE d.chance > 0", MonsterGlobalDropEntry.class);
-      return query.getResultList();
+      TypedQuery<DropDataGlobal> query = entityManager.createQuery("SELECT d FROM DropDataGlobal d WHERE d.chance > 0", DropDataGlobal.class);
+      return getResultList(query, new MonsterGlobalDropEntryTransformer());
    }
 }

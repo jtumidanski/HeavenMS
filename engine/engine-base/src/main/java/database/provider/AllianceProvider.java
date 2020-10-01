@@ -7,7 +7,7 @@ import javax.persistence.TypedQuery;
 
 import accessor.AbstractQueryExecutor;
 import client.database.data.AllianceData;
-import client.database.utility.AllianceTransformer;
+import database.transformer.AllianceTransformer;
 import entity.Alliance;
 
 public class AllianceProvider extends AbstractQueryExecutor {

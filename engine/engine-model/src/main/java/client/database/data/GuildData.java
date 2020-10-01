@@ -10,9 +10,4 @@ public record GuildData(String name, Integer gp, Integer logo, Integer logoColor
       this(name, gp, logo, logoColor, logoBackground, logoBackgroundColor, capacity, new String[]{rank1Title,
             rank2Title, rank3Title, rank4Title, rank5Title}, leaderId, notice, signature, allianceId);
    }
-
-   public GuildData(String name, Integer gp, Integer logo, Integer logoColor, Integer logoBackground,
-                    Integer logoBackgroundColor) {
-      this(name, gp, logo, logoColor, logoBackground, logoBackgroundColor, 0, new String[0], 0, "", 0, 0);
-   }
 }

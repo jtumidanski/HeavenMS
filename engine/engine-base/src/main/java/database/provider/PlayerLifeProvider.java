@@ -7,7 +7,7 @@ import javax.persistence.TypedQuery;
 
 import accessor.AbstractQueryExecutor;
 import client.database.data.PlayerLifeData;
-import client.database.utility.PlayerLifeTransformer;
+import database.transformer.PlayerLifeTransformer;
 import entity.PLife;
 import tools.Pair;
 

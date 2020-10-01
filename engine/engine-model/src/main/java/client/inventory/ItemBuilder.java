@@ -23,6 +23,7 @@ public class ItemBuilder<T extends Item, U extends ItemBuilder<T, U>> {
 
    public ItemBuilder(int id) {
       this.id = id;
+      this.petId = -1;
    }
 
    public ItemBuilder(int id, short position, short quantity, MaplePet pet, int petId) {

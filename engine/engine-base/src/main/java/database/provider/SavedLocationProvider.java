@@ -8,7 +8,7 @@ import javax.persistence.TypedQuery;
 
 import accessor.AbstractQueryExecutor;
 import client.database.data.SavedLocationData;
-import client.database.utility.SavedLocationTransformer;
+import database.transformer.SavedLocationTransformer;
 import entity.SavedLocation;
 
 public class SavedLocationProvider extends AbstractQueryExecutor {

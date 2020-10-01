@@ -473,7 +473,7 @@ public class MapleClient {
    }
 
    public int getLoginState() {  // 0 = LOGIN_NOT_LOGGED_IN, 1= LOGIN_SERVER_TRANSITION, 2 = LOGIN_LOGGED_IN
-      Optional<AccountLoginData> loginData = DatabaseConnection.getInstance().withConnectionResult(connection -> AccountProvider.getInstance().getLoginData(connection, accId));
+      Optional<AccountLoginData> loginData = DatabaseConnection.getInstance().withConnectionResult(connection -> AccountProvider.getInstance().getLoginData(connection, accId).orElse(null));
       if (loginData.isEmpty()) {
          return LOGIN_NOT_LOGGED_IN;
       }

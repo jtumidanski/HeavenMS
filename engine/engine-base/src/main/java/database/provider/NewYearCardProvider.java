@@ -6,7 +6,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
 import accessor.AbstractQueryExecutor;
-import client.database.utility.NewYearCardRecordFromResultSetTransformer;
+import database.transformer.NewYearCardRecordFromResultSetTransformer;
 import client.newyear.NewYearCardRecord;
 import entity.NewYear;
 

@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
+import client.CharacterIdAndAccount;
 import client.DueyAction;
 import client.MapleCharacter;
 import client.MapleClient;
@@ -39,7 +40,7 @@ import tools.packet.stat.EnableActions;
 
 public class DueyProcessor {
 
-   private static Pair<Integer, Integer> getAccountCharacterIdFromCNAME(String name) {
+   private static CharacterIdAndAccount getAccountCharacterIdFromCNAME(String name) {
       return DatabaseConnection.getInstance().withConnectionResult(connection ->
             CharacterProvider.getInstance().getIdAndAccountIdForName(connection, name).orElse(null)).orElse(null);
    }
@@ -144,10 +145,10 @@ public class DueyProcessor {
                return;
             }
 
-            Pair<Integer, Integer> accIdCid;
+            CharacterIdAndAccount accIdCid;
             if (c.getPlayer().getMeso() >= finalCost) {
                accIdCid = getAccountCharacterIdFromCNAME(recipient);
-               int recipientAccId = accIdCid.getLeft();
+               int recipientAccId = accIdCid.accountId();
                if (recipientAccId != -1) {
                   if (recipientAccId == c.getAccID()) {
                      PacketCreator.announce(c, new SendDuey(DueyAction.TO_CLIENT_SEND_SAME_ACC_ERROR));
@@ -162,7 +163,7 @@ public class DueyProcessor {
                return;
             }
 
-            int recipientCid = accIdCid.getRight();
+            int recipientCid = accIdCid.id();
             if (recipientCid == -1) {
                PacketCreator.announce(c, new SendDuey(DueyAction.TO_CLIENT_SEND_NAME_DOES_NOT_EXIST));
                return;

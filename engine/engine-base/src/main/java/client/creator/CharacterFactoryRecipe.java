@@ -72,7 +72,14 @@ public class CharacterFactoryRecipe {
             luk = 4;
             remainingAp = 9;
          }
+      } else {
+         str = 4;
+         dex = 4;
+         intelligence = 4;
+         luk = 4;
+         remainingAp = 0;
       }
+
       maxHp = 50;
       maxMp = 5;
       remainingSp = 0;

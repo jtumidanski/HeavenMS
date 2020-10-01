@@ -6,6 +6,7 @@ import javax.persistence.TypedQuery;
 
 import accessor.AbstractQueryExecutor;
 import client.database.data.MonsterCardData;
+import database.transformer.MonsterCardDataTransformer;
 
 public class MonsterCardProvider extends AbstractQueryExecutor {
    private static MonsterCardProvider instance;
@@ -21,7 +22,7 @@ public class MonsterCardProvider extends AbstractQueryExecutor {
    }
 
    public List<MonsterCardData> getMonsterCardData(EntityManager entityManager) {
-      TypedQuery<MonsterCardData> query = entityManager.createQuery("SELECT NEW client.database.data.MonsterCardData(m.cardId, m.mobId) FROM MonsterCardData m", MonsterCardData.class);
-      return query.getResultList();
+      TypedQuery<entity.MonsterCardData> query = entityManager.createQuery("SELECT m FROM MonsterCardData m", entity.MonsterCardData.class);
+      return getResultList(query, new MonsterCardDataTransformer());
    }
 }

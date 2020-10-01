@@ -6,6 +6,8 @@ import javax.persistence.TypedQuery;
 
 import accessor.AbstractQueryExecutor;
 import client.database.data.MarriageData;
+import database.transformer.MarriageDataTransformer;
+import entity.Marriage;
 
 public class MarriageProvider extends AbstractQueryExecutor {
    private static MarriageProvider instance;
@@ -21,15 +23,15 @@ public class MarriageProvider extends AbstractQueryExecutor {
    }
 
    public Optional<MarriageData> getById(EntityManager entityManager, int marriageId) {
-      TypedQuery<MarriageData> query = entityManager.createQuery("SELECT NEW client.database.data.MarriageData(m.marriageId, m.husbandId, m.wifeId) FROM Marriage m WHERE m.marriageId = :marriageId", MarriageData.class);
+      TypedQuery<Marriage> query = entityManager.createQuery("SELECT m FROM Marriage m WHERE m.marriageId = :marriageId", Marriage.class);
       query.setParameter("marriageId", marriageId);
-      return getSingleOptional(query);
+      return getSingleOptional(query, new MarriageDataTransformer());
    }
 
    public Optional<MarriageData> getBySpouses(EntityManager entityManager, int spouse1, int spouse2) {
-      TypedQuery<MarriageData> query = entityManager.createQuery("SELECT NEW client.database.data.MarriageData(m.marriageId, m.husbandId, m.wifeId) FROM Marriage m WHERE m.husbandId = :spouse1 OR m.wifeId = :spouse2", MarriageData.class);
+      TypedQuery<Marriage> query = entityManager.createQuery("SELECT m FROM Marriage m WHERE m.husbandId = :spouse1 OR m.wifeId = :spouse2", Marriage.class);
       query.setParameter("spouse1", spouse1);
       query.setParameter("spouse2", spouse2);
-      return getSingleOptional(query);
+      return getSingleOptional(query, new MarriageDataTransformer());
    }
 }

@@ -5,7 +5,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
 import accessor.AbstractQueryExecutor;
-import client.database.utility.ReactorDropTransformer;
+import database.transformer.ReactorDropTransformer;
 import entity.ReactorDrop;
 import server.maps.ReactorDropEntry;
 

@@ -6,6 +6,8 @@ import javax.persistence.TypedQuery;
 
 import accessor.AbstractQueryExecutor;
 import client.database.data.KeyMapData;
+import database.transformer.KeyMapDataTransformer;
+import entity.KeyMap;
 
 public class KeyMapProvider extends AbstractQueryExecutor {
    private static KeyMapProvider instance;
@@ -21,8 +23,8 @@ public class KeyMapProvider extends AbstractQueryExecutor {
    }
 
    public List<KeyMapData> getForCharacter(EntityManager entityManager, int characterId) {
-      TypedQuery<KeyMapData> query = entityManager.createQuery("SELECT NEW client.database.data.KeyMapData(k.key, k.type, k.action) FROM KeyMap k WHERE k.characterId = :characterId", KeyMapData.class);
+      TypedQuery<KeyMap> query = entityManager.createQuery("SELECT k FROM KeyMap k WHERE k.characterId = :characterId", KeyMap.class);
       query.setParameter("characterId", characterId);
-      return query.getResultList();
+      return getResultList(query, new KeyMapDataTransformer());
    }
 }

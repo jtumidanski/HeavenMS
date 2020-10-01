@@ -8,7 +8,7 @@ import javax.persistence.TypedQuery;
 
 import accessor.AbstractQueryExecutor;
 import client.database.data.SkillMacroData;
-import client.database.utility.SkillMacroTransformer;
+import database.transformer.SkillMacroTransformer;
 import entity.SkillMacro;
 
 public class SkillMacroProvider extends AbstractQueryExecutor {

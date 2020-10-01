@@ -6,7 +6,7 @@ import javax.persistence.TypedQuery;
 
 import accessor.AbstractQueryExecutor;
 import client.database.data.SkillData;
-import client.database.utility.SkillTransformer;
+import database.transformer.SkillTransformer;
 import entity.Skill;
 
 public class SkillProvider extends AbstractQueryExecutor {

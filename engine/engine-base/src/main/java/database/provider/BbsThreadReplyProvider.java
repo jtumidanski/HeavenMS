@@ -8,7 +8,7 @@ import javax.persistence.TypedQuery;
 
 import accessor.AbstractQueryExecutor;
 import client.database.data.BbsThreadReplyData;
-import client.database.utility.BbsThreadReplyTransformer;
+import database.transformer.BbsThreadReplyTransformer;
 import entity.bbs.BBSReply;
 
 public class BbsThreadReplyProvider extends AbstractQueryExecutor {
