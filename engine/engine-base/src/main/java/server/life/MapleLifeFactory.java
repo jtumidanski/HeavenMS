@@ -100,7 +100,7 @@ public class MapleLifeFactory {
             .setFFALoot(MapleDataTool.getIntConvert("publicReward", monsterInfoData, 0) > 0)
             .setUndead(MapleDataTool.getIntConvert("undead", monsterInfoData, 0) > 0)
             .setName(MapleDataTool.getString(mid + "/name", mobStringData, "MISSINGNO"))
-            .setBuffToGive(MapleDataTool.getIntConvert("buff", monsterInfoData, 0))
+            .setBuffToGive(MapleDataTool.getIntConvert("buff", monsterInfoData, -1))
             .setCp(MapleDataTool.getIntConvert("getCP", monsterInfoData, 0))
             .setRemoveOnMiss(MapleDataTool.getIntConvert("removeOnMiss", monsterInfoData, 0) > 0);
 

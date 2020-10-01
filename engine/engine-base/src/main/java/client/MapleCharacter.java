@@ -4978,7 +4978,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public MaplePet getPet(int index) {
-      if (index < 0) {
+      if (index < 0 || index >= pets.length) {
          return null;
       }
 

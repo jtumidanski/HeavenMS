@@ -84,6 +84,7 @@ public class MapleMonsterStatsBuilder {
       revives = new ArrayList<>();
       skills = new ArrayList<>();
       resistance = new HashMap<>();
+      buffToGive = -1;
    }
 
    public MapleMonsterStatsBuilder(MapleMonsterStats other) {

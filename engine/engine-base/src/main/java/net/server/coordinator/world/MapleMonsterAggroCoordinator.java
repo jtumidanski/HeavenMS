@@ -50,7 +50,7 @@ public class MapleMonsterAggroCoordinator {
                .setUpdateStreak(0)
                .setToNextUpdate(updateEntryExpiration(pae))
                .setCurrentDamageInstances(pae.currentDamageInstances() + 1)
-               .setAverageDamage((int) (totalDamage / pae.currentDamageInstances()))
+               .setAverageDamage((int) (totalDamage / (pae.currentDamageInstances() + 1)))
                .setAccumulatedDamage(totalDamage)
                .build();
       }
