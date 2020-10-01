@@ -23,6 +23,7 @@ services:
       - "engine"
     ports:
       - '8081:8081'
+      - '8581:5005'
     environment:
       WAIT_HOSTS: db:3306, engine:8080, engine:8484
     expose:
@@ -37,6 +38,7 @@ services:
       - "engine"
     ports:
       - '8082:8082'
+      - '8582:5005'
     environment:
       WAIT_HOSTS: db:3306, engine:8080, engine:8484
     expose:
@@ -57,14 +59,13 @@ services:
       - '7575:7575'
       - '7576:7576'
       - '7577:7577'
-      - '5005:5005'
+      - '8580:5005'
     expose:
       - '8080'
       - '8484'
       - '7575'
       - '7576'
       - '7577'
-      - '5005'
     environment:
       WAIT_HOSTS: db:3306
     volumes:
