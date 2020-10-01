@@ -60,7 +60,8 @@ public final class TakeDamageHandler extends AbstractPacketHandler<TakeDamagePac
       int damage = packet.damage();
       byte direction = packet.direction();
 
-      int oid = 0, pgmr = 0;
+      int oid = packet.objectId();
+      int pgmr = 0;
       int pos_x = 0, pos_y = 0, fake = 0;
       boolean is_pgmr = false, is_pg = true, is_deadly = false;
       int mpAttack = 0;
@@ -84,7 +85,7 @@ public final class TakeDamageHandler extends AbstractPacketHandler<TakeDamagePac
                List<LoseItem> loseItems;
                if (damage > 0) {
                   loseItems = attacker.getStats().loseItemList();
-                  if (loseItems != null) {
+                  if (loseItems.size() != 0) {
                      if (chr.getBuffEffect(MapleBuffStat.AURA) == null) {
                         MapleInventoryType type;
                         final int playerXPosition = chr.position().x;
