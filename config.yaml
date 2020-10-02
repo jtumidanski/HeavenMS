@@ -193,11 +193,6 @@ server:
 
   #Ip Configuration
   HOST: 192.168.1.109
-  HOST_PORT: 8080
-  BUDDY_MS_HOST: ms-bos
-  BUDDY_MS_PORT: 8081
-  CASH_SHOP_MS_HOST: ms-cos
-  CASH_SHOP_MS_PORT: 8082
 
   LOCALSERVER: true
   GMSERVER: false
