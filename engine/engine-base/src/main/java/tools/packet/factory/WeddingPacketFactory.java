@@ -3,6 +3,8 @@ package tools.packet.factory;
 import client.MapleCharacter;
 import client.inventory.Item;
 import client.processor.CharacterProcessor;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 import tools.StringUtil;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.wedding.MarriageRequest;
@@ -207,7 +209,7 @@ public class WeddingPacketFactory extends AbstractPacketFactory {
             break;
          }
          default: {
-            System.out.println("Unknown WishList Mode: " + packet.mode());
+            LoggerUtil.printError(LoggerOriginator.EXCEPTION, "Unknown WishList Mode: " + packet.mode());
             break;
          }
       }

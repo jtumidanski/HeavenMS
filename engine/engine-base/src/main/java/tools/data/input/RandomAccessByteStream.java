@@ -3,6 +3,9 @@ package tools.data.input;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
+
 /**
  * Provides an abstract layer to a byte stream. This layer can be accessed
  * randomly.
@@ -51,8 +54,7 @@ public class RandomAccessByteStream implements SeekableInputStreamBytestream {
       try {
          return raf.length() - raf.getFilePointer();
       } catch (IOException e) {
-         e.printStackTrace();
-         System.out.println("ERROR " + e);
+         LoggerUtil.printError(LoggerOriginator.EXCEPTION, e);
          return 0;
       }
    }

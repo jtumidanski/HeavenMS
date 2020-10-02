@@ -2,6 +2,9 @@ package tools.data.input;
 
 import java.io.IOException;
 
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
+
 /**
  * Provides an abstract accessor to a generic Little Endian byte stream. This
  * accessor is seekable.
@@ -31,8 +34,7 @@ public class GenericSeekableLittleEndianAccessor extends GenericLittleEndianAcce
       try {
          bs.seek(offset);
       } catch (IOException e) {
-         e.printStackTrace();
-         System.out.println("Seek failed " + e);
+         LoggerUtil.printError(LoggerOriginator.EXCEPTION, e);
       }
    }
 
@@ -47,8 +49,7 @@ public class GenericSeekableLittleEndianAccessor extends GenericLittleEndianAcce
       try {
          return bs.getPosition();
       } catch (IOException e) {
-         e.printStackTrace();
-         System.out.println("getPosition failed" + e);
+         LoggerUtil.printError(LoggerOriginator.EXCEPTION, e);
          return -1;
       }
    }

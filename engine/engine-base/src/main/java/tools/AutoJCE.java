@@ -9,17 +9,9 @@ import java.util.Map;
 public class AutoJCE {
    public static byte removeCryptographyRestrictions() {
       if (!isRestrictedCryptography()) {
-         //System.out.println("Cryptography restrictions removal not needed");
          return 0;
       }
       try {
-         /*
-          * Do the following, but with reflection to bypass access checks:
-          *
-          * JceSecurity.isRestricted = false;
-          * JceSecurity.defaultPolicy.perms.clear();
-          * JceSecurity.defaultPolicy.add(CryptoAllPermission.INSTANCE);
-          */
          final Class<?> jceSecurity = Class.forName("javax.crypto.JceSecurity");
          final Class<?> cryptoPermissions = Class.forName("javax.crypto.CryptoPermissions");
          final Class<?> cryptoAllPermission = Class.forName("javax.crypto.CryptoAllPermission");
@@ -38,8 +30,6 @@ public class AutoJCE {
          final Field instance = cryptoAllPermission.getDeclaredField("INSTANCE");
          instance.setAccessible(true);
          defaultPolicy.add((Permission) instance.get(null));
-
-         //System.out.println("Successfully removed cryptography restrictions");
          return 1;
       } catch (final Exception e) {
          e.printStackTrace();

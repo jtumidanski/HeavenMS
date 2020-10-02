@@ -17,6 +17,8 @@ import provider.MapleDataProviderFactory;
 import provider.MapleDataTool;
 import provider.wz.MapleDataType;
 import server.life.builder.MapleMonsterStatsBuilder;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 import tools.Pair;
 import tools.StringUtil;
 
@@ -46,7 +48,7 @@ public class MapleLifeFactory {
       } else if (type.equalsIgnoreCase("m")) {
          return getMonster(id).orElseThrow();
       } else {
-         System.out.println("Unknown Life type: " + type);
+         LoggerUtil.printError(LoggerOriginator.EXCEPTION, "Unknown Life type: " + type);
          return null;
       }
    }
@@ -231,7 +233,7 @@ public class MapleLifeFactory {
          }
          return Optional.of(new MapleMonster(monsterId, stats));
       } catch (NullPointerException npe) {
-         System.out.println("[SEVERE] MOB " + monsterId + " failed to load. Issue: " + npe.getMessage() + "\n\n");
+         LoggerUtil.printError(LoggerOriginator.EXCEPTION, "[SEVERE] MOB " + monsterId + " failed to load. Issue: " + npe.getMessage() + "\n\n");
          npe.printStackTrace();
          return Optional.empty();
       }
@@ -251,7 +253,7 @@ public class MapleLifeFactory {
             return stats.level();
          }
       } catch (NullPointerException npe) {
-         System.out.println("[SEVERE] MOB " + mid + " failed to load. Issue: " + npe.getMessage() + "\n\n");
+         LoggerUtil.printError(LoggerOriginator.EXCEPTION, "[SEVERE] MOB " + mid + " failed to load. Issue: " + npe.getMessage() + "\n\n");
          npe.printStackTrace();
       }
 

@@ -7387,12 +7387,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             equipUpgrades.put(eq, new LinkedList<>());
          }
 
-            /*
-            for (Entry<StatUpgrade, Float> es : statIncreases.entrySet()) {
-                System.out.println(es);
-            }
-            */
-
          for (Entry<StatUpgrade, Float> e : statIncreases.entrySet()) {
             double ev = Math.sqrt(e.getValue());
 

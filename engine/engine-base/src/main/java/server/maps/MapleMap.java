@@ -3121,15 +3121,6 @@ public class MapleMap {
    }
 
    private int getNumShouldSpawn(int numPlayers) {
-        /*
-        System.out.println("----------------------------------");
-        for (SpawnPoint spawnPoint : getMonsterSpawn()) {
-            System.out.println("sp " + spawnPoint.getPosition().getX() + ", " + spawnPoint.getPosition().getY() + ": " + spawnPoint.getDenySpawn());
-        }
-        System.out.println("try " + monsterSpawn.size() + " - " + spawnedMonstersOnMap.get());
-        System.out.println("----------------------------------");
-        */
-
       if (YamlConfig.config.server.USE_ENABLE_FULL_RESPAWN) {
          return (monsterSpawn.size() - spawnedMonstersOnMap.get());
       }

@@ -30,6 +30,8 @@ import server.maps.AbstractMapleMapObject;
 import server.maps.MapleMap;
 import server.maps.MapleMapObject;
 import server.maps.MapleMapObjectType;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 import tools.MasterBroadcaster;
 import tools.Pair;
 import tools.packet.character.npc.GetPlayerNPC;
@@ -208,7 +210,7 @@ public class MaplePlayerNPC extends AbstractMapleMapObject {
       }
 
       if (YamlConfig.config.server.USE_DEBUG) {
-         System.out.println("GOT SID " + scriptId + " POS " + pos);
+         LoggerUtil.printInfo(LoggerOriginator.NPC, "GOT SID " + scriptId + " POS " + pos);
       }
 
       int jobId = (chr.getJob().getId() / 100) * 100;

@@ -3,6 +3,9 @@ package tools.data.input;
 import java.io.IOException;
 import java.io.InputStream;
 
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
+
 /**
  * Provides an abstract wrapper to a stream of bytes.
  */
@@ -60,8 +63,7 @@ public class InputStreamByteStream implements ByteInputStream {
       try {
          return is.available();
       } catch (IOException e) {
-         e.printStackTrace();
-         System.out.println("ERROR" + e);
+         LoggerUtil.printError(LoggerOriginator.EXCEPTION, e);
          return 0;
       }
    }

@@ -6,18 +6,20 @@ import java.util.Optional;
 import java.util.Set;
 
 import client.MapleClient;
-import database.DatabaseConnection;
-import database.provider.ShopItemProvider;
-import database.provider.ShopProvider;
 import client.inventory.Item;
 import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import client.processor.PetProcessor;
-import constants.inventory.ItemConstants;
 import constants.ShopTransactionOperation;
+import constants.inventory.ItemConstants;
+import database.DatabaseConnection;
+import database.provider.ShopItemProvider;
+import database.provider.ShopProvider;
 import server.MapleItemInformationProvider;
 import server.MapleShop;
 import server.MapleShopItem;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 import tools.PacketCreator;
 import tools.packet.shop.ConfirmShopTransaction;
 import tools.packet.shop.GetNPCShop;
@@ -106,7 +108,7 @@ public class MapleShopProcessor {
       Optional<MapleShopItem> itemResult = shop.findBySlot(slot);
       if (itemResult.isPresent()) {
          if (itemResult.get().itemId() != itemId) {
-            System.out.println("Wrong slot number in shop " + shop.id());
+            LoggerUtil.printError(LoggerOriginator.EXCEPTION, "Wrong slot number in shop " + shop.id());
             return;
          }
       } else {

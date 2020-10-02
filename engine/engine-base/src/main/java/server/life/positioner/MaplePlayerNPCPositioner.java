@@ -15,6 +15,8 @@ import server.life.MaplePlayerNPC;
 import server.maps.MapleMap;
 import server.maps.MapleMapObject;
 import server.maps.MapleMapObjectType;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 import tools.MasterBroadcaster;
 import tools.packet.character.npc.GetPlayerNPC;
 import tools.packet.character.npc.RemovePlayerNPC;
@@ -119,7 +121,7 @@ public class MaplePlayerNPCPositioner {
    private static Point reorganizePlayerNpc(MapleMap map, int newStep, List<MapleMapObject> mmoList) {
       if (!mmoList.isEmpty()) {
          if (YamlConfig.config.server.USE_DEBUG) {
-            System.out.println("Reorganizing player npc map, step " + newStep);
+            LoggerUtil.printInfo(LoggerOriginator.NPC, "Reorganizing player npc map, step " + newStep);
          }
 
          List<MaplePlayerNPC> playerNpcList = new ArrayList<>(mmoList.size());

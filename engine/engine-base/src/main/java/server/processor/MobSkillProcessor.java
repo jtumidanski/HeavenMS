@@ -21,6 +21,8 @@ import server.maps.MapleMapObject;
 import server.maps.MapleMapObjectType;
 import server.maps.MapleMist;
 import tools.ArrayMap;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 import tools.Randomizer;
 
 public class MobSkillProcessor {
@@ -241,7 +243,7 @@ public class MobSkillProcessor {
             }
             break;
          default:
-            System.out.println("Unhandled Mob skill: " + mobSkill.skillId());
+            LoggerUtil.printError(LoggerOriginator.EXCEPTION, "Unhandled Mob skill: " + mobSkill.skillId());
             break;
       }
       if (stats.size() > 0) {
