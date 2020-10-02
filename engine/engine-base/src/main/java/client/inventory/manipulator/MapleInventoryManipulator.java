@@ -422,7 +422,7 @@ public class MapleInventoryManipulator {
          inv.lockInventory();
          try {
             chr.unequippedItem((Equip) item);
-            inv.removeItem(slot, quantity, allowZero);
+            item = inv.removeItem(slot, quantity, allowZero).orElseThrow();
          } finally {
             inv.unlockInventory();
          }
@@ -436,7 +436,7 @@ public class MapleInventoryManipulator {
                PetProcessor.getInstance().unequipPet(chr, (byte) petIdx, true);
             }
          }
-         inv.removeItem(slot, quantity, allowZero);
+         item = inv.removeItem(slot, quantity, allowZero).orElseThrow();
          if (type != MapleInventoryType.CAN_HOLD) {
             announceModifyInventory(c, item, fromDrop, allowZero);
          }

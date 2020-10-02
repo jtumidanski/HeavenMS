@@ -449,14 +449,28 @@ public class MapleInventory implements Iterable<Item> {
       return newItem;
    }
 
-   public void removeItem(short slot) {
-      removeItem(slot, (short) 1, false);
+   /**
+    * Removes 1 of an item from the slot.
+    *
+    * @param slot the slot to modify
+    * @return the updated item
+    */
+   public Optional<Item> removeItem(short slot) {
+      return removeItem(slot, (short) 1, false);
    }
 
-   public void removeItem(short slot, short quantity, boolean allowZero) {
+   /**
+    * Removes a quantity of an item from the slot.
+    *
+    * @param slot      the slot to modify
+    * @param quantity  the quantity to remove
+    * @param allowZero if a quantity of zero is allowed
+    * @return the updated item
+    */
+   public Optional<Item> removeItem(short slot, short quantity, boolean allowZero) {
       Item item = getItem(slot);
       if (item == null) {// TODO is it ok not to throw an exception here?
-         return;
+         return Optional.empty();
       }
       item = item.setQuantity((short) (item.quantity() - quantity));
       if (item.quantity() < 0) {
@@ -465,6 +479,7 @@ public class MapleInventory implements Iterable<Item> {
       if (item.quantity() == 0 && !allowZero) {
          removeSlot(slot);
       }
+      return Optional.of(item);
    }
 
    public void update(final Item item) {
@@ -528,6 +543,12 @@ public class MapleInventory implements Iterable<Item> {
       }
    }
 
+   /**
+    * Removes an item from the slot.
+    *
+    * @param slot the slot to remove from
+    * @return the item removed
+    */
    public void removeSlot(short slot) {
       Item item;
       lock.lock();
