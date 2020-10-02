@@ -39,6 +39,7 @@ services:
       - "db"
       - "engine"
       - "nginx"
+      - "logs"
     ports:
       - '8581:5005'
     environment:
@@ -56,6 +57,7 @@ services:
       - "db"
       - "engine"
       - "nginx"
+      - "logs"
     ports:
       - '8582:5005'
     environment:
@@ -67,6 +69,17 @@ services:
     volumes:
       - ./config.yaml:/config.yaml:ro
     container_name: ms-cos
+  logs:
+    image: ms-logs:latest
+    ports:
+      - '8583:5005'
+    networks:
+      - engine-net
+      - bos-net
+      - cos-net
+    expose:
+      - '8080'
+    container_name: ms-logs
   engine:
     user: root
     build:
@@ -74,6 +87,7 @@ services:
       dockerfile: engine.Dockerfile
     depends_on:
       - "db"
+      - "logs"
     ports:
       - '8484:8484'
       - '7575:7575'
