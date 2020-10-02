@@ -732,9 +732,7 @@ public class MapleItemInformationProvider {
             .setPosition((short) 0)
             .setSlots(ringId)
             .setElemental(isElemental)
-            .setQuantity((short) 1)
-            .setGiftFrom("")
-            .setOwner("");
+            .setQuantity((short) 1);
 
       Map<String, Integer> stats = this.getEquipStats(equipId);
       if (stats != null) {
