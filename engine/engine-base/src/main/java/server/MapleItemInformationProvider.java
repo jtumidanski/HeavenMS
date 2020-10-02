@@ -56,8 +56,9 @@ import server.MakerItemFactory.MakerItemCreateEntry;
 import server.life.MapleLifeFactory;
 import server.life.MapleMonsterInformationProvider;
 import server.processor.StatEffectProcessor;
-import tools.FilePrinter;
 import tools.I18nMessage;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
@@ -1201,7 +1202,7 @@ public class MapleItemInformationProvider {
          String itemName = MapleItemInformationProvider.getInstance().getName(equip.id());
          Server.getInstance().broadcastGMMessage(chr.getWorld(), PacketCreator.create(new YellowTip("[Warning]: " + chr.getName() + " tried to equip " + itemName + " into slot " + dst + ".")));
          AutoBanFactory.PACKET_EDIT.alert(chr, chr.getName() + " tried to forcibly equip an item.");
-         FilePrinter.printError(FilePrinter.EXPLOITS + chr.getName() + ".txt", chr.getName() + " tried to equip " + itemName + " into " + dst + " slot.");
+         LoggerUtil.printError(LoggerOriginator.EXPLOITS, chr.getName() + " tried to equip " + itemName + " into " + dst + " slot.");
          return false;
       }
 

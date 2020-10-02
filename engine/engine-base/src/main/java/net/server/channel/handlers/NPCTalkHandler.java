@@ -10,11 +10,12 @@ import scripting.npc.NPCScriptManager;
 import server.life.MapleNPC;
 import server.life.MaplePlayerNPC;
 import server.maps.MapleMapObject;
-import tools.FilePrinter;
+import tools.I18nMessage;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
-import tools.I18nMessage;
 import tools.packet.stat.EnableActions;
 
 public final class NPCTalkHandler extends AbstractPacketHandler<NPCTalkPacket> {
@@ -61,7 +62,7 @@ public final class NPCTalkHandler extends AbstractPacketHandler<NPCTalkPacket> {
                boolean hasNpcScript = NPCScriptManager.getInstance().start(client, npc.id(), packet.objectId(), null);
                if (!hasNpcScript) {
                   if (!npc.hasShop()) {
-                     FilePrinter.printError(FilePrinter.NPC_UNCODED, "NPC " + npc.getName() + "(" + npc.id() + ") is not coded.");
+                     LoggerUtil.printError(LoggerOriginator.NPC_UNCODED, "NPC " + npc.getName() + "(" + npc.id() + ") is not coded.");
                      return;
                   } else if (client.getPlayer().getShop() != null) {
                      PacketCreator.announce(client, new EnableActions());

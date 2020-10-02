@@ -17,7 +17,8 @@ import constants.skills.Warrior;
 import net.server.Server;
 import server.MapleItemInformationProvider;
 import server.events.RescueGaga;
-import tools.FilePrinter;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 import tools.PacketCreator;
 import tools.packet.AddNewCharacter;
 import tools.packet.message.YellowTip;
@@ -248,8 +249,7 @@ public class CharacterFactory {
 
       Server.getInstance().createCharacterEntry(newCharacter);
       Server.getInstance().broadcastGMMessage(c.getWorld(), PacketCreator.create(new YellowTip("[New Char]: " + c.getAccountName() + " has created a new character with IGN " + name)));
-      FilePrinter.print(FilePrinter.CREATED_CHAR + c.getAccountName() + ".txt", c.getAccountName() + " created character with IGN " + name);
-
+      LoggerUtil.printInfo(LoggerOriginator.CREATED_CHAR, c.getAccountName() + " created character with IGN " + name);
       return 0;
    }
 }

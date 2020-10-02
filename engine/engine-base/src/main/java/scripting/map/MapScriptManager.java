@@ -10,7 +10,8 @@ import javax.script.ScriptException;
 import client.MapleCharacter;
 import client.MapleClient;
 import scripting.AbstractScriptManager;
-import tools.FilePrinter;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 
 public class MapScriptManager extends AbstractScriptManager {
    private static MapScriptManager instance = new MapScriptManager();
@@ -62,7 +63,7 @@ public class MapScriptManager extends AbstractScriptManager {
          ((Invocable) iv).invokeFunction("start", new MapScriptMethods(c));
          return true;
       } catch (final Exception ute) {
-         FilePrinter.printError(FilePrinter.MAP_SCRIPT + scriptName + ".txt", ute);
+         LoggerUtil.printError(LoggerOriginator.MAP_SCRIPT, ute, String.format("Script [%s]", scriptName));
       }
       return false;
    }

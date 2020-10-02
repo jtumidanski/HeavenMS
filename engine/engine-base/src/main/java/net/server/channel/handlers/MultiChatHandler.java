@@ -10,8 +10,9 @@ import net.server.channel.packet.MultiChatPacket;
 import net.server.channel.packet.reader.MultiChatReader;
 import net.server.processor.MapleGuildProcessor;
 import net.server.world.World;
-import tools.FilePrinter;
 import tools.LogHelper;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 import tools.packet.message.MultiChat;
 
 public final class MultiChatHandler extends AbstractPacketHandler<MultiChatPacket> {
@@ -32,7 +33,7 @@ public final class MultiChatHandler extends AbstractPacketHandler<MultiChatPacke
 
       if (packet.message().length() > Byte.MAX_VALUE && !player.isGM()) {
          AutoBanFactory.PACKET_EDIT.alert(client.getPlayer(), client.getPlayer().getName() + " tried to packet edit chats.");
-         FilePrinter.printError(FilePrinter.EXPLOITS + client.getPlayer().getName() + ".txt", client.getPlayer().getName() + " tried to send text with length of " + packet.message().length());
+         LoggerUtil.printError(LoggerOriginator.EXPLOITS, client.getPlayer().getName() + " tried to send text with length of " + packet.message().length());
          client.disconnect(true, false);
          return;
       }

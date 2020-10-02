@@ -20,11 +20,12 @@ import net.server.channel.packet.storage.StorePacket;
 import net.server.channel.packet.storage.TakeoutPacket;
 import server.MapleItemInformationProvider;
 import server.MapleStorage;
-import tools.FilePrinter;
+import tools.I18nMessage;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
-import tools.I18nMessage;
 import tools.packet.stat.EnableActions;
 import tools.packet.storage.StorageError;
 
@@ -94,7 +95,7 @@ public final class StorageHandler extends AbstractPacketHandler<BaseStoragePacke
          storage.setMeso(storageMesos - meso);
          chr.gainMeso(meso, false, true, false);
          chr.setUsedStorage();
-         FilePrinter.print(FilePrinter.STORAGE + c.getPlayer().getName() + ".txt", c.getPlayer().getName() + (meso > 0 ? " took out " : " stored ") + Math.abs(meso) + " mesos");
+         LoggerUtil.printInfo(LoggerOriginator.STORAGE, c.getPlayer().getName() + (meso > 0 ? " took out " : " stored ") + Math.abs(meso) + " mesos");
          storage.sendMeso(c);
       } else {
          PacketCreator.announce(c, new EnableActions());
@@ -113,7 +114,7 @@ public final class StorageHandler extends AbstractPacketHandler<BaseStoragePacke
       MapleInventory inv = chr.getInventory(invType);
       if (slot < 1 || slot > inv.getSlotLimit()) { //player inv starts at one
          AutoBanFactory.PACKET_EDIT.alert(c.getPlayer(), c.getPlayer().getName() + " tried to packet edit with storage.");
-         FilePrinter.print(FilePrinter.EXPLOITS + c.getPlayer().getName() + ".txt", c.getPlayer().getName() + " tried to store item at slot " + slot);
+         LoggerUtil.printError(LoggerOriginator.EXPLOITS, c.getPlayer().getName() + " tried to store item at slot " + slot);
          c.disconnect(true, false);
          return;
       }
@@ -163,7 +164,7 @@ public final class StorageHandler extends AbstractPacketHandler<BaseStoragePacke
          storage.store(item);    // inside a critical section, "!(storage.isFull())" is still in effect...
          chr.setUsedStorage();
          String itemName = ii.getName(item.id());
-         FilePrinter.print(FilePrinter.STORAGE + c.getAccountName() + ".txt", c.getPlayer().getName() + " stored " + item.quantity() + " " + itemName + " (" + item.id() + ")");
+         LoggerUtil.printInfo(LoggerOriginator.STORAGE, c.getPlayer().getName() + " stored " + item.quantity() + " " + itemName + " (" + item.id() + ")");
          storage.sendStored(c, ItemConstants.getInventoryType(itemId));
       }
    }
@@ -171,7 +172,7 @@ public final class StorageHandler extends AbstractPacketHandler<BaseStoragePacke
    private void takeOut(MapleClient c, MapleItemInformationProvider ii, MapleCharacter chr, MapleStorage storage, byte type, byte slot) {
       if (slot < 0 || slot > storage.getSlots()) { // removal starts at zero
          AutoBanFactory.PACKET_EDIT.alert(c.getPlayer(), c.getPlayer().getName() + " tried to packet edit with storage.");
-         FilePrinter.print(FilePrinter.EXPLOITS + c.getPlayer().getName() + ".txt", c.getPlayer().getName() + " tried to work with storage slot " + slot);
+         LoggerUtil.printError(LoggerOriginator.EXPLOITS, c.getPlayer().getName() + " tried to work with storage slot " + slot);
          c.disconnect(true, false);
          return;
       }
@@ -199,7 +200,7 @@ public final class StorageHandler extends AbstractPacketHandler<BaseStoragePacke
                MapleInventoryManipulator.addFromDrop(c, item, false);
 
                String itemName = ii.getName(item.id());
-               FilePrinter.print(FilePrinter.STORAGE + c.getAccountName() + ".txt", c.getPlayer().getName() + " took out " + item.quantity() + " " + itemName + " (" + item.id() + ")");
+               LoggerUtil.printInfo(LoggerOriginator.STORAGE, c.getPlayer().getName() + " took out " + item.quantity() + " " + itemName + " (" + item.id() + ")");
 
                storage.sendTakenOut(c, item.inventoryType());
             } else {

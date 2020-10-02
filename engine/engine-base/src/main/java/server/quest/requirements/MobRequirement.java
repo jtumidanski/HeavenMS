@@ -9,7 +9,8 @@ import provider.MapleData;
 import provider.MapleDataTool;
 import server.quest.MapleQuest;
 import server.quest.MapleQuestRequirementType;
-import tools.FilePrinter;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 
 public class MobRequirement extends MapleQuestRequirement {
    Map<Integer, Integer> mobs = new HashMap<>();
@@ -40,12 +41,13 @@ public class MobRequirement extends MapleQuestRequirement {
          try {
             progress = Integer.parseInt(status.getProgress(mobID));
          } catch (NumberFormatException ex) {
-            FilePrinter.printError(FilePrinter.EXCEPTION_CAUGHT, ex, "Mob: " + mobID + " Quest: " + questID + "CID: " + chr.getId() + " Progress: " + status.getProgress(mobID));
+            LoggerUtil.printError(LoggerOriginator.EXCEPTION_CAUGHT, ex, "Mob: " + mobID + " Quest: " + questID + "CID: " + chr.getId() + " Progress: " + status.getProgress(mobID));
             return false;
          }
 
-         if (progress < countReq)
+         if (progress < countReq) {
             return false;
+         }
       }
       return true;
    }

@@ -9,7 +9,8 @@ import constants.skills.NightWalker;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.GrenadeEffectPacket;
 import net.server.channel.packet.reader.GrenadeEffectReader;
-import tools.FilePrinter;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 import tools.MasterBroadcaster;
 import tools.packet.attack.ThrowGrenade;
 
@@ -32,7 +33,7 @@ public class GrenadeEffectHandler extends AbstractPacketHandler<GrenadeEffectPac
             }
             break;
          default:
-            FilePrinter.printError(FilePrinter.UNHANDLED_EVENT, "The skill id: " + packet.skillId() + " is not coded in " + this.getClass().getName() + ".");
+            LoggerUtil.printError(LoggerOriginator.UNHANDLED_EVENT, "The skill id: " + packet.skillId() + " is not coded in " + this.getClass().getName() + ".");
       }
    }
 }

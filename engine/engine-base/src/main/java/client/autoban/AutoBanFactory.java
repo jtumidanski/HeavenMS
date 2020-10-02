@@ -3,7 +3,8 @@ package client.autoban;
 import client.MapleCharacter;
 import config.YamlConfig;
 import net.server.Server;
-import tools.FilePrinter;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 import tools.MapleLogger;
 import tools.PacketCreator;
 import tools.StringUtil;
@@ -67,7 +68,7 @@ public enum AutoBanFactory {
          Server.getInstance().broadcastGMMessage((chr != null ? chr.getWorld() : 0), PacketCreator.create(new YellowTip((chr != null ? StringUtil.makeMapleReadable(chr.getName()) : "") + " caused " + this.name() + " " + reason)));
       }
       if (YamlConfig.config.server.USE_AUTOBAN_LOG) {
-         FilePrinter.print(FilePrinter.AUTOBAN_WARNING, (chr != null ? StringUtil.makeMapleReadable(chr.getName()) : "") + " caused " + this.name() + " " + reason);
+         LoggerUtil.printInfo(LoggerOriginator.AUTOBAN_WARNING, (chr != null ? StringUtil.makeMapleReadable(chr.getName()) : "") + " caused " + this.name() + " " + reason);
       }
    }
 

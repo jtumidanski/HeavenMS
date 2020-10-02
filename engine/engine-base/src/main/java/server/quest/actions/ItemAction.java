@@ -17,8 +17,9 @@ import provider.MapleDataTool;
 import server.MapleItemInformationProvider;
 import server.quest.MapleQuest;
 import server.quest.MapleQuestActionType;
-import tools.FilePrinter;
 import tools.I18nMessage;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
@@ -292,7 +293,7 @@ public class ItemAction extends MapleQuestAction {
                }
 
                MapleInventoryManipulator.addById(chr.getClient(), item.id(), (short) missingQty);
-               FilePrinter.print(FilePrinter.QUEST_RESTORE_ITEM, chr + " obtained " + itemId + " qty. " + missingQty + " from quest " + questID);
+               LoggerUtil.printInfo(LoggerOriginator.QUEST_RESTORE_ITEM, chr + " obtained " + itemId + " qty. " + missingQty + " from quest " + questID);
             }
             return true;
          }

@@ -29,7 +29,8 @@ import constants.inventory.ItemConstants;
 import net.server.PlayerCoolDownValueHolder;
 import server.MapleItemInformationProvider;
 import server.maps.MapleMiniGame;
-import tools.FilePrinter;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 import tools.PacketFactory;
 import tools.StringUtil;
 import tools.data.output.MaplePacketLittleEndianWriter;
@@ -49,8 +50,7 @@ public abstract class AbstractPacketFactory implements PacketFactory {
       if (handler.isPresent()) {
          return handler.get().apply(packetInput);
       }
-
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
+      LoggerUtil.printError(LoggerOriginator.PACKET_LOG, "Trying to handle invalid input " + packetInput.toString());
       return new byte[0];
    }
 

@@ -329,11 +329,11 @@ public class MaplePartySearchCoordinator {
          leaderQueue.clear();
          leaderQueue.addAll(queuedLeaders.getRight());
 
-         try {
-            leaderQueue.addAll(25, recalledLeaders);
-         } catch (IndexOutOfBoundsException e) {
-            leaderQueue.addAll(recalledLeaders);
-         }
+//         try {
+//            leaderQueue.addAll(25, recalledLeaders);
+//         } catch (IndexOutOfBoundsException e) {
+//         }
+         leaderQueue.addAll(recalledLeaders);
       } finally {
          leaderQueueRLock.unlock();
       }

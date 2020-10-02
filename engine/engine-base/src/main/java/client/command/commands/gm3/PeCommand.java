@@ -10,14 +10,15 @@ import client.MapleClient;
 import client.command.Command;
 import net.MaplePacketHandler;
 import net.PacketProcessor;
-import tools.FilePrinter;
 import tools.HexTool;
+import tools.I18nMessage;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 import tools.MessageBroadcaster;
 import tools.data.input.ByteArrayByteStream;
 import tools.data.input.GenericSeekableLittleEndianAccessor;
 import tools.data.input.SeekableLittleEndianAccessor;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.I18nMessage;
 
 public class PeCommand extends Command {
    {
@@ -50,7 +51,7 @@ public class PeCommand extends Command {
             MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("PE_COMMAND_RECEIVING").with(packet));
             packetHandler.handlePacket(accessor, c);
          } catch (final Throwable t) {
-            FilePrinter.printError(FilePrinter.PACKET_HANDLER + packetHandler.getClass().getName() + ".txt", t, "Error for " + (c.getPlayer() == null ? "" : "player ; " + c.getPlayer() + " on map ; " + c.getPlayer().getMapId() + " - ") + "account ; " + c.getAccountName() + "\r\n" + accessor.toString());
+            LoggerUtil.printError(LoggerOriginator.PACKET_HANDLER, "Error for " + (c.getPlayer() == null ? "" : "player ; " + c.getPlayer() + " on map ; " + c.getPlayer().getMapId() + " - ") + "account ; " + c.getAccountName() + "\r\n" + accessor.toString());
          }
       }
    }

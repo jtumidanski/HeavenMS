@@ -53,7 +53,8 @@ import net.server.world.PartyOperation;
 import net.server.world.World;
 import scripting.event.EventInstanceManager;
 import server.life.MobSkill;
-import tools.FilePrinter;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 import tools.MasterBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
@@ -287,10 +288,10 @@ public final class PlayerLoggedInHandler extends AbstractPacketHandler<PlayerLog
                      byte[] familyLoginNotice = PacketCreator.create(new FamilyLogonNotice(player.getName(), true));
                      MasterBroadcaster.getInstance().sendToSenior(familyEntry.getSenior(), character -> familyLoginNotice, true);
                   } else {
-                     FilePrinter.printError(FilePrinter.FAMILY_ERROR, "Player " + player.getName() + "'s family doesn't have an entry for them. (" + f.getID() + ")");
+                     LoggerUtil.printError(LoggerOriginator.FAMILY_ERROR, "Player " + player.getName() + "'s family doesn't have an entry for them. (" + f.getID() + ")");
                   }
                } else {
-                  FilePrinter.printError(FilePrinter.FAMILY_ERROR, "Player " + player.getName() + " has an invalid family ID. (" + player.getFamilyId() + ")");
+                  LoggerUtil.printError(LoggerOriginator.FAMILY_ERROR, "Player " + player.getName() + " has an invalid family ID. (" + player.getFamilyId() + ")");
                   PacketCreator.announce(client, new GetFamilyInfo(null));
                }
             } else {

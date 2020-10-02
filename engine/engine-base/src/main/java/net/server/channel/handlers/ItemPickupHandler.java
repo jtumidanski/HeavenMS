@@ -8,7 +8,8 @@ import net.server.AbstractPacketHandler;
 import net.server.channel.packet.ItemPickupPacket;
 import net.server.channel.packet.reader.ItemPickupReader;
 import server.maps.MapleMapObject;
-import tools.FilePrinter;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 
 public final class ItemPickupHandler extends AbstractPacketHandler<ItemPickupPacket> {
    @Override
@@ -27,7 +28,7 @@ public final class ItemPickupHandler extends AbstractPacketHandler<ItemPickupPac
       Point charPos = chr.position();
       Point obPos = ob.position();
       if (Math.abs(charPos.getX() - obPos.getX()) > 800 || Math.abs(charPos.getY() - obPos.getY()) > 600) {
-         FilePrinter.printError(FilePrinter.EXPLOITS + client.getPlayer().getName() + ".txt", client.getPlayer().getName() + " tried to pick up an item too far away. Map id: " + chr.getMapId() + " Player pos: " + charPos + " Object pos: " + obPos);
+         LoggerUtil.printError(LoggerOriginator.EXPLOITS, client.getPlayer().getName() + " tried to pick up an item too far away. Map id: " + chr.getMapId() + " Player pos: " + charPos + " Object pos: " + obPos);
          return;
       }
 

@@ -5,15 +5,16 @@ import java.util.Optional;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.autoban.AutoBanFactory;
+import config.YamlConfig;
 import database.DatabaseConnection;
 import database.provider.CharacterProvider;
-import config.YamlConfig;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.WhisperPacket;
 import net.server.channel.packet.reader.WhisperReader;
 import net.server.world.World;
-import tools.FilePrinter;
 import tools.LogHelper;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 import tools.PacketCreator;
 import tools.packet.message.BuddyFindReply;
 import tools.packet.message.FindReply;
@@ -87,7 +88,7 @@ public final class WhisperHandler extends AbstractPacketHandler<WhisperPacket> {
       }
       if (packet.message().length() > Byte.MAX_VALUE) {
          AutoBanFactory.PACKET_EDIT.alert(client.getPlayer(), client.getPlayer().getName() + " tried to packet edit with whispers.");
-         FilePrinter.printError(FilePrinter.EXPLOITS + client.getPlayer().getName() + ".txt", client.getPlayer().getName() + " tried to send text with length of " + packet.message().length());
+         LoggerUtil.printError(LoggerOriginator.EXPLOITS, client.getPlayer().getName() + " tried to send text with length of " + packet.message().length());
          client.disconnect(true, false);
          return;
       }

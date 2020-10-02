@@ -30,7 +30,8 @@ import net.server.channel.Channel;
 import server.DueyPackage;
 import server.MapleItemInformationProvider;
 import server.MapleTradeUtil;
-import tools.FilePrinter;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 import tools.PacketCreator;
 import tools.Pair;
 import tools.packet.parcel.DueyParcelReceived;
@@ -132,7 +133,7 @@ public class DueyProcessor {
                fee += 5000;
             } else if (!c.getPlayer().haveItem(5330000)) {
                AutoBanFactory.PACKET_EDIT.alert(c.getPlayer(), c.getPlayer().getName() + " tried to packet edit with Quick Delivery on duey.");
-               FilePrinter.printError(FilePrinter.EXPLOITS + c.getPlayer().getName() + ".txt", c.getPlayer().getName() + " tried to use duey with Quick Delivery, mesos " + sendMesos + " and amount " + amount);
+               LoggerUtil.printError(LoggerOriginator.EXPLOITS, c.getPlayer().getName() + " tried to use duey with Quick Delivery, mesos " + sendMesos + " and amount " + amount);
                c.disconnect(true, false);
                return;
             }
@@ -140,7 +141,7 @@ public class DueyProcessor {
             long finalCost = (long) sendMesos + fee;
             if (finalCost < 0 || finalCost > Integer.MAX_VALUE || (amount < 1 && sendMesos == 0)) {
                AutoBanFactory.PACKET_EDIT.alert(c.getPlayer(), c.getPlayer().getName() + " tried to packet edit with duey.");
-               FilePrinter.printError(FilePrinter.EXPLOITS + c.getPlayer().getName() + ".txt", c.getPlayer().getName() + " tried to use duey with mesos " + sendMesos + " and amount " + amount);
+               LoggerUtil.printError(LoggerOriginator.EXPLOITS, c.getPlayer().getName() + " tried to use duey with mesos " + sendMesos + " and amount " + amount);
                c.disconnect(true, false);
                return;
             }
@@ -226,7 +227,7 @@ public class DueyProcessor {
 
             if (dueyPackage.isEmpty()) {
                PacketCreator.announce(c, new SendDuey(DueyAction.TO_CLIENT_RECV_UNKNOWN_ERROR));
-               FilePrinter.printError(FilePrinter.EXPLOITS + c.getPlayer().getName() + ".txt", c.getPlayer().getName() + " tried to receive package from duey with id " + packageId);
+               LoggerUtil.printError(LoggerOriginator.EXPLOITS, c.getPlayer().getName() + " tried to receive package from duey with id " + packageId);
                return;
             }
 

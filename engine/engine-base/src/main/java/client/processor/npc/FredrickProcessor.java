@@ -6,19 +6,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-
 import javax.persistence.EntityManager;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import database.DatabaseConnection;
-import database.administrator.CharacterAdministrator;
-import database.administrator.FredStorageAdministrator;
-import database.administrator.InventoryItemAdministrator;
-import database.administrator.NoteAdministrator;
 import client.database.data.CharacterNameNote;
 import client.database.data.CharacterWorldData;
-import database.provider.FredStorageProvider;
 import client.inventory.Item;
 import client.inventory.ItemFactory;
 import client.inventory.MapleInventory;
@@ -26,16 +19,23 @@ import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import client.processor.CharacterProcessor;
 import client.processor.NoteProcessor;
+import database.DatabaseConnection;
+import database.administrator.CharacterAdministrator;
+import database.administrator.FredStorageAdministrator;
+import database.administrator.InventoryItemAdministrator;
+import database.administrator.NoteAdministrator;
+import database.provider.FredStorageProvider;
 import net.server.Server;
 import net.server.world.World;
 import server.MapleItemInformationProvider;
 import server.maps.MapleHiredMerchant;
-import tools.FilePrinter;
+import tools.I18nMessage;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
 import tools.ServerNoticeType;
-import tools.I18nMessage;
 import tools.packet.fredrick.FredrickMessage;
 
 public class FredrickProcessor {
@@ -198,7 +198,7 @@ public class FredrickProcessor {
                   Item item = it.getLeft();
                   MapleInventoryManipulator.addFromDrop(chr.getClient(), item, false);
                   String itemName = MapleItemInformationProvider.getInstance().getName(item.id());
-                  FilePrinter.print(FilePrinter.FREDRICK + chr.getName() + ".txt", chr.getName() + " gained " + item.quantity() + " " + itemName + " (" + item.id() + ")");
+                  LoggerUtil.printInfo(LoggerOriginator.FREDRICK, chr.getName() + " gained " + item.quantity() + " " + itemName + " (" + item.id() + ")");
                }
 
                PacketCreator.announce(chr, new FredrickMessage((byte) 0x1E));

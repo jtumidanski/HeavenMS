@@ -43,8 +43,9 @@ import server.CashShop;
 import server.CashShop.CashItem;
 import server.CashShop.CashItemFactory;
 import server.MapleItemInformationProvider;
-import tools.FilePrinter;
 import tools.I18nMessage;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
@@ -81,7 +82,7 @@ public final class CashOperationHandler extends AbstractPacketHandler<BaseCashOp
 
    private boolean canBuy(MapleCharacter chr, CashItem item, int cash) {
       if (item != null && item.isOnSale() && item.getPrice() <= cash) {
-         FilePrinter.print(FilePrinter.CASHITEM_BOUGHT, chr + " bought " + MapleItemInformationProvider.getInstance().getName(item.getItemId()) + " (SN " + item.getSN() + ") for " + item.getPrice());
+         LoggerUtil.printInfo(LoggerOriginator.CASHITEM_BOUGHT, chr + " bought " + MapleItemInformationProvider.getInstance().getName(item.getItemId()) + " (SN " + item.getSN() + ") for " + item.getPrice());
          return true;
       } else {
          return false;
@@ -235,7 +236,7 @@ public final class CashOperationHandler extends AbstractPacketHandler<BaseCashOp
    private void makePurchase(MapleClient c, MapleCharacter chr, CashShop cs, int action, int useNX, int snCS) {
       CashItem cItem = CashItemFactory.getItem(snCS);
       if (!canBuy(chr, cItem, cs.getCash(useNX))) {
-         FilePrinter.printError(FilePrinter.ITEM, "Denied to sell cash item with SN " + snCS);
+         LoggerUtil.printError(LoggerOriginator.ITEM, "Denied to sell cash item with SN " + snCS);
          c.enableCSActions();
          return;
       }
@@ -336,7 +337,7 @@ public final class CashOperationHandler extends AbstractPacketHandler<BaseCashOp
          return;
       }
       if (chr.getStorage().gainSlots(4)) {
-         FilePrinter.print(FilePrinter.STORAGE + c.getAccountName() + ".txt", c.getPlayer().getName() + " bought 4 slots to their account storage.");
+         LoggerUtil.printInfo(LoggerOriginator.STORAGE, c.getPlayer().getName() + " bought 4 slots to their account storage.");
          chr.setUsedStorage();
 
          PacketCreator.announce(c, new ShowBoughtStorageSlots(chr.getStorage().getSlots()));
@@ -353,7 +354,7 @@ public final class CashOperationHandler extends AbstractPacketHandler<BaseCashOp
          return;
       }
       if (chr.getStorage().gainSlots(8)) {
-         FilePrinter.print(FilePrinter.STORAGE + c.getAccountName() + ".txt", c.getPlayer().getName() + " bought 8 slots to their account storage.");
+         LoggerUtil.printInfo(LoggerOriginator.STORAGE, c.getPlayer().getName() + " bought 8 slots to their account storage.");
          chr.setUsedStorage();
 
          PacketCreator.announce(c, new ShowBoughtStorageSlots(chr.getStorage().getSlots()));

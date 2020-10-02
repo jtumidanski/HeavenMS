@@ -8,7 +8,8 @@ import javax.script.ScriptEngine;
 import client.MapleClient;
 import scripting.AbstractScriptManager;
 import server.maps.MaplePortal;
-import tools.FilePrinter;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 
 public class PortalScriptManager extends AbstractScriptManager {
 
@@ -44,7 +45,7 @@ public class PortalScriptManager extends AbstractScriptManager {
             return (boolean) ((Invocable) iv).invokeFunction("enter", new PortalPlayerInteraction(c, portal));
          }
       } catch (Exception ute) {
-         FilePrinter.printError(FilePrinter.PORTAL + portal.getScriptName() + ".txt", ute);
+         LoggerUtil.printError(LoggerOriginator.PORTAL, ute, String.format("Portal [%s]", portal.getScriptName()));
       }
       return false;
    }

@@ -10,7 +10,8 @@ import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
 import net.server.Server;
-import tools.FilePrinter;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 
 public class TimerManager implements TimerManagerMBean {
    private static TimerManager instance = new TimerManager();
@@ -123,7 +124,7 @@ public class TimerManager implements TimerManagerMBean {
          try {
             r.run();
          } catch (Throwable t) {
-            FilePrinter.printError(FilePrinter.EXCEPTION_CAUGHT, t);
+            LoggerUtil.printError(LoggerOriginator.EXCEPTION_CAUGHT, t);
          }
       }
    }

@@ -67,12 +67,13 @@ import server.maps.MaplePlayerShop;
 import server.maps.MaplePlayerShopItem;
 import server.maps.MaplePortal;
 import server.processor.MapleTradeProcessor;
-import tools.FilePrinter;
+import tools.I18nMessage;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
-import tools.I18nMessage;
 import tools.packet.MiniRoomError;
 import tools.packet.character.box.AddMatchCard;
 import tools.packet.character.box.AddOmokBox;
@@ -298,7 +299,7 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
 
          if (slot >= merchant.getItems().size() || slot < 0) {
             AutoBanFactory.PACKET_EDIT.alert(chr, chr.getName() + " tried to packet edit with a hired merchant.");
-            FilePrinter.printError(FilePrinter.EXPLOITS + chr.getName() + ".txt", chr.getName() + " tried to remove item at slot " + slot);
+            LoggerUtil.printError(LoggerOriginator.EXPLOITS, chr.getName() + " tried to remove item at slot " + slot);
             c.disconnect(true, false);
             return;
          }
@@ -314,7 +315,7 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
 
       if (quantity < 1) {
          AutoBanFactory.PACKET_EDIT.alert(chr, chr.getName() + " tried to packet edit with a hired merchant and or player shop.");
-         FilePrinter.printError(FilePrinter.EXPLOITS + chr.getName() + ".txt", chr.getName() + " tried to buy item " + itemId + " with quantity " + quantity);
+         LoggerUtil.printError(LoggerOriginator.EXPLOITS, chr.getName() + " tried to buy item " + itemId + " with quantity " + quantity);
          c.disconnect(true, false);
          return;
       }
@@ -369,7 +370,7 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
 
          if (slot >= shop.getItems().size() || slot < 0) {
             AutoBanFactory.PACKET_EDIT.alert(chr, chr.getName() + " tried to packet edit with a player shop.");
-            FilePrinter.printError(FilePrinter.EXPLOITS + chr.getName() + ".txt", chr.getName() + " tried to remove item at slot " + slot);
+            LoggerUtil.printError(LoggerOriginator.EXPLOITS, chr.getName() + " tried to remove item at slot " + slot);
             c.disconnect(true, false);
             return;
          }
@@ -412,7 +413,7 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
 
       if (perBundle <= 0 || perBundle * bundles > 2000 || bundles <= 0 || price <= 0 || price > Integer.MAX_VALUE) {
          AutoBanFactory.PACKET_EDIT.alert(chr, chr.getName() + " tried to packet edit with hired merchants.");
-         FilePrinter.printError(FilePrinter.EXPLOITS + chr.getName() + ".txt", chr.getName() + " might of possibly packet edited Hired Merchants\nperBundle: " + perBundle + "\nperBundle * bundles (This multiplied cannot be greater than 2000): " + perBundle * bundles + "\nbundles: " + bundles + "\nprice: " + price);
+         LoggerUtil.printError(LoggerOriginator.EXPLOITS, chr.getName() + " might of possibly packet edited Hired Merchants\nperBundle: " + perBundle + "\nperBundle * bundles (This multiplied cannot be greater than 2000): " + perBundle * bundles + "\nbundles: " + bundles + "\nprice: " + price);
          return;
       }
 
@@ -543,7 +544,7 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
                trade.getPartnerTrade().ifPresent(partner -> PacketCreator.announce(partner.getOwner(), new TradeItemAdd((byte) 1, finalTradeItem)));
             }
          } catch (Exception e) {
-            FilePrinter.printError(FilePrinter.TRADE_EXCEPTION, e, "Player '" + chr + "' tried to add " + ii.getName(item.id()) + " qty. " + item.quantity() + " in trade (slot " + targetSlot + ") then exception occurred.");
+            LoggerUtil.printError(LoggerOriginator.TRADE_EXCEPTION, e, "Player '" + chr + "' tried to add " + ii.getName(item.id()) + " qty. " + item.quantity() + " in trade (slot " + targetSlot + ") then exception occurred.");
          } finally {
             inv.unlockInventory();
          }

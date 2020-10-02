@@ -36,9 +36,10 @@ import rest.buddy.Character;
 import rest.buddy.GetBuddiesResponse;
 import rest.buddy.UpdateBuddy;
 import rest.buddy.UpdateCharacter;
-import tools.FilePrinter;
 import tools.I18nMessage;
 import tools.LambdaNoOp;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
@@ -66,7 +67,7 @@ public class BuddyListProcessor {
    protected void getBuddies(int characterId, Consumer<Stream<Integer>> consumer) {
       UriBuilder.service(RestService.BUDDY).path("characters").path(characterId).path("buddies").getRestClient(GetBuddiesResponse.class)
             .success((responseCode, response) -> consumer.accept(response.buddies().stream().map(Buddy::id)))
-            .failure(responseCode -> FilePrinter.printError(FilePrinter.BUDDY_ORCHESTRATOR, "Failed to get buddies for character " + characterId))
+            .failure(responseCode -> LoggerUtil.printError(LoggerOriginator.BUDDY_ORCHESTRATOR, "Failed to get buddies for character " + characterId))
             .get();
    }
 
@@ -88,7 +89,7 @@ public class BuddyListProcessor {
    public void getBuddyListCapacity(int characterId, Consumer<Integer> consumer) {
       UriBuilder.service(RestService.BUDDY).path("characters").path(characterId).getRestClient(Character.class)
             .success((responseCode, character) -> consumer.accept(character.capacity()))
-            .failure(responseCode -> FilePrinter.printError(FilePrinter.BUDDY_ORCHESTRATOR, "Failed to get buddy list capacity for character " + characterId))
+            .failure(responseCode -> LoggerUtil.printError(LoggerOriginator.BUDDY_ORCHESTRATOR, "Failed to get buddy list capacity for character " + characterId))
             .get();
    }
 
@@ -101,7 +102,7 @@ public class BuddyListProcessor {
       BuddyList result;
       UriBuilder.service(RestService.BUDDY).path("characters").path(character.getId()).path("buddies").getRestClient(GetBuddiesResponse.class)
             .success((responseCode, response) -> character.modifyBuddyList(buddyList -> populateBuddyList(buddyList, response)))
-            .failure(responseCode -> FilePrinter.printError(FilePrinter.BUDDY_ORCHESTRATOR, "Failed to load buddies for character " + character.getId()))
+            .failure(responseCode -> LoggerUtil.printError(LoggerOriginator.BUDDY_ORCHESTRATOR, "Failed to load buddies for character " + character.getId()))
             .get();
    }
 
@@ -147,7 +148,7 @@ public class BuddyListProcessor {
     * @param characterId the id of the character
     */
    public void syncCharacter(int accountId, int characterId) {
-      syncCharacter(accountId, characterId, LambdaNoOp::doNothing, () -> FilePrinter.printError(FilePrinter.BUDDY_ORCHESTRATOR, "Failed to sync character " + characterId));
+      syncCharacter(accountId, characterId, LambdaNoOp::doNothing, () -> LoggerUtil.printError(LoggerOriginator.BUDDY_ORCHESTRATOR, "Failed to sync character " + characterId));
    }
 
    /**
@@ -173,7 +174,7 @@ public class BuddyListProcessor {
    public void deleteCharacter(int worldId, int characterId) {
       UriBuilder.service(RestService.BUDDY).path("characters").path(characterId).getRestClient()
             .success((responseCode, result) -> getBuddies(worldId, characterId, stream -> stream.forEach(buddy -> deleteBuddySuccess(buddy, characterId))))
-            .failure(responseCode -> FilePrinter.printError(FilePrinter.BUDDY_ORCHESTRATOR, "Failed to delete character " + characterId))
+            .failure(responseCode -> LoggerUtil.printError(LoggerOriginator.BUDDY_ORCHESTRATOR, "Failed to delete character " + characterId))
             .delete();
    }
 
@@ -184,7 +185,7 @@ public class BuddyListProcessor {
     */
    public void deleteBuddies(int characterId) {
       UriBuilder.service(RestService.BUDDY).path("characters").path(characterId).path("buddies").getRestClient()
-            .failure(responseCode -> FilePrinter.printError(FilePrinter.BUDDY_ORCHESTRATOR, "Failed to delete buddies for character " + characterId))
+            .failure(responseCode -> LoggerUtil.printError(LoggerOriginator.BUDDY_ORCHESTRATOR, "Failed to delete buddies for character " + characterId))
             .delete();
    }
 
@@ -357,7 +358,7 @@ public class BuddyListProcessor {
 
    //TODO - handle logging locale
    protected void operationFailure(MapleCharacter character, String debugMessage) {
-      FilePrinter.printError(FilePrinter.BUDDY_ORCHESTRATOR, debugMessage);
+      LoggerUtil.printError(LoggerOriginator.BUDDY_ORCHESTRATOR, debugMessage);
       MessageBroadcaster.getInstance().sendServerNotice(character, ServerNoticeType.PINK_TEXT, I18nMessage.from("BUDDY_SERVICE_OFFLINE"));
    }
 

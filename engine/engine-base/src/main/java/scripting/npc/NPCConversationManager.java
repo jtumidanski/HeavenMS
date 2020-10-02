@@ -60,9 +60,10 @@ import server.partyquest.MonsterCarnival;
 import server.partyquest.Pyramid;
 import server.partyquest.Pyramid.PyramidMode;
 import server.processor.MapleShopProcessor;
-import tools.FilePrinter;
 import tools.I18nMessage;
 import tools.LogHelper;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
@@ -390,7 +391,7 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
       if (shop != null) {
          MapleShopProcessor.getInstance().sendShop(shop, c);
       } else {
-         FilePrinter.printError(FilePrinter.NPC_UNCODED, "Shop ID: " + id + " is missing from database.");
+         LoggerUtil.printError(LoggerOriginator.NPC_UNCODED, "Shop ID: " + id + " is missing from database.");
          MapleShopProcessor.getInstance().sendShop(MapleShopFactory.getInstance().getShop(11000), c);
       }
    }

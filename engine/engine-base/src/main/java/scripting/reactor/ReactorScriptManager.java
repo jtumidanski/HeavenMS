@@ -13,7 +13,8 @@ import database.provider.ReactorDropProvider;
 import scripting.AbstractScriptManager;
 import server.maps.MapleReactor;
 import server.maps.ReactorDropEntry;
-import tools.FilePrinter;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 
 public class ReactorScriptManager extends AbstractScriptManager {
 
@@ -43,7 +44,7 @@ public class ReactorScriptManager extends AbstractScriptManager {
       } //do nothing, hit is OPTIONAL
 
       catch (final ScriptException | NullPointerException e) {
-         FilePrinter.printError(FilePrinter.REACTOR + reactor.getId() + ".txt", e);
+         LoggerUtil.printError(LoggerOriginator.REACTOR, e, String.format("Reactor [%d]", reactor.getId()));
       }
    }
 
@@ -58,7 +59,7 @@ public class ReactorScriptManager extends AbstractScriptManager {
          iv.put("rm", rm);
          ((Invocable) iv).invokeFunction("act");
       } catch (final ScriptException | NoSuchMethodException | NullPointerException e) {
-         FilePrinter.printError(FilePrinter.REACTOR + reactor.getId() + ".txt", e);
+         LoggerUtil.printError(LoggerOriginator.REACTOR, e, String.format("Reactor [%d]", reactor.getId()));
       }
    }
 
@@ -98,7 +99,7 @@ public class ReactorScriptManager extends AbstractScriptManager {
             ((Invocable) iv).invokeFunction("release");
          }
       } catch (final ScriptException | NoSuchMethodException | NullPointerException ute) {
-         FilePrinter.printError(FilePrinter.REACTOR + reactor.getId() + ".txt", ute);
+         LoggerUtil.printError(LoggerOriginator.REACTOR, ute, String.format("Reactor [%d]", reactor.getId()));
       }
    }
 }

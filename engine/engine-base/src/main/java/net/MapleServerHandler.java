@@ -27,7 +27,8 @@ import net.server.audit.locks.MonitoredReentrantLock;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
 import net.server.coordinator.session.MapleSessionCoordinator;
 import server.TimerManager;
-import tools.FilePrinter;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 import tools.MapleAESOFB;
 import tools.MapleLogger;
 import tools.PacketCreator;
@@ -70,7 +71,7 @@ public class MapleServerHandler extends IoHandlerAdapter {
          MapleClient client = (MapleClient) session.getAttribute(MapleClient.CLIENT_KEY);
 
          if (client != null && client.getPlayer() != null) {
-            FilePrinter.printError(FilePrinter.EXCEPTION_CAUGHT, cause, "Exception caught by: " + client.getPlayer());
+            LoggerUtil.printError(LoggerOriginator.EXCEPTION_CAUGHT, cause, "Exception caught by: " + client.getPlayer());
          }
       }
    }
@@ -108,8 +109,7 @@ public class MapleServerHandler extends IoHandlerAdapter {
          if (!MapleSessionCoordinator.getInstance().canStartLoginSession(session)) {
             return;
          }
-
-         FilePrinter.print(FilePrinter.SESSION, "IoSession with " + session.getRemoteAddress() + " opened on " + sdf.format(Calendar.getInstance().getTime()), false);
+         LoggerUtil.printInfo(LoggerOriginator.SESSION, "IoSession with " + session.getRemoteAddress() + " opened on " + sdf.format(Calendar.getInstance().getTime()));
       }
 
       byte[] ivRecv = {70, 114, 122, 82};
@@ -140,7 +140,7 @@ public class MapleServerHandler extends IoHandlerAdapter {
                client.disconnect(false, false);
             }
          } catch (Throwable t) {
-            FilePrinter.printError(FilePrinter.ACCOUNT_STUCK, t);
+            LoggerUtil.printError(LoggerOriginator.ACCOUNT_STUCK, t);
          } finally {
             session.closeNow();
             session.removeAttribute(MapleClient.CLIENT_KEY);
@@ -172,7 +172,7 @@ public class MapleServerHandler extends IoHandlerAdapter {
             MapleLogger.logRecv(client, packetId, message);
             packetHandler.handlePacket(accessor, client);
          } catch (final Throwable t) {
-            FilePrinter.printError(FilePrinter.PACKET_HANDLER + packetHandler.getClass().getName() + ".txt", t, "Error for " + (client.getPlayer() == null ? "" : "player ; " + client.getPlayer() + " on map ; " + client.getPlayer().getMapId() + " - ") + "account ; " + client.getAccountName() + "\r\n" + accessor.toString());
+            LoggerUtil.printError(LoggerOriginator.PACKET_HANDLER, t, "Error for " + (client.getPlayer() == null ? "" : "player ; " + client.getPlayer() + " on map ; " + client.getPlayer().getMapId() + " - ") + "account ; " + client.getAccountName() + "\r\n" + accessor.toString());
             //client.announce(MaplePacketCreator.enableActions());//bugs sometimes
          }
          client.updateLastPacket();

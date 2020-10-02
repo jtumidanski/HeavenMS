@@ -11,7 +11,8 @@ import java.util.Map;
 import client.MapleCharacter;
 import config.YamlConfig;
 import net.server.Server;
-import tools.FilePrinter;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 import tools.StringUtil;
 
 public class AutoBanManager {
@@ -40,13 +41,15 @@ public class AutoBanManager {
                points.put(fac, points.get(fac) / 2); //So the points are not completely gone.
             }
          }
-         if (fac.getExpire() != -1)
+         if (fac.getExpire() != -1) {
             lastTime.put(fac, Server.getInstance().getCurrentTime());
+         }
 
          if (points.containsKey(fac)) {
             points.put(fac, points.get(fac) + 1);
-         } else
+         } else {
             points.put(fac, 1);
+         }
 
          if (points.get(fac) >= fac.getMaximum()) {
             chr.autoBan(reason);
@@ -56,7 +59,7 @@ public class AutoBanManager {
       }
       if (YamlConfig.config.server.USE_AUTOBAN_LOG) {
          // Lets log every single point too.
-         FilePrinter.print(FilePrinter.AUTOBAN_WARNING, StringUtil.makeMapleReadable(chr.getName()) + " caused " + fac.name() + " " + reason);
+         LoggerUtil.printInfo(LoggerOriginator.AUTOBAN_WARNING, StringUtil.makeMapleReadable(chr.getName()) + " caused " + fac.name() + " " + reason);
       }
    }
 
@@ -68,12 +71,13 @@ public class AutoBanManager {
       if (lastMisses == misses && misses > 6) {
          sameMissCount++;
       }
-      if (sameMissCount > 4)
+      if (sameMissCount > 4) {
          chr.sendPolice("You will be disconnected for miss god mode.");
-         //chr.autoBan("Auto banned for : " + misses + " Miss god mode", 1);
-      else if (sameMissCount > 0)
-
+      }
+      //chr.autoBan("Auto banned for : " + misses + " Miss god mode", 1);
+      else if (sameMissCount > 0) {
          this.lastMisses = misses;
+      }
       this.misses = 0;
    }
 
@@ -113,8 +117,7 @@ public class AutoBanManager {
             if (YamlConfig.config.server.USE_AUTOBAN) {
                chr.getClient().disconnect(false, false);
             }
-
-            FilePrinter.print(FilePrinter.EXPLOITS, "Player " + chr + " was caught spamming TYPE " + type + " and has been disconnected.");
+            LoggerUtil.printError(LoggerOriginator.EXPLOITS, "Player " + chr + " was caught spamming TYPE " + type + " and has been disconnected.");
          }
       } else {
          this.timestamp[type] = time;

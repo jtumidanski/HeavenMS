@@ -79,11 +79,11 @@ import client.command.commands.gm2.WarpAreaCommand;
 import client.command.commands.gm2.WarpCommand;
 import client.command.commands.gm2.WarpMapCommand;
 import client.command.commands.gm2.WhereAmICommand;
+import client.command.commands.gm3.AbnormalStatusCommand;
 import client.command.commands.gm3.BanCommand;
 import client.command.commands.gm3.ChatCommand;
 import client.command.commands.gm3.CheckDmgCommand;
 import client.command.commands.gm3.ClosePortalCommand;
-import client.command.commands.gm3.AbnormalStatusCommand;
 import client.command.commands.gm3.EndEventCommand;
 import client.command.commands.gm3.ExpeditionsCommand;
 import client.command.commands.gm3.FaceCommand;
@@ -148,14 +148,14 @@ import client.command.commands.gm4.MesoRateCommand;
 import client.command.commands.gm4.PapCommand;
 import client.command.commands.gm4.PianusCommand;
 import client.command.commands.gm4.PinkBeanCommand;
-import client.command.commands.gm4.PlayerNpcCommand;
-import client.command.commands.gm4.PlayerNpcRemoveCommand;
 import client.command.commands.gm4.PlayerMobCommand;
 import client.command.commands.gm4.PlayerMobRemoveCommand;
+import client.command.commands.gm4.PlayerNpcCommand;
+import client.command.commands.gm4.PlayerNpcRemoveCommand;
 import client.command.commands.gm4.PnpcCommand;
-import client.command.commands.gm4.RemovePlayerNpcCommand;
 import client.command.commands.gm4.ProItemCommand;
 import client.command.commands.gm4.QuestRateCommand;
+import client.command.commands.gm4.RemovePlayerNpcCommand;
 import client.command.commands.gm4.ServerMessageCommand;
 import client.command.commands.gm4.SetEqStatCommand;
 import client.command.commands.gm4.TravelRateCommand;
@@ -182,11 +182,12 @@ import client.command.commands.gm6.ShutdownCommand;
 import client.command.commands.gm6.SpawnAllPlayerNpcCommand;
 import client.command.commands.gm6.SupplyRateCouponCommand;
 import client.command.commands.gm6.WarpWorldCommand;
-import tools.FilePrinter;
+import tools.I18nMessage;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 import tools.MessageBroadcaster;
 import tools.Pair;
 import tools.ServerNoticeType;
-import tools.I18nMessage;
 
 public class CommandsExecutor {
    private static final char USER_HEADING = '@';
@@ -271,8 +272,7 @@ public class CommandsExecutor {
 
    private void writeLog(MapleClient client, String command) {
       SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm");
-      FilePrinter.print(FilePrinter.USED_COMMANDS, client.getPlayer().getName() + " used: " + command + " on "
-            + sdf.format(Calendar.getInstance().getTime()));
+      LoggerUtil.printInfo(LoggerOriginator.USED_COMMANDS, client.getPlayer().getName() + " used: " + command + " on " + sdf.format(Calendar.getInstance().getTime()));
    }
 
    private void addCommandInfo(String name, Class<? extends Command> commandClass) {

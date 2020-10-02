@@ -408,7 +408,7 @@ public class PacketCreator {
          case QUICK_SLOT_INIT:
             return Optional.of(GenericPacketFactory.getInstance());
       }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to get an unhandled PacketFactory " + opcode.getValue());
+      LoggerUtil.printError(LoggerOriginator.PACKET_LOGS, "Trying to get an unhandled PacketFactory " + opcode.getValue());
       return Optional.empty();
    }
 

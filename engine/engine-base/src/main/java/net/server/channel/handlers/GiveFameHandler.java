@@ -7,11 +7,12 @@ import client.autoban.AutoBanFactory;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.GiveFamePacket;
 import net.server.channel.packet.reader.GiveFameReader;
-import tools.FilePrinter;
+import tools.I18nMessage;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
-import tools.I18nMessage;
 import tools.packet.message.GiveFameErrorResponse;
 
 public final class GiveFameHandler extends AbstractPacketHandler<GiveFamePacket> {
@@ -30,7 +31,7 @@ public final class GiveFameHandler extends AbstractPacketHandler<GiveFamePacket>
          return;
       } else if (fameChange != 1 && fameChange != -1) {
          AutoBanFactory.PACKET_EDIT.alert(client.getPlayer(), client.getPlayer().getName() + " tried to packet edit fame.");
-         FilePrinter.printError(FilePrinter.EXPLOITS + client.getPlayer().getName() + ".txt", client.getPlayer().getName() + " tried to fame hack with fame change " + fameChange);
+         LoggerUtil.printError(LoggerOriginator.EXPLOITS, client.getPlayer().getName() + " tried to fame hack with fame change " + fameChange);
          client.disconnect(true, false);
          return;
       }

@@ -8,13 +8,14 @@ import config.YamlConfig;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.GeneralChatPacket;
 import net.server.channel.packet.reader.GeneralChatReader;
-import tools.FilePrinter;
+import tools.I18nMessage;
 import tools.LogHelper;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
-import tools.I18nMessage;
 import tools.packet.message.ChatText;
 import tools.packet.stat.EnableActions;
 
@@ -33,7 +34,7 @@ public final class GeneralChatHandler extends AbstractPacketHandler<GeneralChatP
       }
       if (packet.message().length() > Byte.MAX_VALUE && !chr.isGM()) {
          AutoBanFactory.PACKET_EDIT.alert(client.getPlayer(), client.getPlayer().getName() + " tried to packet edit in General Chat.");
-         FilePrinter.printError(FilePrinter.EXPLOITS + client.getPlayer().getName() + ".txt", client.getPlayer().getName() + " tried to send text with length of " + packet.message().length());
+         LoggerUtil.printError(LoggerOriginator.EXPLOITS, client.getPlayer().getName() + " tried to send text with length of " + packet.message().length());
          client.disconnect(true, false);
          return;
       }

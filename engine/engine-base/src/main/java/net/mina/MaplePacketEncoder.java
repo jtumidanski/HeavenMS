@@ -9,8 +9,9 @@ import client.MapleClient;
 import config.YamlConfig;
 import constants.net.OpcodeConstants;
 import net.server.coordinator.session.MapleSessionCoordinator;
-import tools.FilePrinter;
 import tools.HexTool;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 import tools.MapleAESOFB;
 import tools.data.input.ByteArrayByteStream;
 import tools.data.input.GenericLittleEndianAccessor;
@@ -39,7 +40,7 @@ public class MaplePacketEncoder implements ProtocolEncoder {
                         System.out.println("UnknownPacket:" + RecvTo);
                      }
                   } else {
-                     FilePrinter.print(FilePrinter.PACKET_STREAM + MapleSessionCoordinator.getSessionRemoteAddress(session) + ".txt", HexTool.toString(new byte[]{input[0], input[1]}) + " ...");
+                     LoggerUtil.printInfo(LoggerOriginator.PACKET_STREAM, MapleSessionCoordinator.getSessionRemoteAddress(session) + HexTool.toString(new byte[]{input[0], input[1]}) + " ...");
                   }
                }
 

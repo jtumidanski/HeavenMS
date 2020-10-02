@@ -23,7 +23,8 @@ import config.YamlConfig;
 import constants.inventory.ItemConstants;
 import server.MapleItemInformationProvider;
 import server.maps.MapleMap;
-import tools.FilePrinter;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 import tools.MasterBroadcaster;
 import tools.PacketCreator;
 import tools.packet.foreigneffect.ShowItemEffect;
@@ -282,7 +283,7 @@ public class MapleInventoryManipulator {
             chr.setHasSandboxItem();
          }
       } else {
-         FilePrinter.printError(FilePrinter.ITEM, "Tried to pickup Equip id " + itemId + " containing more than 1 quantity --> " + quantity);
+         LoggerUtil.printError(LoggerOriginator.ITEM, "Tried to pickup Equip id " + itemId + " containing more than 1 quantity --> " + quantity);
          PacketCreator.announce(c, new InventoryFull());
          PacketCreator.announce(c, new ShowItemUnavailable());
          return Optional.empty();

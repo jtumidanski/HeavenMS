@@ -5,7 +5,8 @@ import java.util.Optional;
 import client.MapleClient;
 import net.MaplePacketHandler;
 import net.server.channel.packet.PacketReaderFactory;
-import tools.FilePrinter;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 public abstract class AbstractPacketHandler<T extends MaplePacket> implements MaplePacketHandler {
@@ -17,7 +18,7 @@ public abstract class AbstractPacketHandler<T extends MaplePacket> implements Ma
 
       Optional<T> packet = readPacket(accessor, client);
       if (packet.isEmpty()) {
-         FilePrinter.printError(FilePrinter.PACKET_HANDLER, "Cannot find reader for packet: " + getReaderClass());
+         LoggerUtil.printError(LoggerOriginator.PACKET_HANDLER, "Cannot find reader for packet: " + getReaderClass());
          return;
       }
 

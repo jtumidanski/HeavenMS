@@ -105,7 +105,8 @@ import server.expeditions.MapleExpeditionBossLog;
 import server.life.MaplePlayerNPCFactory;
 import server.quest.MapleQuest;
 import tools.AutoJCE;
-import tools.FilePrinter;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 import tools.MasterBroadcaster;
 import tools.Pair;
 import tools.packet.PacketInput;
@@ -1069,7 +1070,7 @@ public class Server {
             g.findMember(mc.getId()).ifPresentOrElse(guildCharacter -> {
                mc.setMGC(guildCharacter);
                guildCharacter.setCharacter(mc);
-            }, () -> FilePrinter.printError(FilePrinter.GUILD_CHAR_ERROR, "Could not find " + mc.getName() + " when loading guild " + id + "."));
+            }, () -> LoggerUtil.printError(LoggerOriginator.GUILD_CHAR_ERROR, "Could not find " + mc.getName() + " when loading guild " + id + "."));
 
             MapleGuildProcessor.getInstance().setMemberOnline(g, mc.getId(), true, mc.getClient().getChannel());
          }
@@ -1335,7 +1336,7 @@ public class Server {
                changedNames.add(new Pair<>(result.oldName(), result.newName()));
             }));
       for (Pair<String, String> namePair : changedNames) {
-         FilePrinter.print(FilePrinter.CHANGE_CHARACTER_NAME, "Name change applied : from \"" + namePair.getLeft() + "\" to \"" + namePair.getRight() + "\" at " + Calendar.getInstance().getTime().toString());
+         LoggerUtil.printInfo(LoggerOriginator.CHANGE_CHARACTER_NAME, "Name change applied : from \"" + namePair.getLeft() + "\" to \"" + namePair.getRight() + "\" at " + Calendar.getInstance().getTime().toString());
       }
    }
 
@@ -1346,7 +1347,7 @@ public class Server {
                String reason = CharacterProcessor.getInstance().checkWorldTransferEligibility(connection, result.characterId(), result.from(), result.to());
                if (reason != null) {
                   WorldTransferAdministrator.getInstance().cancelById(connection, result.id());
-                  FilePrinter.print(FilePrinter.WORLD_TRANSFER, "World transfer cancelled : Character ID " + result.characterId() + " at " + Calendar.getInstance().getTime().toString() + ", Reason : " + reason);
+                  LoggerUtil.printInfo(LoggerOriginator.WORLD_TRANSFER, "World transfer cancelled : Character ID " + result.characterId() + " at " + Calendar.getInstance().getTime().toString() + ", Reason : " + reason);
                } else {
                   CharacterAdministrator.getInstance().performWorldTransfer(connection, result.characterId(), result.from(), result.to(), result.id());
 
@@ -1358,7 +1359,7 @@ public class Server {
          int charId = worldTransferPair.getLeft();
          int oldWorld = worldTransferPair.getRight().getLeft();
          int newWorld = worldTransferPair.getRight().getRight();
-         FilePrinter.print(FilePrinter.WORLD_TRANSFER, "World transfer applied : Character ID " + charId + " from World " + oldWorld + " to World " + newWorld + " at " + Calendar.getInstance().getTime().toString());
+         LoggerUtil.printInfo(LoggerOriginator.WORLD_TRANSFER, "World transfer applied : Character ID " + charId + " from World " + oldWorld + " to World " + newWorld + " at " + Calendar.getInstance().getTime().toString());
       }
    }
 

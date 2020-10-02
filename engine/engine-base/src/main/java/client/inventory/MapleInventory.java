@@ -26,7 +26,8 @@ import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
 import server.MapleItemInformationProvider;
 import server.ThreadManager;
-import tools.FilePrinter;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 import tools.Pair;
 
 public class MapleInventory implements Iterable<Item> {
@@ -274,7 +275,7 @@ public class MapleInventory implements Iterable<Item> {
       for (Item item : list()) {
          String itemName = ii.getName(item.id());
          if (itemName == null) {
-            FilePrinter.printError(FilePrinter.EXCEPTION, "[CRITICAL] Item " + item.id() + " has no name.");
+            LoggerUtil.printError(LoggerOriginator.EXCEPTION, "[CRITICAL] Item " + item.id() + " has no name.");
             continue;
          }
 

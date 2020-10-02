@@ -27,7 +27,8 @@ import net.server.channel.packet.CouponCodePacket;
 import net.server.channel.packet.reader.CouponCodeReader;
 import server.CashShop;
 import server.MapleItemInformationProvider;
-import tools.FilePrinter;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 import tools.PacketCreator;
 import tools.Pair;
 import tools.packet.cashshop.CashShopMessage;
@@ -57,8 +58,7 @@ public final class CouponCodeHandler extends AbstractPacketHandler<CouponCodePac
             if (MapleItemInformationProvider.getInstance().getName(item) == null) {
                item = 4000000;
                qty = 1;
-
-               FilePrinter.printError(FilePrinter.UNHANDLED_EVENT, "Error trying to redeem item id " + item + " from code id " + codeId + ".");
+               LoggerUtil.printError(LoggerOriginator.UNHANDLED_EVENT, "Error trying to redeem item id " + item + " from code id " + codeId + ".");
             }
 
             if (!chr.canHold(item, qty)) {

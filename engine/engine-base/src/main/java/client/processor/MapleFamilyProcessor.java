@@ -4,24 +4,24 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
-
 import javax.persistence.EntityManager;
 
 import client.MapleCharacter;
 import client.MapleFamily;
 import client.MapleFamilyEntry;
 import client.MapleJob;
+import client.database.data.CharacterData;
+import config.YamlConfig;
 import database.DatabaseConnection;
 import database.administrator.CharacterAdministrator;
 import database.administrator.FamilyCharacterAdministrator;
-import client.database.data.CharacterData;
 import database.provider.CharacterProvider;
 import database.provider.FamilyCharacterProvider;
 import database.provider.FamilyEntitlementProvider;
-import config.YamlConfig;
 import net.server.Server;
 import net.server.world.World;
-import tools.FilePrinter;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 import tools.PacketCreator;
 import tools.Pair;
 import tools.packet.family.GetFamilyInfo;
@@ -95,7 +95,7 @@ public class MapleFamilyProcessor {
          if (senior != null) {
             junior.setSenior(senior, false);
          } else {
-            FilePrinter.printError(FilePrinter.FAMILY_ERROR, "Missing senior for character " + junior.getName() + " in world " + world);
+            LoggerUtil.printError(LoggerOriginator.FAMILY_ERROR, "Missing senior for character " + junior.getName() + " in world " + world);
          }
       }
 
@@ -136,7 +136,7 @@ public class MapleFamilyProcessor {
          }
          if (!success) {
             entityManager.getTransaction().rollback();
-            FilePrinter.printError(FilePrinter.FAMILY_ERROR, "Family rep auto save failed for family " + mapleFamily.getID() + " on " + Calendar.getInstance().getTime().toString() + ".");
+            LoggerUtil.printError(LoggerOriginator.FAMILY_ERROR, "Family rep auto save failed for family " + mapleFamily.getID() + " on " + Calendar.getInstance().getTime().toString() + ".");
          } else {
             entityManager.getTransaction().commit();
          }

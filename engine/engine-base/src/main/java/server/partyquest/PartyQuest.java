@@ -8,7 +8,8 @@ import client.MapleCharacter;
 import net.server.Server;
 import net.server.world.MapleParty;
 import net.server.world.MaplePartyCharacter;
-import tools.FilePrinter;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 
 public class PartyQuest {
    int channel, world;
@@ -64,7 +65,7 @@ public class PartyQuest {
          case "LudiPQLast":
             return 800 * level / 5;
       }
-      FilePrinter.printError(FilePrinter.NPC, "Unhandled PartyQuest: " + PQ);
+      LoggerUtil.printError(LoggerOriginator.NPC, "Unhandled PartyQuest: " + PQ);
       return 0;
    }
 
