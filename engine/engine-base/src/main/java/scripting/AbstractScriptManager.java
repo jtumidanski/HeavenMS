@@ -12,14 +12,34 @@ import client.MapleClient;
 import tools.FilePrinter;
 
 public abstract class AbstractScriptManager {
-
-   private ScriptEngineFactory sef;
+   private final ScriptEngineFactory sef;
 
    protected AbstractScriptManager() {
       sef = new ScriptEngineManager().getEngineByName("groovy").getFactory();
    }
 
    protected ScriptEngine getScriptEngine(String path) {
+      ScriptEngine engine = sef.getScriptEngine();
+      engine = evalPrerequisites(engine, getPrerequisites());
+      return eval(engine, path);
+   }
+
+   protected String[] getPrerequisites() {
+      return new String[0];
+   }
+
+   protected ScriptEngine evalPrerequisites(ScriptEngine engine, String... paths) {
+      ScriptEngine primedEngine = engine;
+      for (String path : paths) {
+         primedEngine = eval(primedEngine, path);
+         if (primedEngine == null) {
+            return null;
+         }
+      }
+      return primedEngine;
+   }
+
+   protected ScriptEngine eval(ScriptEngine engine, String path) {
       path = "script/src/main/groovy/" + path;
       File scriptFile = null;
       if (new File(path + ".groovy").exists()) {
@@ -29,7 +49,6 @@ public abstract class AbstractScriptManager {
          return null;
       }
 
-      ScriptEngine engine = sef.getScriptEngine();
       try (FileReader fr = new FileReader(scriptFile)) {
          engine.eval(fr);
       } catch (final ScriptException | IOException t) {
@@ -50,7 +69,6 @@ public abstract class AbstractScriptManager {
 
       return engine;
    }
-
 
    protected void resetContext(String path, MapleClient c) {
       c.removeScriptEngine("script/src/main/groovy/" + path + ".groovy");

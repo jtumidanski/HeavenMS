@@ -24,6 +24,11 @@ public class ReactorScriptManager extends AbstractScriptManager {
       return instance;
    }
 
+   @Override
+   protected String[] getPrerequisites() {
+      return new String[]{"reactor/SimpleReactor"};
+   }
+
    public void onHit(MapleClient c, MapleReactor reactor) {
       try {
          ScriptEngine iv = getScriptEngine("reactor/" + reactor.getId(), c);
