@@ -3,6 +3,7 @@ package tools.data.input;
 import java.io.IOException;
 import java.io.InputStream;
 
+import tools.LogType;
 import tools.LoggerOriginator;
 import tools.LoggerUtil;
 
@@ -63,7 +64,7 @@ public class InputStreamByteStream implements ByteInputStream {
       try {
          return is.available();
       } catch (IOException e) {
-         LoggerUtil.printError(LoggerOriginator.EXCEPTION, e);
+         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXCEPTION, e);
          return 0;
       }
    }

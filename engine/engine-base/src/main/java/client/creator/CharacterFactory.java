@@ -17,6 +17,7 @@ import constants.skills.Warrior;
 import net.server.Server;
 import server.MapleItemInformationProvider;
 import server.events.RescueGaga;
+import tools.LogType;
 import tools.LoggerOriginator;
 import tools.LoggerUtil;
 import tools.PacketCreator;
@@ -249,7 +250,7 @@ public class CharacterFactory {
 
       Server.getInstance().createCharacterEntry(newCharacter);
       Server.getInstance().broadcastGMMessage(c.getWorld(), PacketCreator.create(new YellowTip("[New Char]: " + c.getAccountName() + " has created a new character with IGN " + name)));
-      LoggerUtil.printInfo(LoggerOriginator.CREATED_CHAR, c.getAccountName() + " created character with IGN " + name);
+      LoggerUtil.printInfo(LoggerOriginator.ENGINE, LogType.CREATED_CHAR, c.getAccountName() + " created character with IGN " + name);
       return 0;
    }
 }

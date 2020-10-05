@@ -12,6 +12,7 @@ import net.MaplePacketHandler;
 import net.PacketProcessor;
 import tools.HexTool;
 import tools.I18nMessage;
+import tools.LogType;
 import tools.LoggerOriginator;
 import tools.LoggerUtil;
 import tools.MessageBroadcaster;
@@ -51,7 +52,7 @@ public class PeCommand extends Command {
             MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("PE_COMMAND_RECEIVING").with(packet));
             packetHandler.handlePacket(accessor, c);
          } catch (final Throwable t) {
-            LoggerUtil.printError(LoggerOriginator.PACKET_HANDLER, "Error for " + (c.getPlayer() == null ? "" : "player ; " + c.getPlayer() + " on map ; " + c.getPlayer().getMapId() + " - ") + "account ; " + c.getAccountName() + "\r\n" + accessor.toString());
+            LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.PACKET_HANDLER, "Error for " + (c.getPlayer() == null ? "" : "player ; " + c.getPlayer() + " on map ; " + c.getPlayer().getMapId() + " - ") + "account ; " + c.getAccountName() + "\r\n" + accessor.toString());
          }
       }
    }

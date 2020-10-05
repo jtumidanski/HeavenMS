@@ -12,6 +12,7 @@ import javax.script.ScriptEngine;
 
 import net.server.channel.Channel;
 import scripting.AbstractScriptManager;
+import tools.LogType;
 import tools.LoggerOriginator;
 import tools.LoggerUtil;
 
@@ -52,7 +53,7 @@ public class EventScriptManager extends AbstractScriptManager {
             entry.getInvocable().invokeFunction("init");
          } catch (Exception ex) {
             Logger.getLogger(EventScriptManager.class.getName()).log(Level.SEVERE, null, ex);
-            LoggerUtil.printError(LoggerOriginator.EXCEPTION, "Error on script: " + entry.getEventManager().getName());
+            LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXCEPTION, "Error on script: " + entry.getEventManager().getName());
          }
       }
       active = events.size() > 1; // boot up loads only 1 script

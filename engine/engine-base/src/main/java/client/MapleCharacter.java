@@ -181,6 +181,7 @@ import server.processor.maps.MapleDoorProcessor;
 import server.processor.maps.MapleMapObjectProcessor;
 import server.quest.MapleQuest;
 import tools.I18nMessage;
+import tools.LogType;
 import tools.LoggerOriginator;
 import tools.LoggerUtil;
 import tools.MapleStringUtil;
@@ -1752,7 +1753,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             resetHpDecreaseTask();
          }
       } else {
-         LoggerUtil.printError(LoggerOriginator.MAPLE_MAP, "Character " + this.getName() + " got stuck when moving to map " + map.getId() + ".");
+         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.MAPLE_MAP, "Character " + this.getName() + " got stuck when moving to map " + map.getId() + ".");
          client.disconnect(true, false);
          return;
       }
@@ -6255,7 +6256,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             }
          }
       } catch (Exception e) {
-         LoggerUtil.printError(LoggerOriginator.EXCEPTION_CAUGHT, e, "MapleCharacter.mobKilled. CID: " + this.id + " last Quest Processed: " + lastQuestProcessed);
+         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXCEPTION_CAUGHT, e, "MapleCharacter.mobKilled. CID: " + this.id + " last Quest Processed: " + lastQuestProcessed);
       }
    }
 
@@ -6726,7 +6727,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          if (tap >= 0) {
             updateStrDexIntLukSp(tstr, tdex, tint, tluk, tap, tsp, GameConstants.getSkillBook(job.getId()));
          } else {
-            LoggerUtil.printInfo(LoggerOriginator.EXCEPTION_CAUGHT, name + " tried to get their stats reset, without having enough AP available.");
+            LoggerUtil.printInfo(LoggerOriginator.ENGINE, LogType.EXCEPTION_CAUGHT, name + " tried to get their stats reset, without having enough AP available.");
          }
       } finally {
          statWriteLock.unlock();
@@ -6801,9 +6802,9 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       Calendar c = Calendar.getInstance();
 
       if (notAutoSave) {
-         LoggerUtil.printInfo(LoggerOriginator.SAVING_CHARACTER, "Attempting to save " + name + " at " + c.getTime().toString());
+         LoggerUtil.printInfo(LoggerOriginator.ENGINE, LogType.SAVING_CHARACTER, "Attempting to save " + name + " at " + c.getTime().toString());
       } else {
-         LoggerUtil.printInfo(LoggerOriginator.AUTOSAVING_CHARACTER, "Attempting to auto save " + name + " at " + c.getTime().toString());
+         LoggerUtil.printInfo(LoggerOriginator.ENGINE, LogType.AUTOSAVING_CHARACTER, "Attempting to auto save " + name + " at " + c.getTime().toString());
       }
 
       Server.getInstance().updateCharacterEntry(this);
@@ -6990,10 +6991,10 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       String message = getName() + " received this - " + text;
       if (Server.getInstance().isGmOnline(this.getWorld())) { //Alert and log if a GM is online
          Server.getInstance().broadcastGMMessage(this.getWorld(), PacketCreator.create(new YellowTip(message)));
-         LoggerUtil.printInfo(LoggerOriginator.AUTOBAN_WARNING, message);
+         LoggerUtil.printInfo(LoggerOriginator.ENGINE, LogType.AUTOBAN_WARNING, message);
       } else { //Auto DC and log if no GM is online
          client.disconnect(false, false);
-         LoggerUtil.printInfo(LoggerOriginator.AUTOBAN_DC, message);
+         LoggerUtil.printInfo(LoggerOriginator.ENGINE, LogType.AUTOBAN_DC, message);
       }
    }
 
@@ -8275,7 +8276,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       DatabaseConnection.getInstance().withConnection(connection ->
             NameChangeProvider.getInstance().getPendingNameChangeForCharacter(connection, getId()).ifPresent(result -> {
                CharacterAdministrator.getInstance().performNameChange(connection, result.characterId(), result.oldName(), result.newName(), result.id());
-               LoggerUtil.printInfo(LoggerOriginator.CHANGE_CHARACTER_NAME, "Name change applied : from \"" + getName() + "\" to \"" + result.newName() + "\" at " + Calendar.getInstance().getTime().toString());
+               LoggerUtil.printInfo(LoggerOriginator.ENGINE, LogType.CHANGE_CHARACTER_NAME, "Name change applied : from \"" + getName() + "\" to \"" + result.newName() + "\" at " + Calendar.getInstance().getTime().toString());
             }));
    }
 

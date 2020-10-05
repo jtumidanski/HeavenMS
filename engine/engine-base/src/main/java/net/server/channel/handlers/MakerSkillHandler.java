@@ -23,6 +23,7 @@ import net.server.channel.packet.reader.MakerActionReader;
 import server.MakerItemFactory;
 import server.MapleItemInformationProvider;
 import tools.I18nMessage;
+import tools.LogType;
 import tools.LoggerOriginator;
 import tools.LoggerUtil;
 import tools.MasterBroadcaster;
@@ -146,7 +147,7 @@ public final class MakerSkillHandler extends AbstractPacketHandler<BaseMakerActi
             switch (createStatus) {
                // non-available for Maker item id has been tried to forge
                case -1 -> {
-                  LoggerUtil.printError(LoggerOriginator.EXPLOITS, "Player " + client.getPlayer().getName() + " tried to craft item id " + toCreate + " using the Maker skill.");
+                  LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXPLOITS, "Player " + client.getPlayer().getName() + " tried to craft item id " + toCreate + " using the Maker skill.");
                   MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("MAKER_SKILL_REQUESTED_ITEM_COULD_NOT_BE_CRAFTED"));
                   PacketCreator.announce(client, new MakerEnableActions());
                }

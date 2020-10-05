@@ -7,6 +7,7 @@ import net.server.AbstractPacketHandler;
 import net.server.channel.packet.NPCShopPacket;
 import net.server.channel.packet.reader.NPCShopReader;
 import server.processor.MapleShopProcessor;
+import tools.LogType;
 import tools.LoggerOriginator;
 import tools.LoggerUtil;
 
@@ -21,7 +22,7 @@ public final class NPCShopHandler extends AbstractPacketHandler<NPCShopPacket> {
       if (packet.mode() == 0) { // mode 0 = buy :)
          if (packet.quantity() < 1) {
             AutoBanFactory.PACKET_EDIT.alert(client.getPlayer(), client.getPlayer().getName() + " tried to packet edit a npc shop.");
-            LoggerUtil.printError(LoggerOriginator.EXPLOITS, client.getPlayer().getName() + " tried to buy quantity " + packet.quantity() + " of item id " + packet.itemId());
+            LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXPLOITS, client.getPlayer().getName() + " tried to buy quantity " + packet.quantity() + " of item id " + packet.itemId());
             client.disconnect(true, false);
             return;
          }

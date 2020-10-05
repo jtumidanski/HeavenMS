@@ -183,6 +183,7 @@ import client.command.commands.gm6.SpawnAllPlayerNpcCommand;
 import client.command.commands.gm6.SupplyRateCouponCommand;
 import client.command.commands.gm6.WarpWorldCommand;
 import tools.I18nMessage;
+import tools.LogType;
 import tools.LoggerOriginator;
 import tools.LoggerUtil;
 import tools.MessageBroadcaster;
@@ -272,7 +273,7 @@ public class CommandsExecutor {
 
    private void writeLog(MapleClient client, String command) {
       SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm");
-      LoggerUtil.printInfo(LoggerOriginator.USED_COMMANDS, client.getPlayer().getName() + " used: " + command + " on " + sdf.format(Calendar.getInstance().getTime()));
+      LoggerUtil.printInfo(LoggerOriginator.ENGINE, LogType.USED_COMMANDS, client.getPlayer().getName() + " used: " + command + " on " + sdf.format(Calendar.getInstance().getTime()));
    }
 
    private void addCommandInfo(String name, Class<? extends Command> commandClass) {

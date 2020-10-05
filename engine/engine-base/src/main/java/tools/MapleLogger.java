@@ -25,7 +25,7 @@ public class MapleLogger {
          return;
       }
       String packet = op.toString() + "\r\n" + HexTool.toString((byte[]) message);
-      LoggerUtil.printError(LoggerOriginator.PACKET_LOGS, String.format("[%s] [%s] %s", c.getAccountName(), chr.getName(), packet));
+      LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.PACKET_LOGS, String.format("[%s] [%s] %s", c.getAccountName(), chr.getName(), packet));
    }
 
    private static boolean isRecvBlocked(RecvOpcode op) {

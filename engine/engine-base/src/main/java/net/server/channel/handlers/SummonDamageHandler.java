@@ -21,6 +21,7 @@ import server.MapleStatEffect;
 import server.life.MapleMonster;
 import server.life.MapleMonsterInformationProvider;
 import server.maps.MapleSummon;
+import tools.LogType;
 import tools.LoggerOriginator;
 import tools.LoggerUtil;
 import tools.MasterBroadcaster;
@@ -77,7 +78,7 @@ public final class SummonDamageHandler extends AbstractDealDamageHandler<SummonD
          if (target != null) {
             if (damage > maxDmg) {
                AutoBanFactory.DAMAGE_HACK.alert(client.getPlayer(), "Possible packet editing summon damage exploit.");
-               LoggerUtil.printError(LoggerOriginator.EXPLOITS, client.getPlayer().getName() + " used a summon of skillId " + summon.getSkill() + " to attack " + MapleMonsterInformationProvider.getInstance().getMobNameFromId(target.id()) + " with damage " + damage + " (max: " + maxDmg + ")");
+               LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXPLOITS, client.getPlayer().getName() + " used a summon of skillId " + summon.getSkill() + " to attack " + MapleMonsterInformationProvider.getInstance().getMobNameFromId(target.id()) + " with damage " + damage + " (max: " + maxDmg + ")");
                damage = maxDmg;
             }
 

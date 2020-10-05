@@ -11,6 +11,7 @@ import client.MapleQuestStatus;
 import constants.game.GameConstants;
 import scripting.AbstractScriptManager;
 import server.quest.MapleQuest;
+import tools.LogType;
 import tools.LoggerOriginator;
 import tools.LoggerUtil;
 
@@ -49,7 +50,7 @@ public class QuestScriptManager extends AbstractScriptManager {
 
             ScriptEngine iv = getQuestScriptEngine(c, questId);
             if (iv == null) {
-               LoggerUtil.printError(LoggerOriginator.QUEST_UNCODED, "START Quest " + questId + " is not coded.");
+               LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.QUEST_UNCODED, "START Quest " + questId + " is not coded.");
                qm.dispose();
                return;
             }
@@ -60,10 +61,10 @@ public class QuestScriptManager extends AbstractScriptManager {
             ((Invocable) iv).invokeFunction("start", (byte) 1, (byte) 0, 0);
          }
       } catch (final UndeclaredThrowableException ute) {
-         LoggerUtil.printError(LoggerOriginator.QUEST, ute, String.format("QuestId [%d]", questId));
+         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.QUEST, ute, String.format("QuestId [%d]", questId));
          dispose(c);
       } catch (final Throwable t) {
-         LoggerUtil.printError(LoggerOriginator.QUEST, t, String.format("QuestId [%d]", getQM(c).getQuest()));
+         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.QUEST, t, String.format("QuestId [%d]", getQM(c).getQuest()));
          dispose(c);
       }
    }
@@ -75,7 +76,7 @@ public class QuestScriptManager extends AbstractScriptManager {
             c.setClickedNPC();
             ((Invocable) iv).invokeFunction("start", mode, type, selection);
          } catch (final Throwable ute) {
-            LoggerUtil.printError(LoggerOriginator.QUEST, ute, String.format("QuestId [%d]", getQM(c).getQuest()));
+            LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.QUEST, ute, String.format("QuestId [%d]", getQM(c).getQuest()));
             dispose(c);
          }
       }
@@ -101,7 +102,7 @@ public class QuestScriptManager extends AbstractScriptManager {
 
             ScriptEngine iv = getQuestScriptEngine(c, questId);
             if (iv == null) {
-               LoggerUtil.printError(LoggerOriginator.QUEST_UNCODED, "END Quest" + questId + " is not coded.");
+               LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.QUEST_UNCODED, "END Quest" + questId + " is not coded.");
                qm.dispose();
                return;
             }
@@ -112,10 +113,10 @@ public class QuestScriptManager extends AbstractScriptManager {
             ((Invocable) iv).invokeFunction("end", (byte) 1, (byte) 0, 0);
          }
       } catch (final UndeclaredThrowableException ute) {
-         LoggerUtil.printError(LoggerOriginator.QUEST, ute, String.format("QuestId [%d]", questId));
+         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.QUEST, ute, String.format("QuestId [%d]", questId));
          dispose(c);
       } catch (final Throwable t) {
-         LoggerUtil.printError(LoggerOriginator.QUEST, t, String.format("QuestId [%d]", getQM(c).getQuest()));
+         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.QUEST, t, String.format("QuestId [%d]", getQM(c).getQuest()));
          dispose(c);
       }
    }
@@ -127,7 +128,7 @@ public class QuestScriptManager extends AbstractScriptManager {
             c.setClickedNPC();
             ((Invocable) iv).invokeFunction("end", mode, type, selection);
          } catch (final Throwable ute) {
-            LoggerUtil.printError(LoggerOriginator.QUEST, ute, String.format("QuestId [%d]", getQM(c).getQuest()));
+            LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.QUEST, ute, String.format("QuestId [%d]", getQM(c).getQuest()));
             dispose(c);
          }
       }
@@ -162,10 +163,10 @@ public class QuestScriptManager extends AbstractScriptManager {
             ((Invocable) iv).invokeFunction("raiseOpen");
          }
       } catch (final UndeclaredThrowableException ute) {
-         LoggerUtil.printError(LoggerOriginator.QUEST, ute, String.format("QuestId [%d]", questId));
+         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.QUEST, ute, String.format("QuestId [%d]", questId));
          dispose(c);
       } catch (final Throwable t) {
-         LoggerUtil.printError(LoggerOriginator.QUEST, t, String.format("QuestId [%d]", getQM(c).getQuest()));
+         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.QUEST, t, String.format("QuestId [%d]", getQM(c).getQuest()));
          dispose(c);
       }
    }

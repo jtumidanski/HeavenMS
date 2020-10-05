@@ -20,6 +20,7 @@ import provider.MapleData;
 import provider.MapleDataProvider;
 import provider.MapleDataProviderFactory;
 import provider.MapleDataTool;
+import tools.LogType;
 import tools.LoggerOriginator;
 import tools.LoggerUtil;
 
@@ -194,7 +195,7 @@ public class MapleSkillBookInformationProvider {
             foundSkillBooks.put(i, SkillBookEntry.SCRIPT);
          }
       } catch (IOException ioe) {
-         LoggerUtil.printError(LoggerOriginator.EXCEPTION, "Failed to read " + file.getName() + ".");
+         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXCEPTION, "Failed to read " + file.getName() + ".");
       }
    }
 

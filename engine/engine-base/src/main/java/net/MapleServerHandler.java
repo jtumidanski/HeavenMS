@@ -27,6 +27,7 @@ import net.server.audit.locks.MonitoredReentrantLock;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
 import net.server.coordinator.session.MapleSessionCoordinator;
 import server.TimerManager;
+import tools.LogType;
 import tools.LoggerOriginator;
 import tools.LoggerUtil;
 import tools.MapleAESOFB;
@@ -71,7 +72,7 @@ public class MapleServerHandler extends IoHandlerAdapter {
          MapleClient client = (MapleClient) session.getAttribute(MapleClient.CLIENT_KEY);
 
          if (client != null && client.getPlayer() != null) {
-            LoggerUtil.printError(LoggerOriginator.EXCEPTION_CAUGHT, cause, "Exception caught by: " + client.getPlayer());
+            LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXCEPTION_CAUGHT, cause, "Exception caught by: " + client.getPlayer());
          }
       }
    }
@@ -109,7 +110,7 @@ public class MapleServerHandler extends IoHandlerAdapter {
          if (!MapleSessionCoordinator.getInstance().canStartLoginSession(session)) {
             return;
          }
-         LoggerUtil.printInfo(LoggerOriginator.SESSION, "IoSession with " + session.getRemoteAddress() + " opened on " + sdf.format(Calendar.getInstance().getTime()));
+         LoggerUtil.printInfo(LoggerOriginator.ENGINE, LogType.SESSION, "IoSession with " + session.getRemoteAddress() + " opened on " + sdf.format(Calendar.getInstance().getTime()));
       }
 
       byte[] ivRecv = {70, 114, 122, 82};
@@ -140,7 +141,7 @@ public class MapleServerHandler extends IoHandlerAdapter {
                client.disconnect(false, false);
             }
          } catch (Throwable t) {
-            LoggerUtil.printError(LoggerOriginator.ACCOUNT_STUCK, t);
+            LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.ACCOUNT_STUCK, t);
          } finally {
             session.closeNow();
             session.removeAttribute(MapleClient.CLIENT_KEY);
@@ -164,7 +165,7 @@ public class MapleServerHandler extends IoHandlerAdapter {
       final MaplePacketHandler packetHandler = processor.getHandler(packetId);
 
       if (YamlConfig.config.server.USE_DEBUG_SHOW_RCVD_PACKET && !ignoredDebugRecvPackets.contains(packetId)) {
-         System.out.println("Received packet id " + packetId + " to be processed by " + packetHandler.getClass().getSimpleName());
+         System.out.println("Received packet id " + packetId);
       }
 
       if (packetHandler != null && packetHandler.validateState(client)) {
@@ -172,7 +173,7 @@ public class MapleServerHandler extends IoHandlerAdapter {
             MapleLogger.logRecv(client, packetId, message);
             packetHandler.handlePacket(accessor, client);
          } catch (final Throwable t) {
-            LoggerUtil.printError(LoggerOriginator.PACKET_HANDLER, t, "Error for " + (client.getPlayer() == null ? "" : "player ; " + client.getPlayer() + " on map ; " + client.getPlayer().getMapId() + " - ") + "account ; " + client.getAccountName() + "\r\n" + accessor.toString());
+            LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.PACKET_HANDLER, t, "Error for " + (client.getPlayer() == null ? "" : "player ; " + client.getPlayer() + " on map ; " + client.getPlayer().getMapId() + " - ") + "account ; " + client.getAccountName() + "\r\n" + accessor.toString());
             //client.announce(MaplePacketCreator.enableActions());//bugs sometimes
          }
          client.updateLastPacket();

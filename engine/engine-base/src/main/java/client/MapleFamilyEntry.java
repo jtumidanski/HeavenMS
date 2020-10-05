@@ -11,6 +11,7 @@ import database.administrator.CharacterAdministrator;
 import database.administrator.FamilyCharacterAdministrator;
 import database.administrator.FamilyEntitlementAdministrator;
 import net.server.Server;
+import tools.LogType;
 import tools.LoggerOriginator;
 import tools.LoggerUtil;
 import tools.PacketCreator;
@@ -95,7 +96,7 @@ public class MapleFamilyEntry {
          }
          if (!success) {
             entityManager.getTransaction().rollback();
-            LoggerUtil.printError(LoggerOriginator.FAMILY_ERROR, "Could not absorb " + oldFamily.getName() + " family into " + newFamily.getName() + " family. (SQL ERROR)");
+            LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.FAMILY_ERROR, "Could not absorb " + oldFamily.getName() + " family into " + newFamily.getName() + " family. (SQL ERROR)");
          } else {
             entityManager.getTransaction().commit();
          }
@@ -138,7 +139,7 @@ public class MapleFamilyEntry {
          }
          if (!success) {
             entityManager.getTransaction().rollback();
-            LoggerUtil.printError(LoggerOriginator.FAMILY_ERROR, "Could not fork family with new leader " + getName() + ". (Old senior : " + oldSenior.getName() + ", leader :" + oldFamily.getLeader().getName() + ")");
+            LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.FAMILY_ERROR, "Could not fork family with new leader " + getName() + ". (Old senior : " + oldSenior.getName() + ", leader :" + oldFamily.getLeader().getName() + ")");
          } else {
             entityManager.getTransaction().commit();
          }

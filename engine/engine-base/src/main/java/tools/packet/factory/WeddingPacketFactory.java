@@ -3,6 +3,7 @@ package tools.packet.factory;
 import client.MapleCharacter;
 import client.inventory.Item;
 import client.processor.CharacterProcessor;
+import tools.LogType;
 import tools.LoggerOriginator;
 import tools.LoggerUtil;
 import tools.StringUtil;
@@ -209,7 +210,7 @@ public class WeddingPacketFactory extends AbstractPacketFactory {
             break;
          }
          default: {
-            LoggerUtil.printError(LoggerOriginator.EXCEPTION, "Unknown WishList Mode: " + packet.mode());
+            LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXCEPTION, "Unknown WishList Mode: " + packet.mode());
             break;
          }
       }

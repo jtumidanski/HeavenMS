@@ -10,6 +10,7 @@ import net.server.channel.packet.GeneralChatPacket;
 import net.server.channel.packet.reader.GeneralChatReader;
 import tools.I18nMessage;
 import tools.LogHelper;
+import tools.LogType;
 import tools.LoggerOriginator;
 import tools.LoggerUtil;
 import tools.MasterBroadcaster;
@@ -34,7 +35,7 @@ public final class GeneralChatHandler extends AbstractPacketHandler<GeneralChatP
       }
       if (packet.message().length() > Byte.MAX_VALUE && !chr.isGM()) {
          AutoBanFactory.PACKET_EDIT.alert(client.getPlayer(), client.getPlayer().getName() + " tried to packet edit in General Chat.");
-         LoggerUtil.printError(LoggerOriginator.EXPLOITS, client.getPlayer().getName() + " tried to send text with length of " + packet.message().length());
+         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXPLOITS, client.getPlayer().getName() + " tried to send text with length of " + packet.message().length());
          client.disconnect(true, false);
          return;
       }

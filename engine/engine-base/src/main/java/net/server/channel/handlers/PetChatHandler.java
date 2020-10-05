@@ -7,6 +7,7 @@ import net.server.AbstractPacketHandler;
 import net.server.channel.packet.pet.PetChatPacket;
 import net.server.channel.packet.reader.PetChatReader;
 import tools.LogHelper;
+import tools.LogType;
 import tools.LoggerOriginator;
 import tools.LoggerUtil;
 import tools.MasterBroadcaster;
@@ -26,7 +27,7 @@ public final class PetChatHandler extends AbstractPacketHandler<PetChatPacket> {
       }
       if (packet.text().length() > Byte.MAX_VALUE) {
          AutoBanFactory.PACKET_EDIT.alert(client.getPlayer(), client.getPlayer().getName() + " tried to packet edit with pets.");
-         LoggerUtil.printError(LoggerOriginator.EXPLOITS, client.getPlayer().getName() + " tried to send text with length of " + packet.text().length());
+         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXPLOITS, client.getPlayer().getName() + " tried to send text with length of " + packet.text().length());
          client.disconnect(true, false);
          return;
       }

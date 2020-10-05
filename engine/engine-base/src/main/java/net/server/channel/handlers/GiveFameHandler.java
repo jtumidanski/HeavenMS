@@ -8,6 +8,7 @@ import net.server.AbstractPacketHandler;
 import net.server.channel.packet.GiveFamePacket;
 import net.server.channel.packet.reader.GiveFameReader;
 import tools.I18nMessage;
+import tools.LogType;
 import tools.LoggerOriginator;
 import tools.LoggerUtil;
 import tools.MessageBroadcaster;
@@ -31,7 +32,7 @@ public final class GiveFameHandler extends AbstractPacketHandler<GiveFamePacket>
          return;
       } else if (fameChange != 1 && fameChange != -1) {
          AutoBanFactory.PACKET_EDIT.alert(client.getPlayer(), client.getPlayer().getName() + " tried to packet edit fame.");
-         LoggerUtil.printError(LoggerOriginator.EXPLOITS, client.getPlayer().getName() + " tried to fame hack with fame change " + fameChange);
+         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXPLOITS, client.getPlayer().getName() + " tried to fame hack with fame change " + fameChange);
          client.disconnect(true, false);
          return;
       }

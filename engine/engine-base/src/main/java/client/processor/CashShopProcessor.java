@@ -22,6 +22,7 @@ import rest.cashshop.GiftsResponse;
 import rest.cashshop.WishListItem;
 import rest.cashshop.WishListResponse;
 import server.CashShop;
+import tools.LogType;
 import tools.LoggerOriginator;
 import tools.LoggerUtil;
 import tools.PacketCreator;
@@ -85,7 +86,7 @@ public class CashShopProcessor {
       List<Integer> results = new ArrayList<>();
       UriBuilder.service(RestService.CASH_SHOP).path("characters").path(characterId).path("wish-list").path("items").getRestClient(WishListResponse.class)
             .success((responseCode, result) -> results.addAll(result.items().parallelStream().map(WishListItem::id).collect(Collectors.toList())))
-            .failure(responseCode -> LoggerUtil.printError(LoggerOriginator.CASH_SHOP_ORCHESTRATOR, "Failed to get wish list for character " + characterId))
+            .failure(responseCode -> LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.CASH_SHOP_ORCHESTRATOR, "Failed to get wish list for character " + characterId))
             .get();
 
       return results;
@@ -133,7 +134,7 @@ public class CashShopProcessor {
     */
    protected void addWishListItem(int characterId, int id) {
       UriBuilder.service(RestService.CASH_SHOP).path("characters").path(characterId).path("wish-list").path("items").getRestClient()
-            .failure(responseCode -> LoggerUtil.printError(LoggerOriginator.CASH_SHOP_ORCHESTRATOR, "Failed to add wish list item " + id + " for character " + characterId))
+            .failure(responseCode -> LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.CASH_SHOP_ORCHESTRATOR, "Failed to add wish list item " + id + " for character " + characterId))
             .create(new WishListItem(id));
    }
 
@@ -144,7 +145,7 @@ public class CashShopProcessor {
     */
    public void deleteWishListForCharacter(int characterId) {
       UriBuilder.service(RestService.CASH_SHOP).path("characters").path(characterId).path("wish-list").path("items").getRestClient()
-            .failure(responseCode -> LoggerUtil.printError(LoggerOriginator.CASH_SHOP_ORCHESTRATOR, "Failed to delete wish list for character " + characterId))
+            .failure(responseCode -> LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.CASH_SHOP_ORCHESTRATOR, "Failed to delete wish list for character " + characterId))
             .delete();
    }
 
@@ -155,7 +156,7 @@ public class CashShopProcessor {
 
    public void gift(int recipient, String from, String message, int sn, int ringId) {
       UriBuilder.service(RestService.CASH_SHOP).path("characters").path(recipient).path("gifts").getRestClient()
-            .failure(responseCode -> LoggerUtil.printError(LoggerOriginator.CASH_SHOP_ORCHESTRATOR, "Failed to create gift for character " + recipient))
+            .failure(responseCode -> LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.CASH_SHOP_ORCHESTRATOR, "Failed to create gift for character " + recipient))
             .create(new rest.cashshop.Gift(from, message, sn, ringId));
    }
 
@@ -169,10 +170,10 @@ public class CashShopProcessor {
 
       UriBuilder.service(RestService.CASH_SHOP).path("characters").path(characterId).path("gifts").getRestClient(GiftsResponse.class)
             .success((responseCode, result) -> gifts.addAll(result.gifts().stream().map(gift -> loadGift(cashShop, gift)).collect(Collectors.toList())))
-            .failure(responseCode -> LoggerUtil.printError(LoggerOriginator.CASH_SHOP_ORCHESTRATOR, "Failed to get gifts for character " + characterId))
+            .failure(responseCode -> LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.CASH_SHOP_ORCHESTRATOR, "Failed to get gifts for character " + characterId))
             .get();
       UriBuilder.service(RestService.CASH_SHOP).path("characters").path(characterId).path("gifts").getRestClient()
-            .failure(responseCode -> LoggerUtil.printError(LoggerOriginator.CASH_SHOP_ORCHESTRATOR, "Failed to delete gifts for character " + characterId))
+            .failure(responseCode -> LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.CASH_SHOP_ORCHESTRATOR, "Failed to delete gifts for character " + characterId))
             .delete();
       return gifts;
    }

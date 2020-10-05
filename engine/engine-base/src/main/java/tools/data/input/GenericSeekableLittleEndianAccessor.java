@@ -2,6 +2,7 @@ package tools.data.input;
 
 import java.io.IOException;
 
+import tools.LogType;
 import tools.LoggerOriginator;
 import tools.LoggerUtil;
 
@@ -34,7 +35,7 @@ public class GenericSeekableLittleEndianAccessor extends GenericLittleEndianAcce
       try {
          bs.seek(offset);
       } catch (IOException e) {
-         LoggerUtil.printError(LoggerOriginator.EXCEPTION, e);
+         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXCEPTION, e);
       }
    }
 
@@ -49,7 +50,7 @@ public class GenericSeekableLittleEndianAccessor extends GenericLittleEndianAcce
       try {
          return bs.getPosition();
       } catch (IOException e) {
-         LoggerUtil.printError(LoggerOriginator.EXCEPTION, e);
+         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXCEPTION, e);
          return -1;
       }
    }

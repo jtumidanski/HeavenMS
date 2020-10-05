@@ -9,6 +9,7 @@ import client.SkillFactory;
 import client.autoban.AutoBanFactory;
 import constants.game.GameConstants;
 import constants.skills.Aran;
+import tools.LogType;
 import tools.LoggerOriginator;
 import tools.LoggerUtil;
 import tools.PacketCreator;
@@ -25,7 +26,7 @@ public class AssignSPProcessor {
       MapleCharacter player = c.getPlayer();
       if ((!GameConstants.isPqSkillMap(player.getMapId()) && GameConstants.isPqSkill(skillId)) || (!player.isGM() && GameConstants.isGMSkills(skillId)) || (!GameConstants.isInJobTree(skillId, player.getJob().getId()) && !player.isGM())) {
          AutoBanFactory.PACKET_EDIT.alert(player, "tried to packet edit in distributing sp.");
-         LoggerUtil.printError(LoggerOriginator.EXPLOITS, c.getPlayer().getName() + " tried to use skill " + skillId + " without it being in their job.");
+         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXPLOITS, c.getPlayer().getName() + " tried to use skill " + skillId + " without it being in their job.");
 
          c.disconnect(true, false);
       }

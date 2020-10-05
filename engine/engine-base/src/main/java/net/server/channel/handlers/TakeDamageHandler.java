@@ -34,6 +34,7 @@ import server.life.MobSkillFactory;
 import server.maps.MapleMap;
 import server.maps.MapleMapObject;
 import server.processor.MobSkillProcessor;
+import tools.LogType;
 import tools.LoggerOriginator;
 import tools.LoggerUtil;
 import tools.MasterBroadcaster;
@@ -135,7 +136,7 @@ public final class TakeDamageHandler extends AbstractPacketHandler<TakeDamagePac
          } catch (ClassCastException e) {
             //this happens due to mob on last map damaging player just before changing maps
             e.printStackTrace();
-            LoggerUtil.printError(LoggerOriginator.EXCEPTION_CAUGHT, "Attacker is not a mob-type, rather is a " + map.getMapObject(oid).getClass().getName() + " entity.");
+            LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXCEPTION_CAUGHT, "Attacker is not a mob-type, rather is a " + map.getMapObject(oid).getClass().getName() + " entity.");
             return;
          }
       }

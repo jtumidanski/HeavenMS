@@ -10,6 +10,7 @@ import config.YamlConfig;
 import constants.net.OpcodeConstants;
 import net.server.coordinator.session.MapleSessionCoordinator;
 import tools.HexTool;
+import tools.LogType;
 import tools.LoggerOriginator;
 import tools.LoggerUtil;
 import tools.MapleAESOFB;
@@ -64,7 +65,7 @@ public class MaplePacketDecoder extends CumulativeProtocolDecoder {
                   System.out.println("UnknownPacket:" + SendTo);
                }
             } else {
-               LoggerUtil.printInfo(LoggerOriginator.PACKET_STREAM, MapleSessionCoordinator.getSessionRemoteAddress(session) + HexTool.toString(new byte[]{decryptedPacket[0], decryptedPacket[1]}) + "...");
+               LoggerUtil.printInfo(LoggerOriginator.ENGINE, LogType.PACKET_STREAM, MapleSessionCoordinator.getSessionRemoteAddress(session) + HexTool.toString(new byte[]{decryptedPacket[0], decryptedPacket[1]}) + "...");
             }
          }
          return true;

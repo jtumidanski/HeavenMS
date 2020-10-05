@@ -11,6 +11,7 @@ import java.util.Map;
 import client.MapleCharacter;
 import config.YamlConfig;
 import net.server.Server;
+import tools.LogType;
 import tools.LoggerOriginator;
 import tools.LoggerUtil;
 import tools.StringUtil;
@@ -59,7 +60,7 @@ public class AutoBanManager {
       }
       if (YamlConfig.config.server.USE_AUTOBAN_LOG) {
          // Lets log every single point too.
-         LoggerUtil.printInfo(LoggerOriginator.AUTOBAN_WARNING, StringUtil.makeMapleReadable(chr.getName()) + " caused " + fac.name() + " " + reason);
+         LoggerUtil.printInfo(LoggerOriginator.ENGINE, LogType.AUTOBAN_WARNING, StringUtil.makeMapleReadable(chr.getName()) + " caused " + fac.name() + " " + reason);
       }
    }
 
@@ -117,7 +118,7 @@ public class AutoBanManager {
             if (YamlConfig.config.server.USE_AUTOBAN) {
                chr.getClient().disconnect(false, false);
             }
-            LoggerUtil.printError(LoggerOriginator.EXPLOITS, "Player " + chr + " was caught spamming TYPE " + type + " and has been disconnected.");
+            LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXPLOITS, "Player " + chr + " was caught spamming TYPE " + type + " and has been disconnected.");
          }
       } else {
          this.timestamp[type] = time;

@@ -5,6 +5,7 @@ import client.MapleClient;
 import client.command.Command;
 import net.server.Server;
 import tools.I18nMessage;
+import tools.LogType;
 import tools.LoggerOriginator;
 import tools.LoggerUtil;
 import tools.MessageBroadcaster;
@@ -30,7 +31,7 @@ public class ReportBugCommand extends Command {
       String message = player.getLastCommandMessage();
       Server.getInstance().broadcastGMMessage(c.getWorld(), PacketCreator.create(new YellowTip("[Bug]:" + StringUtil.makeMapleReadable(player.getName()) + ": " + message)));
       MessageBroadcaster.getInstance().sendWorldServerNotice(c.getWorld(), ServerNoticeType.POP_UP, MapleCharacter::isGM, SimpleMessage.from(message));
-      LoggerUtil.printError(LoggerOriginator.COMMAND_BUG, StringUtil.makeMapleReadable(player.getName()) + ": " + message);
+      LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.COMMAND_BUG, StringUtil.makeMapleReadable(player.getName()) + ": " + message);
       MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("REPORT_BUG_COMMAND_MESSAGE_LOOPBACK").with(message));
 
    }

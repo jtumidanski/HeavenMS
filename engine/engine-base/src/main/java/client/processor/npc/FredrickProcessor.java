@@ -30,6 +30,7 @@ import net.server.world.World;
 import server.MapleItemInformationProvider;
 import server.maps.MapleHiredMerchant;
 import tools.I18nMessage;
+import tools.LogType;
 import tools.LoggerOriginator;
 import tools.LoggerUtil;
 import tools.MessageBroadcaster;
@@ -198,7 +199,7 @@ public class FredrickProcessor {
                   Item item = it.getLeft();
                   MapleInventoryManipulator.addFromDrop(chr.getClient(), item, false);
                   String itemName = MapleItemInformationProvider.getInstance().getName(item.id());
-                  LoggerUtil.printInfo(LoggerOriginator.FREDRICK, chr.getName() + " gained " + item.quantity() + " " + itemName + " (" + item.id() + ")");
+                  LoggerUtil.printInfo(LoggerOriginator.ENGINE, LogType.FREDRICK, chr.getName() + " gained " + item.quantity() + " " + itemName + " (" + item.id() + ")");
                }
 
                PacketCreator.announce(chr, new FredrickMessage((byte) 0x1E));

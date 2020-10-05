@@ -90,6 +90,7 @@ import server.processor.maps.MapleMapObjectProcessor;
 import server.processor.maps.MapleMapObjectTypeProcessor;
 import server.processor.maps.MapleMapProcessor;
 import tools.I18nMessage;
+import tools.LogType;
 import tools.LoggerOriginator;
 import tools.LoggerUtil;
 import tools.MasterBroadcaster;
@@ -1857,7 +1858,7 @@ public class MapleMap {
          } else if (monster.id() == 9400326 || monster.id() == 9400331 || monster.id() == 9400336) {
             monsterItemDrop(monster, monster.getDropPeriodTime());
          } else {
-            LoggerUtil.printError(LoggerOriginator.UNHANDLED_EVENT, "UNCODED TIMED MOB DETECTED: " + monster.id());
+            LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.UNHANDLED_EVENT, "UNCODED TIMED MOB DETECTED: " + monster.id());
          }
       }
 
@@ -1932,7 +1933,7 @@ public class MapleMap {
    public MaplePortal getDoorPortal(int doorId) {
       MaplePortal doorPortal = portals.get(0x80 + doorId);
       if (doorPortal == null) {
-         LoggerUtil.printError(LoggerOriginator.EXCEPTION, "[Door] " + mapName + "(" + mapId + ") does not contain door portal id " + doorId);
+         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXCEPTION, "[Door] " + mapName + "(" + mapId + ") does not contain door portal id " + doorId);
          return portals.get(0x80);
       }
 

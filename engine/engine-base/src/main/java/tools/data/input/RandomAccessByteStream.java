@@ -3,6 +3,7 @@ package tools.data.input;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
+import tools.LogType;
 import tools.LoggerOriginator;
 import tools.LoggerUtil;
 
@@ -54,7 +55,7 @@ public class RandomAccessByteStream implements SeekableInputStreamBytestream {
       try {
          return raf.length() - raf.getFilePointer();
       } catch (IOException e) {
-         LoggerUtil.printError(LoggerOriginator.EXCEPTION, e);
+         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXCEPTION, e);
          return 0;
       }
    }

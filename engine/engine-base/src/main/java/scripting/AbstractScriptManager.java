@@ -9,6 +9,7 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
 import client.MapleClient;
+import tools.LogType;
 import tools.LoggerOriginator;
 import tools.LoggerUtil;
 
@@ -53,7 +54,7 @@ public abstract class AbstractScriptManager {
       try (FileReader fr = new FileReader(scriptFile)) {
          engine.eval(fr);
       } catch (final ScriptException | IOException t) {
-         LoggerUtil.printError(LoggerOriginator.INVOCABLE, t, path);
+         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.INVOCABLE, t, path);
          return null;
       }
       return engine;

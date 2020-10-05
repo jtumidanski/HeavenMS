@@ -18,6 +18,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import net.server.audit.locks.MonitoredLockType;
 import server.TimerManager;
+import tools.LogType;
 import tools.LoggerOriginator;
 import tools.LoggerUtil;
 
@@ -123,8 +124,8 @@ public class ThreadTracker {
                            DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
                            dateFormat.setTimeZone(TimeZone.getDefault());
                            String df = dateFormat.format(new Date());
-                           LoggerUtil.printInfo(LoggerOriginator.DEADLOCK_LOCKS, printThreadLog(tt, df));
-                           LoggerUtil.printInfo(LoggerOriginator.DEADLOCK_STACK, printThreadStack(ste, df));
+                           LoggerUtil.printInfo(LoggerOriginator.ENGINE, LogType.DEADLOCK_LOCKS, printThreadLog(tt, df));
+                           LoggerUtil.printInfo(LoggerOriginator.ENGINE, LogType.DEADLOCK_STACK, printThreadStack(ste, df));
                         }
                      }
                   }
@@ -163,7 +164,7 @@ public class ThreadTracker {
             } else {    // print status
                DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
                dateFormat.setTimeZone(TimeZone.getDefault());
-               LoggerUtil.printError(LoggerOriginator.DEADLOCK_STATE, printThreadTrackerState(dateFormat.format(new Date())));
+               LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.DEADLOCK_STATE, printThreadTrackerState(dateFormat.format(new Date())));
             }
          } else {
             long tid = Thread.currentThread().getId();

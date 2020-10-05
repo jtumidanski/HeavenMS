@@ -52,6 +52,7 @@ import server.quest.requirements.NpcRequirement;
 import server.quest.requirements.PetRequirement;
 import server.quest.requirements.QuestRequirement;
 import server.quest.requirements.ScriptRequirement;
+import tools.LogType;
 import tools.LoggerOriginator;
 import tools.LoggerUtil;
 import tools.PacketCreator;
@@ -115,7 +116,7 @@ public class MapleQuest {
                medals.put(this.id, medalId);
             }
          } else {
-            LoggerUtil.printError(LoggerOriginator.QUEST, "no data " + id);
+            LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.QUEST, "no data " + id);
          }
       }
 

@@ -10,6 +10,7 @@ import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
 import net.server.Server;
+import tools.LogType;
 import tools.LoggerOriginator;
 import tools.LoggerUtil;
 
@@ -124,7 +125,7 @@ public class TimerManager implements TimerManagerMBean {
          try {
             r.run();
          } catch (Throwable t) {
-            LoggerUtil.printError(LoggerOriginator.EXCEPTION_CAUGHT, t);
+            LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXCEPTION_CAUGHT, t);
          }
       }
    }

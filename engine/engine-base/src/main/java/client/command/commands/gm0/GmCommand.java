@@ -5,6 +5,7 @@ import client.MapleClient;
 import client.command.Command;
 import net.server.Server;
 import tools.I18nMessage;
+import tools.LogType;
 import tools.LoggerOriginator;
 import tools.LoggerUtil;
 import tools.MessageBroadcaster;
@@ -30,7 +31,7 @@ public class GmCommand extends Command {
       String message = player.getLastCommandMessage();
       Server.getInstance().broadcastGMMessage(c.getWorld(), PacketCreator.create(new YellowTip("[GM Message]:" + StringUtil.makeMapleReadable(player.getName()) + ": " + message)));
       MessageBroadcaster.getInstance().sendWorldServerNotice(c.getWorld(), ServerNoticeType.POP_UP, MapleCharacter::isGM, SimpleMessage.from(message));
-      LoggerUtil.printError(LoggerOriginator.COMMAND_GM, StringUtil.makeMapleReadable(player.getName()) + ": " + message);
+      LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.COMMAND_GM, StringUtil.makeMapleReadable(player.getName()) + ": " + message);
       MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("GM_COMMAND_MESSAGE_LOOPBACK").with(message));
       MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("GM_COMMAND_TIP_" + Randomizer.nextInt(5)));
    }

@@ -14,6 +14,7 @@ import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import config.YamlConfig;
 import net.server.coordinator.world.MapleInviteCoordinator;
+import tools.LogType;
 import tools.LoggerOriginator;
 import tools.LoggerUtil;
 import tools.PacketCreator;
@@ -88,7 +89,7 @@ public class MapleTrade {
          throw new RuntimeException("Trade is locked.");
       }
       if (meso < 0) {
-         LoggerUtil.printError(LoggerOriginator.EXPLOITS, "[Hack] " + owner.getName() + " Trying to trade < 0 mesos");
+         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXPLOITS, "[Hack] " + owner.getName() + " Trying to trade < 0 mesos");
          return;
       }
       if (owner.getMeso() >= meso) {

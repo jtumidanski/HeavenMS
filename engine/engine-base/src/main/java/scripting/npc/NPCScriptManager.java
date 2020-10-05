@@ -12,6 +12,7 @@ import client.MapleClient;
 import net.server.world.MaplePartyCharacter;
 import scripting.AbstractScriptManager;
 import server.ScriptedItem;
+import tools.LogType;
 import tools.LoggerOriginator;
 import tools.LoggerUtil;
 import tools.MessageBroadcaster;
@@ -87,7 +88,7 @@ public class NPCScriptManager extends AbstractScriptManager {
          }
 
       } catch (final Exception ute) {
-         LoggerUtil.printError(LoggerOriginator.NPC, ute, String.format("NPC [%d]", npc));
+         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.NPC, ute, String.format("NPC [%d]", npc));
          dispose(c);
       }
    }
@@ -136,7 +137,7 @@ public class NPCScriptManager extends AbstractScriptManager {
          }
          return true;
       } catch (final Exception ute) {
-         LoggerUtil.printError(LoggerOriginator.NPC, ute, String.format("NPC [%d]", npc));
+         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.NPC, ute, String.format("NPC [%d]", npc));
          dispose(c);
 
          return false;
@@ -151,7 +152,7 @@ public class NPCScriptManager extends AbstractScriptManager {
             ((Invocable) iv).invokeFunction("action", mode, type, selection);
          } catch (ScriptException | NoSuchMethodException t) {
             if (getCM(c) != null) {
-               LoggerUtil.printError(LoggerOriginator.NPC, t, String.format("NPC [%d]", getCM(c).getNpc()));
+               LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.NPC, t, String.format("NPC [%d]", getCM(c).getNpc()));
             }
             dispose(c);
          }

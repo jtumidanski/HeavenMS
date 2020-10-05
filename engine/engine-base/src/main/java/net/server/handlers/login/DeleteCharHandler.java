@@ -7,6 +7,7 @@ import client.processor.CharacterProcessor;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.reader.DeleteCharacterReader;
 import net.server.login.packet.DeleteCharacterPacket;
+import tools.LogType;
 import tools.LoggerOriginator;
 import tools.LoggerUtil;
 import tools.PacketCreator;
@@ -30,7 +31,7 @@ public final class DeleteCharHandler extends AbstractPacketHandler<DeleteCharact
          }
 
          if (client.deleteCharacter(packet.characterId(), client.getAccID())) {
-            LoggerUtil.printInfo(LoggerOriginator.DELETED_CHAR, client.getAccountName() + " deleted CID: " + packet.characterId());
+            LoggerUtil.printInfo(LoggerOriginator.ENGINE, LogType.DELETED_CHAR, client.getAccountName() + " deleted CID: " + packet.characterId());
             PacketCreator.announce(client, new DeleteCharacter(packet.characterId(), DeleteCharacterResponse.SUCCESS));
          } else {
             PacketCreator.announce(client, new DeleteCharacter(packet.characterId(), DeleteCharacterResponse.UNKNOWN_ERROR));

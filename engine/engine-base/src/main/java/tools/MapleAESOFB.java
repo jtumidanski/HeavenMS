@@ -37,9 +37,9 @@ public class MapleAESOFB {
          cipher = Cipher.getInstance("AES");
          cipher.init(Cipher.ENCRYPT_MODE, skey);
       } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
-         LoggerUtil.printError(LoggerOriginator.EXCEPTION, e);
+         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXCEPTION, e);
       } catch (InvalidKeyException e) {
-         LoggerUtil.printError(LoggerOriginator.EXCEPTION, "Error initializing the encryption cipher.  Make sure you're using the Unlimited Strength cryptography jar files.");
+         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXCEPTION, "Error initializing the encryption cipher.  Make sure you're using the Unlimited Strength cryptography jar files.");
       }
       this.setIv(iv);
       this.mapleVersion = (short) (((mapleVersion >> 8) & 0xFF) | ((mapleVersion << 8) & 0xFF00));

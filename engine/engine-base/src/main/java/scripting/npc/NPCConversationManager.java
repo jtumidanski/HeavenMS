@@ -62,6 +62,7 @@ import server.partyquest.Pyramid.PyramidMode;
 import server.processor.MapleShopProcessor;
 import tools.I18nMessage;
 import tools.LogHelper;
+import tools.LogType;
 import tools.LoggerOriginator;
 import tools.LoggerUtil;
 import tools.MasterBroadcaster;
@@ -391,7 +392,7 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
       if (shop != null) {
          MapleShopProcessor.getInstance().sendShop(shop, c);
       } else {
-         LoggerUtil.printError(LoggerOriginator.NPC_UNCODED, "Shop ID: " + id + " is missing from database.");
+         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.NPC_UNCODED, "Shop ID: " + id + " is missing from database.");
          MapleShopProcessor.getInstance().sendShop(MapleShopFactory.getInstance().getShop(11000), c);
       }
    }

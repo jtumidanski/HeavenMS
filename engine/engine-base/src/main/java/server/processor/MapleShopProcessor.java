@@ -18,6 +18,7 @@ import database.provider.ShopProvider;
 import server.MapleItemInformationProvider;
 import server.MapleShop;
 import server.MapleShopItem;
+import tools.LogType;
 import tools.LoggerOriginator;
 import tools.LoggerUtil;
 import tools.PacketCreator;
@@ -108,7 +109,7 @@ public class MapleShopProcessor {
       Optional<MapleShopItem> itemResult = shop.findBySlot(slot);
       if (itemResult.isPresent()) {
          if (itemResult.get().itemId() != itemId) {
-            LoggerUtil.printError(LoggerOriginator.EXCEPTION, "Wrong slot number in shop " + shop.id());
+            LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXCEPTION, "Wrong slot number in shop " + shop.id());
             return;
          }
       } else {

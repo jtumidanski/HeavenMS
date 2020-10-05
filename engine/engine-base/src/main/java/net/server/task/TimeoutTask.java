@@ -5,6 +5,7 @@ import java.util.Collection;
 import client.MapleCharacter;
 import config.YamlConfig;
 import net.server.world.World;
+import tools.LogType;
 import tools.LoggerOriginator;
 import tools.LoggerUtil;
 
@@ -15,7 +16,7 @@ public class TimeoutTask extends BaseTask implements Runnable {
       Collection<MapleCharacter> chars = world.getPlayerStorage().getAllCharacters();
       for (MapleCharacter chr : chars) {
          if (time - chr.getClient().getLastPacket() > YamlConfig.config.server.TIMEOUT_DURATION) {
-            LoggerUtil.printInfo(LoggerOriginator.DCS, chr.getName() + " auto-disconnected due to inactivity.");
+            LoggerUtil.printInfo(LoggerOriginator.ENGINE, LogType.DCS, chr.getName() + " auto-disconnected due to inactivity.");
             chr.getClient().disconnect(true, chr.getCashShop().isOpened());
          }
       }

@@ -9,6 +9,7 @@ import net.server.channel.packet.reader.FieldDamageMobReader;
 import server.life.MapleMonster;
 import server.life.MapleMonsterInformationProvider;
 import server.maps.MapleMap;
+import tools.LogType;
 import tools.LoggerOriginator;
 import tools.LoggerUtil;
 import tools.MasterBroadcaster;
@@ -26,7 +27,7 @@ public class FieldDamageMobHandler extends AbstractPacketHandler<FieldDamageMobP
       MapleMap map = chr.getMap();
 
       if (map.getEnvironment().isEmpty()) {   // no environment objects activated to actually hit the mob
-         LoggerUtil.printError(LoggerOriginator.EXPLOITS, client.getPlayer().getName() + " tried to use an obstacle on map id " + map.getId() + " to attack.");
+         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXPLOITS, client.getPlayer().getName() + " tried to use an obstacle on map id " + map.getId() + " to attack.");
          return;
       }
 
@@ -35,7 +36,7 @@ public class FieldDamageMobHandler extends AbstractPacketHandler<FieldDamageMobP
 
          if (packet.damage() < 0 || packet.damage() > GameConstants.MAX_FIELD_MOB_DAMAGE) {
             MasterBroadcaster.getInstance().sendToAllInMap(map, new DamageMonster(packet.mobId(), packet.damage()), true, chr);
-            LoggerUtil.printError(LoggerOriginator.EXPLOITS, client.getPlayer().getName() + " tried to use an obstacle on map id " + map.getId() + " to attack " + MapleMonsterInformationProvider.getInstance().getMobNameFromId(mob.id()) + " with damage " + packet.damage());
+            LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXPLOITS, client.getPlayer().getName() + " tried to use an obstacle on map id " + map.getId() + " to attack " + MapleMonsterInformationProvider.getInstance().getMobNameFromId(mob.id()) + " with damage " + packet.damage());
             return;
          }
       }

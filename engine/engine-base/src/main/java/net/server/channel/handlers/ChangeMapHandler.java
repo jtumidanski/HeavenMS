@@ -15,6 +15,7 @@ import server.MapleTradeResult;
 import server.maps.MapleMap;
 import server.maps.MaplePortal;
 import server.processor.MapleTradeProcessor;
+import tools.LogType;
 import tools.LoggerOriginator;
 import tools.LoggerUtil;
 import tools.PacketCreator;
@@ -37,7 +38,7 @@ public final class ChangeMapHandler extends AbstractPacketHandler<ChangeMapPacke
 
       if (chr.isChangingMaps() || chr.isBanned()) {
          if (chr.isChangingMaps()) {
-            LoggerUtil.printError(LoggerOriginator.PORTAL_STUCK, "Player " + chr.getName() + " got stuck when changing maps. Timestamp: " + Calendar.getInstance().getTime().toString() + " Last visited map ids: " + chr.getLastVisitedMapIds());
+            LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.PORTAL_STUCK, "Player " + chr.getName() + " got stuck when changing maps. Timestamp: " + Calendar.getInstance().getTime().toString() + " Last visited map ids: " + chr.getLastVisitedMapIds());
          }
 
          PacketCreator.announce(client, new EnableActions());

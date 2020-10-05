@@ -22,7 +22,7 @@ public class LogHelper {
       //Trade 2 to trade 1
       logTrade(trade2, name2, name1, log);
       log.append("\r\n\r\n");
-      LoggerUtil.printInfo(LoggerOriginator.LOG_TRADE, log.toString());
+      LoggerUtil.printInfo(LoggerOriginator.ENGINE, LogType.LOG_TRADE, log.toString());
    }
 
    protected static void logTrade(MapleTrade trade1, String name1, String name2, StringBuilder log) {
@@ -47,7 +47,7 @@ public class LogHelper {
          log.append(message);
       }
       log.append("\r\n");
-      LoggerUtil.printInfo(LoggerOriginator.LOG_EXPEDITION, log.toString());
+      LoggerUtil.printInfo(LoggerOriginator.ENGINE, LogType.LOG_EXPEDITION, log.toString());
    }
 
    public static String getTimeString(long then) {
@@ -60,19 +60,19 @@ public class LogHelper {
    public static void logLeaf(MapleCharacter player, boolean gotPrize, String operation) {
       String timeStamp = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss").format(new Date());
       String log = player.getName() + (gotPrize ? " used a maple leaf to buy " + operation : " redeemed " + operation + " VP for a leaf") + " - " + timeStamp;
-      LoggerUtil.printInfo(LoggerOriginator.LOG_LEAF, log);
+      LoggerUtil.printInfo(LoggerOriginator.ENGINE, LogType.LOG_LEAF, log);
    }
 
    public static void logGachapon(MapleCharacter player, int itemId, String map) {
       String itemName = MapleItemInformationProvider.getInstance().getName(itemId);
       String timeStamp = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss").format(new Date());
       String log = player.getName() + " got a " + itemName + "(" + itemId + ") from the " + map + " gachapon. - " + timeStamp;
-      LoggerUtil.printInfo(LoggerOriginator.LOG_GACHAPON, log);
+      LoggerUtil.printInfo(LoggerOriginator.ENGINE, LogType.LOG_GACHAPON, log);
    }
 
    public static void logChat(MapleClient player, String chatType, String text) {
       SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm");
-      LoggerUtil.printInfo(LoggerOriginator.LOG_CHAT, "[" + sdf.format(Calendar.getInstance().getTime()) + "] (" + chatType + ") " + player.getPlayer().getName() + ": " + text);
+      LoggerUtil.printInfo(LoggerOriginator.ENGINE, LogType.LOG_CHAT, "[" + sdf.format(Calendar.getInstance().getTime()) + "] (" + chatType + ") " + player.getPlayer().getName() + ": " + text);
    }
 
 }

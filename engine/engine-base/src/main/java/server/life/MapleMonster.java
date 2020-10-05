@@ -60,6 +60,7 @@ import server.maps.MapleSummon;
 import server.processor.maps.MapleMapObjectProcessor;
 import tools.I18nMessage;
 import tools.IntervalBuilder;
+import tools.LogType;
 import tools.LoggerOriginator;
 import tools.LoggerUtil;
 import tools.MasterBroadcaster;
@@ -835,7 +836,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
             }, getAnimationTime("die1"));
          }
       } else {  // is this even necessary?
-         LoggerUtil.printError(LoggerOriginator.EXCEPTION, "[CRITICAL LOSS] toSpawn is null for " + this.getName());
+         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXCEPTION, "[CRITICAL LOSS] toSpawn is null for " + this.getName());
       }
 
       MapleCharacter looter = map.getCharacterById(getCharacterIdWithHighestDamage());
@@ -1130,7 +1131,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
          case WEAK:
             break;
          default: {
-            LoggerUtil.printError(LoggerOriginator.EXCEPTION, "Unknown elemental effectiveness: " + getMonsterEffectiveness(status.getSkill().getElement()));
+            LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXCEPTION, "Unknown elemental effectiveness: " + getMonsterEffectiveness(status.getSkill().getElement()));
             return false;
          }
       }

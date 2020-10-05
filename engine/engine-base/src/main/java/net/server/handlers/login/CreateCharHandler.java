@@ -9,6 +9,7 @@ import client.creator.CharacterFactory;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.reader.CreateCharacterReader;
 import net.server.login.packet.CreateCharacterPacket;
+import tools.LogType;
 import tools.LoggerOriginator;
 import tools.LoggerUtil;
 import tools.PacketCreator;
@@ -26,7 +27,7 @@ public final class CreateCharHandler extends AbstractPacketHandler<CreateCharact
       int[] items = new int[]{packet.weapon(), packet.top(), packet.bottom(), packet.shoes(), packet.hair(), packet.face()};
       for (int item : items) {
          if (!isLegal(item)) {
-            LoggerUtil.printError(LoggerOriginator.EXPLOITS, "Owner from account '" + client.getAccountName() + "' tried to packet edit in char creation.");
+            LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXPLOITS, "Owner from account '" + client.getAccountName() + "' tried to packet edit in char creation.");
             client.disconnect(true, false);
             return;
          }

@@ -73,6 +73,7 @@ import tools.BCrypt;
 import tools.HexTool;
 import tools.I18nMessage;
 import tools.LogHelper;
+import tools.LogType;
 import tools.LoggerOriginator;
 import tools.LoggerUtil;
 import tools.MapleAESOFB;
@@ -343,7 +344,7 @@ public class MapleClient {
       } else {
          accId = accountData.get().id();
          if (accId <= 0) {
-            LoggerUtil.printError(LoggerOriginator.LOGIN_EXCEPTION, "Tried to login with account id " + accId);
+            LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.LOGIN_EXCEPTION, "Tried to login with account id " + accId);
             return 15;
          }
 
@@ -565,7 +566,7 @@ public class MapleClient {
          }
 
       } catch (final Throwable t) {
-         LoggerUtil.printError(LoggerOriginator.ACCOUNT_STUCK, t);
+         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.ACCOUNT_STUCK, t);
       }
    }
 
@@ -624,7 +625,7 @@ public class MapleClient {
                }
             }
          } catch (final Exception e) {
-            LoggerUtil.printError(LoggerOriginator.ACCOUNT_STUCK, e);
+            LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.ACCOUNT_STUCK, e);
          } finally {
             if (!this.serverTransition) {
                MapleGuildCharacter guildCharacter = player.getMGC();
@@ -829,7 +830,7 @@ public class MapleClient {
       for (World w : Server.getInstance().getWorlds()) {
          for (MapleCharacter chr : w.getPlayerStorage().getAllCharacters()) {
             if (accountId == chr.getAccountID()) {
-               LoggerUtil.printError(LoggerOriginator.EXPLOITS, "Player:  " + chr.getName() + " has been removed from " + GameConstants.WORLD_NAMES[w.getId()] + ". Possible Dupe attempt.");
+               LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXPLOITS, "Player:  " + chr.getName() + " has been removed from " + GameConstants.WORLD_NAMES[w.getId()] + ". Possible Dupe attempt.");
                chr.getClient().forceDisconnect();
                w.getPlayerStorage().removePlayer(chr.getId());
             }
