@@ -18,6 +18,8 @@ import server.maps.MapleMap;
 import server.maps.MapleMapObject;
 import server.maps.MapleMapObjectType;
 import server.processor.MobSkillProcessor;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 import tools.MasterBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
@@ -141,7 +143,7 @@ public final class MoveLifeHandler extends AbstractMoveHandler<MoveLifePacket> {
 
       if (packet.hasMovement()) {
          if (YamlConfig.config.server.USE_DEBUG_SHOW_RCVD_MVLIFE) {
-            System.out.println((isSkill ? "SKILL " : (isAttack ? "ATTACK " : " ")) + "castPos: " + castPos + " rawAct: " + rawActivity + " opt: " + pOption + " skillID: " + useSkillId + " skillLV: " + useSkillLevel + " " + "allowSkill: " + nextMovementCouldBeSkill + " mobMp: " + mobMp);
+            LoggerUtil.printDebug(LoggerOriginator.ENGINE, (isSkill ? "SKILL " : (isAttack ? "ATTACK " : " ")) + "castPos: " + castPos + " rawAct: " + rawActivity + " opt: " + pOption + " skillID: " + useSkillId + " skillLV: " + useSkillLevel + " " + "allowSkill: " + nextMovementCouldBeSkill + " mobMp: " + mobMp);
          }
          PacketInput movePacket = new MoveMonster(packet.objectId(), nextMovementCouldBeSkill, rawActivity, useSkillId, useSkillLevel, pOption, startPos, packet.movementList());
          MasterBroadcaster.getInstance().sendToAllInMapRange(map, movePacket, player, serverStartPos);

@@ -13,6 +13,9 @@ import net.server.channel.packet.guild.InviteToGuildPacket;
 import net.server.channel.packet.guild.JoinGuildPacket;
 import net.server.channel.packet.guild.LeaveGuildPacket;
 import net.server.channel.packet.guild.ShowGuildInformationPacket;
+import tools.LogType;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 public class GuildOperationReader implements PacketReader<BaseGuildOperationPacket> {
@@ -43,7 +46,7 @@ public class GuildOperationReader implements PacketReader<BaseGuildOperationPack
          case 0x1E:
             return readMatch(accessor, type);
          default:
-            System.out.println("Unhandled GUILD_OPERATION packet: \n" + accessor.toString());
+            LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.UNHANDLED_EVENT, "Unhandled GUILD_OPERATION packet: \n" + accessor.toString());
       }
 
       return new BaseGuildOperationPacket(type);

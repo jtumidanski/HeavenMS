@@ -11,8 +11,6 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ScheduledFuture;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.script.ScriptException;
 
 import client.MapleCharacter;
@@ -44,6 +42,9 @@ import server.maps.MapleMap;
 import server.maps.MapleMapManager;
 import server.maps.MaplePortal;
 import server.maps.MapleReactor;
+import tools.LogType;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 import tools.MasterBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
@@ -277,7 +278,7 @@ public class EventInstanceManager {
          try {
             invokeScriptFunction("scheduledTimeout", EventInstanceManager.this);
          } catch (ScriptException | NoSuchMethodException ex) {
-            Logger.getLogger(EventManager.class.getName()).log(Level.SEVERE, "Event '" + em.getName() + "' does not implement scheduledTimeout function.", ex);
+            LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXCEPTION, ex, "Event '" + em.getName() + "' does not implement scheduledTimeout function.");
          }
       }, time);
    }
@@ -357,7 +358,7 @@ public class EventInstanceManager {
       try {
          invokeScriptFunction("playerUnregistered", EventInstanceManager.this, chr);
       } catch (ScriptException | NoSuchMethodException ex) {
-         Logger.getLogger(EventManager.class.getName()).log(Level.SEVERE, "Event '" + em.getName() + "' does not implement playerUnregistered function.", ex);
+         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXCEPTION, ex, "Event '" + em.getName() + "' does not implement playerUnregistered function.");
       }
 
       wL.lock();

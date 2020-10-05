@@ -35,6 +35,9 @@ import server.maps.MapleReactor;
 import server.maps.ReactorDropEntry;
 import server.partyquest.MapleCarnivalFactory;
 import server.partyquest.MapleCarnivalFactory.MCSkill;
+import tools.LogType;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 import tools.MasterBroadcaster;
 import tools.packet.monster.DamageMonster;
 
@@ -309,7 +312,7 @@ public class ReactorActionManager extends AbstractPlayerInteraction {
          try {
             ((Invocable) iv).invokeFunction(methodName, eim);
          } catch (ScriptException | NoSuchMethodException ex) {
-            Logger.getLogger(EventManager.class.getName()).log(Level.SEVERE, null, ex);
+            LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.REACTOR, ex);
          }
       }, delay);
    }
@@ -319,7 +322,7 @@ public class ReactorActionManager extends AbstractPlayerInteraction {
          try {
             ((Invocable) iv).invokeFunction(methodName, (Object) null);
          } catch (ScriptException | NoSuchMethodException ex) {
-            Logger.getLogger(EventManager.class.getName()).log(Level.SEVERE, null, ex);
+            LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.REACTOR, ex);
          }
       }, timestamp);
    }

@@ -165,7 +165,7 @@ public class MapleServerHandler extends IoHandlerAdapter {
       final MaplePacketHandler packetHandler = processor.getHandler(packetId);
 
       if (YamlConfig.config.server.USE_DEBUG_SHOW_RCVD_PACKET && !ignoredDebugRecvPackets.contains(packetId)) {
-         System.out.println("Received packet id " + packetId);
+         LoggerUtil.printDebug(LoggerOriginator.ENGINE, "Received packet id " + packetId);
       }
 
       if (packetHandler != null && packetHandler.validateState(client)) {

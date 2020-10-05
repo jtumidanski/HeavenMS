@@ -208,11 +208,8 @@ public class MapleInventory implements Iterable<Item> {
          for (Integer itValue : it.getValue()) {
             int usedSlots = typesSlotsUsed.get(itemType);
 
-            //System.out.print("inserting " + itemId.intValue() + " with type " + itemType + " qty " + it.getValue() + " owner '" + rcvOwners.get(it.getKey()) + "' current usedSlots:");
-            //for(Integer i : typesSlotsUsed) System.out.print(" " + i);
             int result = MapleInventoryManipulator.checkSpaceProgressively(c, itemId, itValue, rcvOwners.get(it.getKey()), usedSlots, useProofInv);
             boolean hasSpace = ((result % 2) != 0);
-            //System.out.print(" -> hasSpace: " + hasSpace + " RESULT : " + result + "\n");
 
             if (!hasSpace) {
                return false;
@@ -577,7 +574,6 @@ public class MapleInventory implements Iterable<Item> {
    public boolean isFull(int margin) {
       lock.lock();
       try {
-         //System.out.print("(" + inventory.size() + " " + margin + " <> " + slotLimit + ")");
          return inventory.size() + margin >= slotLimit;
       } finally {
          lock.unlock();
@@ -587,7 +583,6 @@ public class MapleInventory implements Iterable<Item> {
    public boolean isFullAfterSomeItems(int margin, int used) {
       lock.lock();
       try {
-         //System.out.print("(" + inventory.size() + " " + margin + " <> " + slotLimit + " -" + used + ")");
          return inventory.size() + margin >= slotLimit - used;
       } finally {
          lock.unlock();

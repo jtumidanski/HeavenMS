@@ -52,8 +52,7 @@ public class EventScriptManager extends AbstractScriptManager {
             ((ScriptEngine) entry.getInvocable()).put("em", entry.getEventManager());
             entry.getInvocable().invokeFunction("init");
          } catch (Exception ex) {
-            Logger.getLogger(EventScriptManager.class.getName()).log(Level.SEVERE, null, ex);
-            LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXCEPTION, "Error on script: " + entry.getEventManager().getName());
+            LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXCEPTION, ex, "Error on script: " + entry.getEventManager().getName());
          }
       }
       active = events.size() > 1; // boot up loads only 1 script

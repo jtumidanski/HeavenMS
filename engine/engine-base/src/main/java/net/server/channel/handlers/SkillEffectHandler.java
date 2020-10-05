@@ -21,6 +21,9 @@ import constants.skills.WindArcher;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.SkillEffectPacket;
 import net.server.channel.packet.reader.SkillEffectReader;
+import tools.LogType;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 import tools.MasterBroadcaster;
 import tools.packet.foreigneffect.ShowSkillEffect;
 
@@ -39,7 +42,7 @@ public final class SkillEffectHandler extends AbstractPacketHandler<SkillEffectP
                NightWalker.POISON_BOMB, ThunderBreaker.CORKSCREW_BLOW, Paladin.MONSTER_MAGNET,
                DarkKnight.MONSTER_MAGNET, Hero.MONSTER_MAGNET, Evan.FIRE_BREATH,
                Evan.ICE_BREATH -> MasterBroadcaster.getInstance().sendToAllInMap(client.getPlayer().getMap(), new ShowSkillEffect(client.getPlayer().getId(), packet.skillId(), packet.level(), packet.flags(), packet.speed(), packet.aids()), false, client.getPlayer());
-         default -> System.out.println(client.getPlayer() + " entered SkillEffectHandler without being handled using " + packet.skillId() + ".");
+         default -> LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXCEPTION, client.getPlayer() + " entered SkillEffectHandler without being handled using " + packet.skillId() + ".");
       }
    }
 }

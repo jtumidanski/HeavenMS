@@ -36,9 +36,9 @@ public class MaplePacketEncoder implements ProtocolEncoder {
                   String Recv = "ServerSend:" + op + " [" + pHeaderStr + "] (" + packetLen + ")\r\n";
                   if (packetLen <= 50000) {
                      String RecvTo = Recv + HexTool.toString(input) + "\r\n" + HexTool.toStringFromAscii(input);
-                     System.out.println(RecvTo);
+                     LoggerUtil.printDebug(LoggerOriginator.ENGINE, RecvTo);
                      if (op == null) {
-                        System.out.println("UnknownPacket:" + RecvTo);
+                        LoggerUtil.printDebug(LoggerOriginator.ENGINE, "UnknownPacket:" + RecvTo);
                      }
                   } else {
                      LoggerUtil.printInfo(LoggerOriginator.ENGINE, LogType.PACKET_STREAM, MapleSessionCoordinator.getSessionRemoteAddress(session) + HexTool.toString(new byte[]{input[0], input[1]}) + " ...");

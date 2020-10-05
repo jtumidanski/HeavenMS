@@ -30,10 +30,13 @@ import net.server.processor.MapleAllianceProcessor;
 import net.server.processor.MapleGuildProcessor;
 import net.server.processor.MaplePartyProcessor;
 import net.server.world.World;
+import tools.I18nMessage;
+import tools.LogType;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
-import tools.I18nMessage;
 import tools.packet.alliance.GetGuildAlliances;
 import tools.packet.guild.GuildMarkChanged;
 import tools.packet.guild.GuildNameChange;
@@ -84,7 +87,7 @@ public final class GuildOperationHandler extends AbstractPacketHandler<BaseGuild
       } else if (packet instanceof GuildMatchPacket) {
          guildMatch(client, mapleCharacter, (GuildMatchPacket) packet);
       } else {
-         System.out.println("Unhandled GUILD_OPERATION packet: \n" + packet.toString());
+         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.UNHANDLED_EVENT, "Unhandled GUILD_OPERATION packet: \n" + packet.toString());
       }
    }
 
@@ -114,7 +117,7 @@ public final class GuildOperationHandler extends AbstractPacketHandler<BaseGuild
    private void changeGuildNotice(MapleCharacter mapleCharacter, ChangeGuildNoticePacket packet) {
       if (mapleCharacter.getGuildId() <= 0 || mapleCharacter.getGuildRank() > 2) {
          if (mapleCharacter.getGuildId() <= 0) {
-            System.out.println("[Hack] " + mapleCharacter.getName() + " tried to change guild notice while not in a guild.");
+            LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXPLOITS, mapleCharacter.getName() + " tried to change guild notice while not in a guild.");
          }
          return;
       }
@@ -127,7 +130,7 @@ public final class GuildOperationHandler extends AbstractPacketHandler<BaseGuild
 
    private void changeGuildEmblem(MapleClient client, MapleCharacter mapleCharacter, ChangeGuildEmblemPacket packet) {
       if (mapleCharacter.getGuildId() <= 0 || mapleCharacter.getGuildRank() != 1 || mapleCharacter.getMapId() != 200000301) {
-         System.out.println("[Hack] " + mapleCharacter.getName() + " tried to change guild emblem without being the guild leader.");
+         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXPLOITS, mapleCharacter.getName() + " tried to change guild emblem without being the guild leader.");
          return;
       }
       if (mapleCharacter.getMeso() < YamlConfig.config.server.CHANGE_EMBLEM_COST) {
@@ -146,7 +149,7 @@ public final class GuildOperationHandler extends AbstractPacketHandler<BaseGuild
 
    private void changeRank(MapleCharacter mapleCharacter, ChangeGuildRankPacket packet) {
       if (mapleCharacter.getGuildRank() > 2 || (packet.rank() <= 2 && mapleCharacter.getGuildRank() != 1) || mapleCharacter.getGuildId() <= 0) {
-         System.out.println("[Hack] " + mapleCharacter.getName() + " is trying to change rank outside of his/her permissions.");
+         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXPLOITS, mapleCharacter.getName() + " is trying to change rank outside of his/her permissions.");
          return;
       }
       if (packet.rank() <= 1 || packet.rank() > 5) {
@@ -157,7 +160,7 @@ public final class GuildOperationHandler extends AbstractPacketHandler<BaseGuild
 
    private void changeRankAndTitle(MapleCharacter mapleCharacter, ChangeGuildRankAndTitlePacket packet) {
       if (mapleCharacter.getGuildId() <= 0 || mapleCharacter.getGuildRank() != 1) {
-         System.out.println("[Hack] " + mapleCharacter.getName() + " tried to change guild rank titles when s/he does not have permission.");
+         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXPLOITS, mapleCharacter.getName() + " tried to change guild rank titles when s/he does not have permission.");
          return;
       }
 
@@ -166,7 +169,7 @@ public final class GuildOperationHandler extends AbstractPacketHandler<BaseGuild
 
    private void expelMember(MapleCharacter mapleCharacter, ExpelFromGuildPacket packet) {
       if (mapleCharacter.getGuildRank() > 2 || mapleCharacter.getGuildId() <= 0) {
-         System.out.println("[Hack] " + mapleCharacter.getName() + " is trying to expel without rank 1 or 2.");
+         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXPLOITS, mapleCharacter.getName() + " is trying to expel without rank 1 or 2.");
          return;
       }
 
@@ -180,7 +183,7 @@ public final class GuildOperationHandler extends AbstractPacketHandler<BaseGuild
 
    private void leaveGuild(MapleClient client, MapleCharacter mapleCharacter, LeaveGuildPacket packet) {
       if (packet.playerId() != mapleCharacter.getId() || !packet.name().equals(mapleCharacter.getName()) || mapleCharacter.getGuildId() <= 0) {
-         System.out.println("[Hack] " + mapleCharacter.getName() + " tried to quit guild under the name \"" + packet.name() + "\" and current guild id of " + mapleCharacter.getGuildId() + ".");
+         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXPLOITS, mapleCharacter.getName() + " tried to quit guild under the name \"" + packet.name() + "\" and current guild id of " + mapleCharacter.getGuildId() + ".");
          return;
       }
 
@@ -201,12 +204,12 @@ public final class GuildOperationHandler extends AbstractPacketHandler<BaseGuild
 
    private void joinGuild(MapleClient client, MapleCharacter mapleCharacter, JoinGuildPacket packet) {
       if (mapleCharacter.getGuildId() > 0) {
-         System.out.println("[Hack] " + mapleCharacter.getName() + " attempted to join a guild when s/he is already in one.");
+         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXPLOITS, mapleCharacter.getName() + " attempted to join a guild when s/he is already in one.");
          return;
       }
 
       if (packet.playerId() != mapleCharacter.getId()) {
-         System.out.println("[Hack] " + mapleCharacter.getName() + " attempted to join a guild with a different character id.");
+         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXPLOITS, mapleCharacter.getName() + " attempted to join a guild with a different character id.");
          return;
       }
 

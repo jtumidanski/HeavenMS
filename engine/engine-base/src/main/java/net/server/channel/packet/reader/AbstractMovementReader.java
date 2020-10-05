@@ -9,6 +9,9 @@ import net.server.MovementData;
 import net.server.PacketReader;
 import net.server.RelativeMovementData;
 import net.server.channel.packet.movement.BaseMovementPacket;
+import tools.LogType;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 import tools.TriFunction;
 import tools.data.input.LittleEndianAccessor;
 import tools.data.input.SeekableLittleEndianAccessor;
@@ -131,7 +134,7 @@ public abstract class AbstractMovementReader<T extends BaseMovementPacket> imple
                break;
             }
             default:
-               System.out.println("Unhandled Case:" + command);
+               LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.UNHANDLED_EVENT, "Unhandled Case:" + command);
          }
       }
       return movementDataList;

@@ -400,11 +400,9 @@ public class MapleInventoryManipulator {
 
          returnValue = ((numSlotsNeeded + usedSlots) << 1);
          returnValue += (numSlotsNeeded == 0 || !inv.isFullAfterSomeItems(numSlotsNeeded - 1, usedSlots)) ? 1 : 0;
-         //System.out.print(" needed " + numSlotsNeeded + " used " + usedSlots + " returnValue " + returnValue);
       } else {
          returnValue = ((quantity + usedSlots) << 1);
          returnValue += (!inv.isFullAfterSomeItems(0, usedSlots)) ? 1 : 0;
-         //System.out.print(" equip needed " + 1 + " used " + usedSlots + " returnValue " + returnValue);
       }
 
       return returnValue;

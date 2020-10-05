@@ -79,6 +79,9 @@ import server.maps.MaplePlayerShopItem;
 import server.maps.MapleTVEffect;
 import server.processor.MapleShopProcessor;
 import tools.I18nMessage;
+import tools.LogType;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
@@ -254,10 +257,10 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
                ((UseVegaSpellPacket) packet).equipSlot(), ((UseVegaSpellPacket) packet).secondCheck(),
                ((UseVegaSpellPacket) packet).useSlot());
       } else if (packet instanceof UseUnhandledPacket) {
-         System.out.println("NEW CASH ITEM: " + itemType + "\n" + ((UseUnhandledPacket) packet).message());
+         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.UNHANDLED_EVENT, "NEW CASH ITEM: " + itemType + "\n" + ((UseUnhandledPacket) packet).message());
          PacketCreator.announce(client, new EnableActions());
       } else {
-         System.out.println("NEW CASH ITEM: " + itemType + "\n");
+         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.UNHANDLED_EVENT, "NEW CASH ITEM: " + itemType + "\n");
          PacketCreator.announce(client, new EnableActions());
       }
    }

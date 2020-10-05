@@ -12,6 +12,9 @@ import server.movement.JumpDownMovement;
 import server.movement.LifeMovementFragment;
 import server.movement.RelativeLifeMovement;
 import server.movement.TeleportMovement;
+import tools.LogType;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 import tools.data.input.LittleEndianAccessor;
 import tools.data.input.SeekableLittleEndianAccessor;
 import tools.exceptions.EmptyMovementException;
@@ -96,7 +99,7 @@ public class PetMovementReader implements PacketReader<PetMovementPacket> {
                accessor.skip(3);
                break;
             default:
-               System.out.println("Unhandled Case:" + command);
+               LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.UNHANDLED_EVENT, "Unhandled Case:" + command);
                throw new EmptyMovementException(accessor);
          }
          if (results.isEmpty()) {

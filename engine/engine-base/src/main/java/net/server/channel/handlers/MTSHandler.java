@@ -8,6 +8,11 @@ import javax.persistence.EntityManager;
 
 import client.MapleCharacter;
 import client.MapleClient;
+import client.inventory.Equip;
+import client.inventory.Item;
+import client.inventory.MapleInventoryType;
+import client.inventory.manipulator.MapleInventoryManipulator;
+import constants.inventory.ItemConstants;
 import database.DatabaseConnection;
 import database.administrator.AccountAdministrator;
 import database.administrator.MtsCartAdministrator;
@@ -15,11 +20,6 @@ import database.administrator.MtsItemAdministrator;
 import database.provider.CharacterProvider;
 import database.provider.MtsCartProvider;
 import database.provider.MtsItemProvider;
-import client.inventory.Equip;
-import client.inventory.Item;
-import client.inventory.MapleInventoryType;
-import client.inventory.manipulator.MapleInventoryManipulator;
-import constants.inventory.ItemConstants;
 import net.server.AbstractPacketHandler;
 import net.server.Server;
 import net.server.channel.Channel;
@@ -42,10 +42,13 @@ import net.server.channel.packet.reader.MTSReader;
 import server.CashShop;
 import server.MTSItemInfo;
 import server.MapleItemInformationProvider;
+import tools.I18nMessage;
+import tools.LogType;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
-import tools.I18nMessage;
 import tools.packet.mtsoperation.GetNotYetSoldMTSInventory;
 import tools.packet.mtsoperation.MTSConfirmBuy;
 import tools.packet.mtsoperation.MTSConfirmSell;
@@ -125,7 +128,7 @@ public final class MTSHandler extends AbstractPacketHandler<BaseMTSPacket> {
          } else if (packet instanceof BuyItemFromCartPacket) {
             buyFromCart(client, ((BuyItemFromCartPacket) packet).itemId());
          } else {
-            System.out.println("Unhandled OP(MTS): " + op + " Packet: " + packet.toString());
+            LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.UNHANDLED_EVENT, "Unhandled OP(MTS): " + op + " Packet: " + packet.toString());
          }
       } else {
          PacketCreator.announce(client, new ShowMTSCash(client.getPlayer().getCashShop().getCash(2), client.getPlayer().getCashShop().getCash(4)));

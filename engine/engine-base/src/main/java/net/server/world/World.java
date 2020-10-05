@@ -78,6 +78,9 @@ import server.maps.AbstractMapleMapObject;
 import server.maps.MapleHiredMerchant;
 import server.maps.MaplePlayerShop;
 import server.maps.MaplePlayerShopItem;
+import tools.LogType;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 import tools.PacketCreator;
 import tools.Pair;
 import tools.packet.message.MultiChat;
@@ -1695,6 +1698,6 @@ public class World {
       players = null;
 
       clearWorldData();
-      System.out.println("Finished shutting down world " + id + "\r\n");
+      LoggerUtil.printInfo(LoggerOriginator.ENGINE, LogType.PROCESS, "Finished shutting down world " + id);
    }
 }

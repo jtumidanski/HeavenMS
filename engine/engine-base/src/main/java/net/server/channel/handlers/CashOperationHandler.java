@@ -153,7 +153,7 @@ public final class CashOperationHandler extends AbstractPacketHandler<BaseCashOp
                handleWorldTransfer(client, character, cashShop, ((WorldTransferPacket) packet).itemId(),
                      ((WorldTransferPacket) packet).newWorldId());
             } else {
-               System.out.println("Unhandled action: " + action + "\n" + packet.toString());
+               LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.UNHANDLED_EVENT, "Unhandled action: " + action + "\n" + packet.toString());
             }
          } finally {
             client.releaseClient();

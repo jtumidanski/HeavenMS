@@ -59,6 +59,9 @@ import server.maps.MapleMapManager;
 import server.maps.MapleMiniDungeon;
 import server.maps.MapleMiniDungeonInfo;
 import tools.I18nMessage;
+import tools.LogType;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
@@ -151,10 +154,9 @@ public final class Channel {
          }
 
          services = new ServicesManager(ChannelServices.OVERALL);
-
-         System.out.println("    Channel " + getId() + ": Listening on port " + port);
+         LoggerUtil.printInfo(LoggerOriginator.ENGINE, LogType.PROCESS, "    Channel " + getId() + ": Listening on port " + port);
       } catch (Exception e) {
-         e.printStackTrace();
+         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXCEPTION, e);
       }
    }
 
@@ -224,7 +226,7 @@ public final class Channel {
             return;
          }
 
-         System.out.println("Shutting down Channel " + channel + " on World " + world);
+         LoggerUtil.printInfo(LoggerOriginator.ENGINE, LogType.PROCESS, "Shutting down Channel " + channel + " on World " + world);
 
          closeAllMerchants();
          disconnectAwayPlayers();
@@ -244,10 +246,9 @@ public final class Channel {
          acceptor.unbind();
 
          finishedShutdown = true;
-         System.out.println("Successfully shut down Channel " + channel + " on World " + world + "\r\n");
+         LoggerUtil.printInfo(LoggerOriginator.ENGINE, LogType.PROCESS, "Successfully shut down Channel " + channel + " on World " + world + "\r\n");
       } catch (Exception e) {
-         e.printStackTrace();
-         System.err.println("Error while shutting down Channel " + channel + " on World " + world + "\r\n" + e);
+         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.PROCESS, e, "Error while shutting down Channel " + channel + " on World " + world + "\r\n" + e);
       }
    }
 

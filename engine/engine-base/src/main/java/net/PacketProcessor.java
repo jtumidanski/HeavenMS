@@ -6,6 +6,9 @@ import java.util.Map;
 
 import net.opcodes.RecvOpcode;
 import net.server.HandlerFactory;
+import tools.LogType;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 
 public final class PacketProcessor {
 
@@ -35,8 +38,7 @@ public final class PacketProcessor {
       try {
          handlers.put(code.getValue(), handler);
       } catch (ArrayIndexOutOfBoundsException e) {
-         e.printStackTrace();
-         System.out.println("Error registering handler - " + code.name());
+         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXCEPTION, e, "Error registering handler - " + code.name());
       }
    }
 

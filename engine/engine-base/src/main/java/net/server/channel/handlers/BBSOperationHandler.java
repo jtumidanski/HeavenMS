@@ -5,11 +5,11 @@ import java.util.Optional;
 
 import client.MapleCharacter;
 import client.MapleClient;
+import client.database.data.BbsThreadData;
+import client.database.data.BbsThreadReplyData;
 import database.DatabaseConnection;
 import database.administrator.BbsThreadAdministrator;
 import database.administrator.BbsThreadReplyAdministrator;
-import client.database.data.BbsThreadData;
-import client.database.data.BbsThreadReplyData;
 import database.provider.BbsThreadProvider;
 import database.provider.BbsThreadReplyProvider;
 import net.server.AbstractPacketHandler;
@@ -22,6 +22,9 @@ import net.server.channel.packet.bbs.ListThreadsPacket;
 import net.server.channel.packet.bbs.NewBBSThreadPacket;
 import net.server.channel.packet.bbs.ReplyToThreadPacket;
 import net.server.channel.packet.reader.BBSOperationReader;
+import tools.LogType;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 import tools.PacketCreator;
 import tools.packet.guild.bbs.GetThreadList;
 import tools.packet.guild.bbs.ShowThread;
@@ -54,7 +57,7 @@ public final class BBSOperationHandler extends AbstractPacketHandler<BaseBBSOper
       } else if (packet instanceof DeleteReplyPacket) {
          deleteBBSReply(client, ((DeleteReplyPacket) packet).replyId());
       } else {
-         System.out.println("Unhandled BBS mode: " + packet.toString());
+         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.UNHANDLED_EVENT, "Unhandled BBS mode: " + packet.toString());
       }
    }
 

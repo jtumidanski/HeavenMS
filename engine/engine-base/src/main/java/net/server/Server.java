@@ -522,7 +522,7 @@ public class Server {
          wldRLock.unlock();
       }
 
-      System.out.println("Starting world " + i);
+      LoggerUtil.printInfo(LoggerOriginator.ENGINE, LogType.PROCESS, "Starting world " + i);
 
       int expRate = YamlConfig.config.worlds.get(i).exp_rate;
       int mesoRate = YamlConfig.config.worlds.get(i).meso_rate;
@@ -568,11 +568,11 @@ public class Server {
       if (canDeploy) {
 
          world.setServerMessage(YamlConfig.config.worlds.get(i).server_message);
-         System.out.println("Finished loading world " + i + "\r\n");
+         LoggerUtil.printInfo(LoggerOriginator.ENGINE, LogType.PROCESS, "Finished loading world " + i);
 
          return i;
       } else {
-         System.out.println("Could not load world " + i + "...\r\n");
+         LoggerUtil.printInfo(LoggerOriginator.ENGINE, LogType.PROCESS, "Could not load world " + i + "...");
          world.shutdown();
          return -2;
       }
@@ -820,7 +820,7 @@ public class Server {
 
 
    public void init() {
-      System.out.println("HeavenMS v" + ServerConstants.VERSION + " starting up.\r\n");
+      LoggerUtil.printInfo(LoggerOriginator.ENGINE, LogType.PROCESS, "HeavenMS v" + ServerConstants.VERSION + " starting up.");
 
       if (YamlConfig.config.server.SHUTDOWNHOOK) {
          Runtime.getRuntime().addShutdownHook(new Thread(shutdown(false)));
@@ -875,16 +875,16 @@ public class Server {
 
       long timeToTake = System.currentTimeMillis();
       SkillFactory.loadAllSkills();
-      System.out.println("Skills loaded in " + ((System.currentTimeMillis() - timeToTake) / 1000.0) + " seconds");
+      LoggerUtil.printInfo(LoggerOriginator.ENGINE, LogType.PROCESS, "Skills loaded in " + ((System.currentTimeMillis() - timeToTake) / 1000.0) + " seconds");
 
       timeToTake = System.currentTimeMillis();
 
       CashItemFactory.getSpecialCashItems();
-      System.out.println("Items loaded in " + ((System.currentTimeMillis() - timeToTake) / 1000.0) + " seconds");
+      LoggerUtil.printInfo(LoggerOriginator.ENGINE, LogType.PROCESS, "Items loaded in " + ((System.currentTimeMillis() - timeToTake) / 1000.0) + " seconds");
 
       timeToTake = System.currentTimeMillis();
       MapleQuest.loadAllQuest();
-      System.out.println("Quest loaded in " + ((System.currentTimeMillis() - timeToTake) / 1000.0) + " seconds\r\n");
+      LoggerUtil.printInfo(LoggerOriginator.ENGINE, LogType.PROCESS, "Quest loaded in " + ((System.currentTimeMillis() - timeToTake) / 1000.0) + " seconds\r\n");
 
       NewYearCardProcessor.getInstance().startPendingNewYearCardRequests();
 
@@ -903,20 +903,15 @@ public class Server {
          MaplePlayerNPCFactory.loadFactoryMetadata();
          loadPlayerNpcMapStepFromDb();
       } catch (Exception e) {
-         e.printStackTrace();//For those who get errors
-         System.out.println("[SEVERE] Syntax error in 'world.ini'.");
+         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXCEPTION, "Syntax error in 'world.ini'.");
          System.exit(0);
       }
-
-      System.out.println();
 
       if (YamlConfig.config.server.USE_FAMILY_SYSTEM) {
          timeToTake = System.currentTimeMillis();
          MapleFamilyProcessor.getInstance().loadAllFamilies();
-         System.out.println("Families loaded in " + ((System.currentTimeMillis() - timeToTake) / 1000.0) + " seconds\r\n");
+         LoggerUtil.printInfo(LoggerOriginator.ENGINE, LogType.PROCESS, "Families loaded in " + ((System.currentTimeMillis() - timeToTake) / 1000.0) + " seconds.");
       }
-
-      System.out.println();
 
       acceptor.getSessionConfig().setIdleTime(IdleStatus.BOTH_IDLE, 30);
       acceptor.setHandler(new MapleServerHandler());
@@ -926,9 +921,8 @@ public class Server {
          ex.printStackTrace();
       }
 
-      System.out.println("Listening on port 8484\r\n\r\n");
-
-      System.out.println("HeavenMS is now online.\r\n");
+      LoggerUtil.printInfo(LoggerOriginator.ENGINE, LogType.PROCESS, "Listening on port 8484.");
+      LoggerUtil.printInfo(LoggerOriginator.ENGINE, LogType.PROCESS, "HeavenMS is now online.");
       online = true;
 
       MapleSkillBookInformationProvider.getInstance();
@@ -1548,7 +1542,7 @@ public class Server {
    }
 
    private synchronized void shutdownInternal(boolean restart) {
-      System.out.println((restart ? "Restarting" : "Shutting down") + " the server!\r\n");
+      LoggerUtil.printInfo(LoggerOriginator.ENGINE, LogType.PROCESS, (restart ? "Restarting" : "Shutting down") + " the server!");
       if (getWorlds() == null) {
          return;//already shutdown
       }
@@ -1599,7 +1593,7 @@ public class Server {
       TimerManager.getInstance().purge();
       TimerManager.getInstance().stop();
 
-      System.out.println("Worlds + Channels are offline.");
+      LoggerUtil.printInfo(LoggerOriginator.ENGINE, LogType.PROCESS, "Worlds + Channels are offline.");
       acceptor.unbind();
       acceptor = null;
 
@@ -1607,7 +1601,7 @@ public class Server {
          server.shutdownNow();
          new Thread(() -> System.exit(0)).start();
       } else {
-         System.out.println("\r\nRestarting the server....\r\n");
+         LoggerUtil.printInfo(LoggerOriginator.ENGINE, LogType.PROCESS, "Restarting the server....");
          try {
             instance.finalize();
          } catch (Throwable ex) {

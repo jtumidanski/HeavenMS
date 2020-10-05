@@ -31,6 +31,9 @@ import net.server.world.World;
 import scripting.event.EventInstanceManager;
 import server.MapleItemInformationProvider;
 import tools.I18nMessage;
+import tools.LogType;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
@@ -284,7 +287,7 @@ public final class RingActionHandler extends AbstractPacketHandler<BaseRingPacke
       } else if (packet instanceof HandleWishListPacket) {
          handleWishList(c, ((HandleWishListPacket) packet).items());
       } else {
-         System.out.println("Unhandled RING_ACTION Mode: " + packet.toString());
+         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.UNHANDLED_EVENT, "Unhandled RING_ACTION Mode: " + packet.toString());
       }
       PacketCreator.announce(c, new EnableActions());
    }
@@ -440,7 +443,7 @@ public final class RingActionHandler extends AbstractPacketHandler<BaseRingPacke
             PacketCreator.announce(source, new WeddingPartnerTransfer(target.getId(), target.getMapId()));
             PacketCreator.announce(target, new WeddingPartnerTransfer(source.getId(), source.getMapId()));
          } catch (Exception e) {
-            System.out.println("Error with engagement " + e.getMessage());
+            LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXCEPTION, e);
          }
       } else {
          MessageBroadcaster.getInstance().sendServerNotice(source, ServerNoticeType.POP_UP, I18nMessage.from("MARRIAGE_PARTNER_DECLINED"));

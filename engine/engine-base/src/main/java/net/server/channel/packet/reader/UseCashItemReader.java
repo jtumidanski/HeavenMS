@@ -38,6 +38,9 @@ import net.server.channel.packet.cash.use.UseTripleMegaphonePacket;
 import net.server.channel.packet.cash.use.UseUnhandledPacket;
 import net.server.channel.packet.cash.use.UseVegaSpellPacket;
 import net.server.channel.packet.cash.use.UseWorldChangePacket;
+import tools.LogType;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 public class UseCashItemReader implements PacketReader<AbstractUseCashItemPacket> {
@@ -135,7 +138,7 @@ public class UseCashItemReader implements PacketReader<AbstractUseCashItemPacket
    private AbstractUseCashItemPacket readBroadcastTool(SeekableLittleEndianAccessor accessor, short position, int itemId) {
       switch (ConsumableCashItems.BroadcasterCategories.getByItemId(itemId)) {
          case CHEAP_MEGAPHONE:
-            System.out.println("Unhandled Item: " + itemId + "\n");
+            LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.UNHANDLED_EVENT, "Unhandled Item: " + itemId + "\n");
             return null;
          case MEGAPHONE:
             return new UseMegaphonePacket(position, itemId, accessor.readMapleAsciiString());
@@ -143,7 +146,7 @@ public class UseCashItemReader implements PacketReader<AbstractUseCashItemPacket
             return new UseSuperMegaphonePacket(position, itemId, accessor.readMapleAsciiString(), accessor.readByte() != 0);
          case HEART_MEGAPHONE:
          case SKULL_MEGAPHONE:
-            System.out.println("Unhandled Item: " + itemId + "\n");
+            LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.UNHANDLED_EVENT, "Unhandled Item: " + itemId + "\n");
             break;
          case MAPLE_TV:
             return readMapleTv(accessor, position, itemId);

@@ -5,6 +5,9 @@ import javax.persistence.Query;
 
 import accessor.AbstractQueryExecutor;
 import entity.TempData;
+import tools.LogType;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 
 public class TempDataAdministrator extends AbstractQueryExecutor {
    private static TempDataAdministrator instance;
@@ -31,7 +34,7 @@ public class TempDataAdministrator extends AbstractQueryExecutor {
       try {
          insert(entityManager, tempData);
       } catch (Exception exception) {
-         System.out.println("Exception inserting record with key " + tempData.getDropperId() + "-" + tempData.getItemId());
+         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXCEPTION, "Exception inserting record with key " + tempData.getDropperId() + "-" + tempData.getItemId());
       }
    }
 

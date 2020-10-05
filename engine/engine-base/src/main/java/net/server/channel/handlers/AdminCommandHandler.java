@@ -36,13 +36,15 @@ import server.life.MapleMonster;
 import server.maps.MapleMapObject;
 import server.maps.MapleMapObjectType;
 import server.quest.MapleQuest;
+import tools.I18nMessage;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Randomizer;
 import tools.ServerNoticeType;
 import tools.SimpleMessage;
 import tools.StringUtil;
-import tools.I18nMessage;
 import tools.packet.stat.EnableActions;
 import tools.packet.ui.GMEffect;
 
@@ -89,7 +91,7 @@ public final class AdminCommandHandler extends AbstractPacketHandler<BaseAdminCo
       } else if (packet instanceof TestingPacket) {
          testingPacket(((TestingPacket) packet).printableInt());
       } else {
-         System.out.println("New GM packet encountered (MODE : " + packet.mode() + ": " + packet.toString());
+         LoggerUtil.printDebug(LoggerOriginator.ENGINE, "New GM packet encountered (MODE : " + packet.mode() + ": " + packet.toString());
       }
    }
 
@@ -173,7 +175,7 @@ public final class AdminCommandHandler extends AbstractPacketHandler<BaseAdminCo
    }
 
    private void testingPacket(int printableInt) {
-      System.out.println(printableInt);
+      LoggerUtil.printDebug(LoggerOriginator.ENGINE, String.valueOf(printableInt));
    }
 
    private void changeMapCommand(MapleClient c, String victim, int mapId) {

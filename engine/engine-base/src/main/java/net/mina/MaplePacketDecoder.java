@@ -60,9 +60,9 @@ public class MaplePacketDecoder extends CumulativeProtocolDecoder {
             String Send = "ClientSend:" + op + " [" + pHeaderStr + "] (" + packetLen + ")\r\n";
             if (packetLen <= 3000) {
                String SendTo = Send + HexTool.toString(decryptedPacket) + "\r\n" + HexTool.toStringFromAscii(decryptedPacket);
-               System.out.println(SendTo);
+               LoggerUtil.printDebug(LoggerOriginator.ENGINE, SendTo);
                if (op == null) {
-                  System.out.println("UnknownPacket:" + SendTo);
+                  LoggerUtil.printDebug(LoggerOriginator.ENGINE, "UnknownPacket:" + SendTo);
                }
             } else {
                LoggerUtil.printInfo(LoggerOriginator.ENGINE, LogType.PACKET_STREAM, MapleSessionCoordinator.getSessionRemoteAddress(session) + HexTool.toString(new byte[]{decryptedPacket[0], decryptedPacket[1]}) + "...");

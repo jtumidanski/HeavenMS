@@ -41,6 +41,9 @@ import server.life.MapleMonster;
 import server.maps.MapleMap;
 import server.quest.MapleQuest;
 import tools.I18nMessage;
+import tools.LogType;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
 import tools.exceptions.EventInstanceInProgressException;
@@ -171,7 +174,7 @@ public class EventManager {
          try {
             iv.invokeFunction(methodName, eim);
          } catch (ScriptException | NoSuchMethodException ex) {
-            Logger.getLogger(EventManager.class.getName()).log(Level.SEVERE, null, ex);
+            LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXCEPTION, ex);
          }
       };
 
@@ -186,7 +189,7 @@ public class EventManager {
          try {
             iv.invokeFunction(methodName, (Object) null);
          } catch (ScriptException | NoSuchMethodException ex) {
-            Logger.getLogger(EventManager.class.getName()).log(Level.SEVERE, null, ex);
+            LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXCEPTION, ex);
          }
       };
 
@@ -425,7 +428,7 @@ public class EventManager {
                   success.accept(eim);
                   eim.startEvent();
                } catch (ScriptException | NoSuchMethodException ex) {
-                  Logger.getLogger(EventManager.class.getName()).log(Level.SEVERE, null, ex);
+                  LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXCEPTION, ex);
                }
 
                return true;
@@ -514,7 +517,7 @@ public class EventManager {
 
                   eim.startEvent();
                } catch (ScriptException | NoSuchMethodException ex) {
-                  Logger.getLogger(EventManager.class.getName()).log(Level.SEVERE, null, ex);
+                  LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXCEPTION, ex);
                }
 
                return true;
@@ -597,7 +600,7 @@ public class EventManager {
 
                   eim.startEvent();
                } catch (ScriptException | NoSuchMethodException ex) {
-                  Logger.getLogger(EventManager.class.getName()).log(Level.SEVERE, null, ex);
+                  LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXCEPTION, ex);
                }
 
                return true;
@@ -640,7 +643,7 @@ public class EventManager {
       try {
          iv.invokeFunction("clearPQ", eim);
       } catch (ScriptException | NoSuchMethodException ex) {
-         Logger.getLogger(EventManager.class.getName()).log(Level.SEVERE, null, ex);
+         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXCEPTION, ex);
       }
    }
 
@@ -648,7 +651,7 @@ public class EventManager {
       try {
          iv.invokeFunction("clearPQ", eim, toMap);
       } catch (ScriptException | NoSuchMethodException ex) {
-         Logger.getLogger(EventManager.class.getName()).log(Level.SEVERE, null, ex);
+         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXCEPTION, ex);
       }
    }
 

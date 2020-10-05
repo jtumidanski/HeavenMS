@@ -305,7 +305,7 @@ public class CommandsExecutor {
 
    private void addCommand(String syntax, int rank, Class<? extends Command> commandClass) {
       if (registeredCommands.containsKey(syntax.toLowerCase())) {
-         System.out.println("Error on register command with name: " + syntax + ". Already exists.");
+         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXCEPTION, "Error on register command with name: " + syntax + ". Already exists.");
          return;
       }
 

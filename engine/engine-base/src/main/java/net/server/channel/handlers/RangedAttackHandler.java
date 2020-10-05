@@ -24,6 +24,9 @@ import net.server.channel.packet.reader.DamageReader;
 import net.server.channel.packet.PacketReaderFactory;
 import server.MapleItemInformationProvider;
 import server.MapleStatEffect;
+import tools.LogType;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 import tools.MasterBroadcaster;
 import tools.PacketCreator;
 import tools.Randomizer;
@@ -163,7 +166,7 @@ public final class RangedAttackHandler extends AbstractDealDamageHandler<AttackP
                }
 
                if (slot < 0) {
-                  System.out.println("<ERROR> Projectile to use was unable to be found.");
+                  LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXCEPTION, "Projectile to use was unable to be found.");
                } else {
                   MapleInventoryManipulator.removeFromSlot(c, MapleInventoryType.USE, slot, bulletConsume, false, true);
                }

@@ -478,7 +478,7 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
       Item item = chr.getInventory(ivType).getItem(pos);
 
       if (targetSlot < 1 || targetSlot > 9) {
-         System.out.println("[Hack] " + chr.getName() + " Trying to dupe on trade slot.");
+         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXPLOITS, chr.getName() + " Trying to dupe on trade slot.");
          PacketCreator.announce(c, new EnableActions());
          return;
       }

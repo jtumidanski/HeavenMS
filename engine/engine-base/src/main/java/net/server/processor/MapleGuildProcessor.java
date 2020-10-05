@@ -26,6 +26,9 @@ import net.server.guild.MapleGuildResponse;
 import net.server.guild.MapleGuildSummary;
 import net.server.world.World;
 import tools.I18nMessage;
+import tools.LogType;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
@@ -374,7 +377,7 @@ public class MapleGuildProcessor {
                         connection -> NoteAdministrator.getInstance().sendNote(connection, guildCharacter.getName(), initiator.getName(), "You have been expelled from the guild.", Byte.parseByte("0")));
                   setOfflineGuildStatus((short) 0, (byte) 5, cid);
                }
-            }, () -> System.out.println("Unable to find member with name " + name + " and id " + cid));
+            }, () -> LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.GUILD_CHAR_ERROR, "Unable to find member with name " + name + " and id " + cid));
    }
 
    public void changeRankTitle(int guildId, String[] ranks) {

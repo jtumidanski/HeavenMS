@@ -18,10 +18,13 @@ import server.maps.MapleMap;
 import server.maps.MapleMiniDungeon;
 import server.maps.MapleMiniDungeonInfo;
 import server.partyquest.MonsterCarnival;
+import tools.I18nMessage;
+import tools.LogType;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
-import tools.I18nMessage;
 import tools.packet.party.PartyCreated;
 import tools.packet.party.PartyStatusMessage;
 import tools.packet.party.UpdateParty;
@@ -229,7 +232,7 @@ public class MaplePartyProcessor {
             });
             break;
          default:
-            System.out.println("Unhandled updateParty operation " + operation.name());
+            LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.UNHANDLED_EVENT, "Unhandled updateParty operation " + operation.name());
       }
 
       Collection<MaplePartyCharacter> partyMembers = party.getMembers();

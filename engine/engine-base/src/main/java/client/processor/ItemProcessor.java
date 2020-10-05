@@ -12,12 +12,14 @@ import config.YamlConfig;
 import constants.game.ExpTable;
 import constants.inventory.ItemConstants;
 import server.MapleItemInformationProvider;
+import tools.I18nMessage;
+import tools.LoggerOriginator;
+import tools.LoggerUtil;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
 import tools.Randomizer;
 import tools.ServerNoticeType;
-import tools.I18nMessage;
 import tools.packet.foreigneffect.ShowForeignEffect;
 import tools.packet.showitemgaininchat.ShowSpecialEffect;
 
@@ -163,7 +165,7 @@ public class ItemProcessor {
       int expNeeded = ExpTable.getEquipExpNeededForLevel(result.itemLevel());
 
       if (YamlConfig.config.server.USE_DEBUG_SHOW_INFO_EQPEXP) {
-         System.out.println("'" + ii.getName(result.id()) + "' -> EXP Gain: " + gain + " Mastery: " + masteryModifier + " Base gain: " + baseExpGain + " exp: " + result.itemExp() + " / " + expNeeded + ", Kills TNL: " + expNeeded / (baseExpGain / c.getPlayer().getExpRate()));
+         LoggerUtil.printDebug(LoggerOriginator.ENGINE, "'" + ii.getName(result.id()) + "' -> EXP Gain: " + gain + " Mastery: " + masteryModifier + " Base gain: " + baseExpGain + " exp: " + result.itemExp() + " / " + expNeeded + ", Kills TNL: " + expNeeded / (baseExpGain / c.getPlayer().getExpRate()));
       }
 
       if (result.itemExp() >= expNeeded) {
