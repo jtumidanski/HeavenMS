@@ -6,6 +6,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Calendar;
 
 import org.apache.mina.core.session.IoSession;
+import org.mindrot.jbcrypt.BCrypt;
 
 import client.MapleClient;
 import database.DatabaseConnection;
@@ -16,7 +17,6 @@ import net.server.Server;
 import net.server.channel.packet.reader.LoginPasswordReader;
 import net.server.coordinator.session.MapleSessionCoordinator;
 import net.server.login.packet.LoginPasswordPacket;
-import tools.BCrypt;
 import tools.HexTool;
 import tools.PacketCreator;
 import tools.packet.login.AuthSuccess;

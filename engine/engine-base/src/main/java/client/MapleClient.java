@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 import javax.script.ScriptEngine;
 
 import org.apache.mina.core.session.IoSession;
+import org.mindrot.jbcrypt.BCrypt;
 
 import client.database.data.AccountData;
 import client.database.data.AccountLoginData;
@@ -69,7 +70,6 @@ import server.life.MapleMonster;
 import server.maps.FieldLimit;
 import server.maps.MapleMap;
 import server.maps.MapleMiniDungeonInfo;
-import tools.BCrypt;
 import tools.HexTool;
 import tools.I18nMessage;
 import tools.LogHelper;
