@@ -6,17 +6,13 @@ import java.util.List;
 import client.MapleCharacter;
 import provider.MapleData;
 import provider.MapleDataTool;
-import server.quest.MapleQuest;
 import server.quest.MapleQuestRequirementType;
 
 public class InfoExRequirement extends MapleQuestRequirement {
    private List<String> infoExpected = new ArrayList<>();
-   private int questId;
 
-
-   public InfoExRequirement(MapleQuest quest, MapleData data) {
-      super(MapleQuestRequirementType.INFO_EX);
-      questId = quest.getId();
+   public InfoExRequirement(int questId, MapleData data) {
+      super(questId, MapleQuestRequirementType.INFO_EX);
       processData(data);
    }
 
@@ -28,7 +24,6 @@ public class InfoExRequirement extends MapleQuestRequirement {
          infoExpected.add(MapleDataTool.getString(value, ""));
       }
    }
-
 
    @Override
    public boolean check(MapleCharacter chr, Integer npcId) {

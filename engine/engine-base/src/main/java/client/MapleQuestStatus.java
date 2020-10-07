@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import server.processor.QuestProcessor;
 import server.quest.MapleQuest;
 import tools.StringUtil;
 
@@ -21,7 +22,7 @@ public class MapleQuestStatus {
    private int forfeited = 0, completed = 0;
    private String customData;
    public MapleQuestStatus(MapleQuest quest, Status status) {
-      this.questID = quest.getId();
+      this.questID = quest.id();
       this.setStatus(status);
       this.completionTime = System.currentTimeMillis();
       this.expirationTime = 0;
@@ -31,7 +32,7 @@ public class MapleQuestStatus {
    }
 
    public MapleQuestStatus(MapleQuest quest, Status status, int npc) {
-      this.questID = quest.getId();
+      this.questID = quest.id();
       this.setStatus(status);
       this.setNpc(npc);
       this.completionTime = System.currentTimeMillis();
@@ -43,7 +44,7 @@ public class MapleQuestStatus {
    }
 
    public MapleQuest getQuest() {
-      return MapleQuest.getInstance(questID);
+      return QuestProcessor.getInstance().getQuest(questID);
    }
 
    public short getQuestID() {
@@ -67,7 +68,7 @@ public class MapleQuestStatus {
    }
 
    private void registerMobs() {
-      for (int i : MapleQuest.getInstance(questID).getRelevantMobs()) {
+      for (int i : QuestProcessor.getInstance().getQuest(questID).getRelevantMobs()) {
          progress.put(i, "000");
       }
    }

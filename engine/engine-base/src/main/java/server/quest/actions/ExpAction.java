@@ -4,14 +4,13 @@ import client.MapleCharacter;
 import config.YamlConfig;
 import provider.MapleData;
 import provider.MapleDataTool;
-import server.quest.MapleQuest;
 import server.quest.MapleQuestActionType;
 
 public class ExpAction extends MapleQuestAction {
-   int exp;
+   private int exp;
 
-   public ExpAction(MapleQuest quest, MapleData data) {
-      super(MapleQuestActionType.EXP, quest);
+   public ExpAction(int questId, MapleData data) {
+      super(questId, MapleQuestActionType.EXP);
       processData(data);
    }
 

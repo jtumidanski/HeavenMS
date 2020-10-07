@@ -6,16 +6,13 @@ import client.inventory.MaplePet;
 import client.inventory.PetFlag;
 import client.processor.PetProcessor;
 import provider.MapleData;
-import server.quest.MapleQuest;
 import server.quest.MapleQuestActionType;
 
 public class PetSpeedAction extends MapleQuestAction {
 
-   public PetSpeedAction(MapleQuest quest, MapleData data) {
-      super(MapleQuestActionType.PET_TAMENESS, quest);
-      questID = quest.getId();
+   public PetSpeedAction(int questId, MapleData data) {
+      super(questId, MapleQuestActionType.PET_TAMENESS);
    }
-
 
    @Override
    public void processData(MapleData data) {

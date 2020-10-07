@@ -474,7 +474,7 @@ public abstract class AbstractPacketFactory implements PacketFactory {
       }
       writer.writeShort(startedSize);
       for (MapleQuestStatus qs : started) {
-         writer.writeShort(qs.getQuest().getId());
+         writer.writeShort(qs.getQuest().id());
          writer.writeMapleAsciiString(qs.getProgressData());
 
          short infoNumber = qs.getInfoNumber();
@@ -487,7 +487,7 @@ public abstract class AbstractPacketFactory implements PacketFactory {
       List<MapleQuestStatus> completed = character.getCompletedQuests();
       writer.writeShort(completed.size());
       for (MapleQuestStatus qs : completed) {
-         writer.writeShort(qs.getQuest().getId());
+         writer.writeShort(qs.getQuest().id());
          writer.writeLong(getTime(qs.getCompletionTime()));
       }
    }

@@ -7,6 +7,7 @@ import client.MapleCharacter;
 import client.MapleQuestStatus;
 import provider.MapleData;
 import provider.MapleDataTool;
+import server.processor.QuestProcessor;
 import server.quest.MapleQuest;
 import server.quest.MapleQuestRequirementType;
 import tools.LogType;
@@ -15,11 +16,9 @@ import tools.LoggerUtil;
 
 public class MobRequirement extends MapleQuestRequirement {
    Map<Integer, Integer> mobs = new HashMap<>();
-   private int questID;
 
-   public MobRequirement(MapleQuest quest, MapleData data) {
-      super(MapleQuestRequirementType.MOB);
-      questID = quest.getId();
+   public MobRequirement(int questId, MapleData data) {
+      super(questId, MapleQuestRequirementType.MOB);
       processData(data);
    }
 
@@ -34,7 +33,7 @@ public class MobRequirement extends MapleQuestRequirement {
 
    @Override
    public boolean check(MapleCharacter chr, Integer npcId) {
-      MapleQuestStatus status = chr.getQuest(MapleQuest.getInstance(questID));
+      MapleQuestStatus status = chr.getQuest(QuestProcessor.getInstance().getQuest(getQuestId()));
       for (Integer mobID : mobs.keySet()) {
          int countReq = mobs.get(mobID);
          int progress;
@@ -42,7 +41,9 @@ public class MobRequirement extends MapleQuestRequirement {
          try {
             progress = Integer.parseInt(status.getProgress(mobID));
          } catch (NumberFormatException ex) {
-            LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXCEPTION_CAUGHT, ex, "Mob: " + mobID + " Quest: " + questID + "CID: " + chr.getId() + " Progress: " + status.getProgress(mobID));
+            LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXCEPTION_CAUGHT, ex,
+                  "Mob: " + mobID + " Quest: " + getQuestId() + "CID:"
+                        + " " + chr.getId() + " Progress: " + status.getProgress(mobID));
             return false;
          }
 

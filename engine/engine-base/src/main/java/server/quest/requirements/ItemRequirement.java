@@ -11,18 +11,16 @@ import constants.inventory.ItemConstants;
 import provider.MapleData;
 import provider.MapleDataTool;
 import server.MapleItemInformationProvider;
-import server.quest.MapleQuest;
 import server.quest.MapleQuestRequirementType;
+import tools.I18nMessage;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
-import tools.I18nMessage;
 
 public class ItemRequirement extends MapleQuestRequirement {
    Map<Integer, Integer> items = new HashMap<>();
 
-
-   public ItemRequirement(MapleQuest quest, MapleData data) {
-      super(MapleQuestRequirementType.ITEM);
+   public ItemRequirement(int questId, MapleData data) {
+      super(questId, MapleQuestRequirementType.ITEM);
       processData(data);
    }
 
@@ -35,7 +33,6 @@ public class ItemRequirement extends MapleQuestRequirement {
          items.put(itemId, count);
       }
    }
-
 
    @Override
    public boolean check(MapleCharacter chr, Integer npcId) {
@@ -61,7 +58,8 @@ public class ItemRequirement extends MapleQuestRequirement {
             } else {
                if (count < countNeeded) {
                   if (chr.getInventory(MapleInventoryType.EQUIPPED).countById(itemId) + count >= countNeeded) {
-                     MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, I18nMessage.from("QUEST_ITEM_UNEQUIP_REQUIREMENT").with(ii.getName(itemId)));
+                     MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT,
+                           I18nMessage.from("QUEST_ITEM_UNEQUIP_REQUIREMENT").with(ii.getName(itemId)));
                      return false;
                   }
                }

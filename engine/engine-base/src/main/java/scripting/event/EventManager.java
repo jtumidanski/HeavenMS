@@ -39,6 +39,7 @@ import server.expeditions.MapleExpedition;
 import server.life.MapleLifeFactory;
 import server.life.MapleMonster;
 import server.maps.MapleMap;
+import server.processor.QuestProcessor;
 import server.quest.MapleQuest;
 import tools.I18nMessage;
 import tools.LogType;
@@ -760,7 +761,7 @@ public class EventManager {
 
    public void startQuest(MapleCharacter chr, int id, int npcId) {
       try {
-         MapleQuest.getInstance(id).forceStart(chr, npcId);
+         QuestProcessor.getInstance().getQuest(id).forceStart(chr, npcId);
       } catch (NullPointerException ex) {
          ex.printStackTrace();
       }
@@ -768,7 +769,7 @@ public class EventManager {
 
    public void completeQuest(MapleCharacter chr, int id, int npcId) {
       try {
-         MapleQuest.getInstance(id).forceComplete(chr, npcId);
+         QuestProcessor.getInstance().getQuest(id).forceComplete(chr, npcId);
       } catch (NullPointerException ex) {
          ex.printStackTrace();
       }

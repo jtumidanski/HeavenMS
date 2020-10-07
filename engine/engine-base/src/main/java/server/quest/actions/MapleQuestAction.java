@@ -10,11 +10,12 @@ import server.quest.MapleQuestActionType;
 
 public abstract class MapleQuestAction {
    private final MapleQuestActionType type;
-   protected int questID;
 
-   public MapleQuestAction(MapleQuestActionType action, MapleQuest quest) {
+   protected int questId;
+
+   public MapleQuestAction(int questId, MapleQuestActionType action) {
       this.type = action;
-      this.questID = quest.getId();
+      this.questId = questId;
    }
 
    public static List<Integer> getJobBy5ByteEncoding(int encoded) {

@@ -7,18 +7,15 @@ import client.MapleCharacter;
 import client.inventory.MaplePet;
 import provider.MapleData;
 import provider.MapleDataTool;
-import server.quest.MapleQuest;
 import server.quest.MapleQuestRequirementType;
 
 public class PetRequirement extends MapleQuestRequirement {
    List<Integer> petIDs = new ArrayList<>();
 
-
-   public PetRequirement(MapleQuest quest, MapleData data) {
-      super(MapleQuestRequirementType.PET);
+   public PetRequirement(int questId, MapleData data) {
+      super(questId, MapleQuestRequirementType.PET);
       processData(data);
    }
-
 
    @Override
    public void processData(MapleData data) {
@@ -26,7 +23,6 @@ public class PetRequirement extends MapleQuestRequirement {
          petIDs.add(MapleDataTool.getInt(petData.getChildByPath("id")));
       }
    }
-
 
    @Override
    public boolean check(MapleCharacter chr, Integer npcId) {

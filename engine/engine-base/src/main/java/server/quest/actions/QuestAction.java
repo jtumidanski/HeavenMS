@@ -7,19 +7,19 @@ import client.MapleCharacter;
 import client.MapleQuestStatus;
 import provider.MapleData;
 import provider.MapleDataTool;
+import server.processor.QuestProcessor;
 import server.quest.MapleQuest;
 import server.quest.MapleQuestActionType;
 
 public class QuestAction extends MapleQuestAction {
-   int mesos;
-   Map<Integer, Integer> quests = new HashMap<>();
+   private int mesos;
 
-   public QuestAction(MapleQuest quest, MapleData data) {
-      super(MapleQuestActionType.QUEST, quest);
-      questID = quest.getId();
+   private Map<Integer, Integer> quests = new HashMap<>();
+
+   public QuestAction(int questId, MapleData data) {
+      super(questId, MapleQuestActionType.QUEST);
       processData(data);
    }
-
 
    @Override
    public void processData(MapleData data) {
@@ -34,7 +34,7 @@ public class QuestAction extends MapleQuestAction {
    public void run(MapleCharacter chr, Integer extSelection) {
       for (Integer questID : quests.keySet()) {
          int stat = quests.get(questID);
-         chr.updateQuestStatus(new MapleQuestStatus(MapleQuest.getInstance(questID), MapleQuestStatus.Status.getById(stat)));
+         chr.updateQuestStatus(new MapleQuestStatus(QuestProcessor.getInstance().getQuest(questID), MapleQuestStatus.Status.getById(stat)));
       }
    }
 } 

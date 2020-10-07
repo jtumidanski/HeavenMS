@@ -10,7 +10,10 @@ import server.quest.MapleQuestRequirementType;
 public abstract class MapleQuestRequirement {
    private final MapleQuestRequirementType type;
 
-   public MapleQuestRequirement(MapleQuestRequirementType type) {
+   private final int questId;
+
+   public MapleQuestRequirement(int questId, MapleQuestRequirementType type) {
+      this.questId = questId;
       this.type = type;
    }
 
@@ -32,5 +35,9 @@ public abstract class MapleQuestRequirement {
 
    public MapleQuestRequirementType getType() {
       return type;
+   }
+
+   public int getQuestId() {
+      return questId;
    }
 }

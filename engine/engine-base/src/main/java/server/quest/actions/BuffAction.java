@@ -4,14 +4,13 @@ import client.MapleCharacter;
 import provider.MapleData;
 import provider.MapleDataTool;
 import server.MapleItemInformationProvider;
-import server.quest.MapleQuest;
 import server.quest.MapleQuestActionType;
 
 public class BuffAction extends MapleQuestAction {
-   int itemEffect;
+   private int itemEffect;
 
-   public BuffAction(MapleQuest quest, MapleData data) {
-      super(MapleQuestActionType.BUFF, quest);
+   public BuffAction(int questId, MapleData data) {
+      super(questId, MapleQuestActionType.BUFF);
       processData(data);
    }
 

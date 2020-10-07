@@ -7,14 +7,14 @@ import client.MapleCharacter;
 import client.MapleQuestStatus;
 import provider.MapleData;
 import provider.MapleDataTool;
-import server.quest.MapleQuest;
+import server.processor.QuestProcessor;
 import server.quest.MapleQuestRequirementType;
 
 public class QuestRequirement extends MapleQuestRequirement {
    Map<Integer, Integer> quests = new HashMap<>();
 
-   public QuestRequirement(MapleQuest quest, MapleData data) {
-      super(MapleQuestRequirementType.QUEST);
+   public QuestRequirement(int questId, MapleData data) {
+      super(questId, MapleQuestRequirementType.QUEST);
       processData(data);
    }
 
@@ -31,15 +31,15 @@ public class QuestRequirement extends MapleQuestRequirement {
    public boolean check(MapleCharacter chr, Integer npcId) {
       for (Integer questID : quests.keySet()) {
          int stateReq = quests.get(questID);
-         MapleQuestStatus q = chr.getQuest(MapleQuest.getInstance(questID));
+         MapleQuestStatus q = chr.getQuest(QuestProcessor.getInstance().getQuest(questID));
 
-         if (q == null && MapleQuestStatus.Status.getById(stateReq).equals(MapleQuestStatus.Status.NOT_STARTED))
+         if (q == null && MapleQuestStatus.Status.getById(stateReq).equals(MapleQuestStatus.Status.NOT_STARTED)) {
             continue;
+         }
 
          if (q == null || !q.getStatus().equals(MapleQuestStatus.Status.getById(stateReq))) {
             return false;
          }
-
       }
       return true;
    }

@@ -3,17 +3,16 @@ package server.quest.requirements;
 import client.MapleCharacter;
 import provider.MapleData;
 import provider.MapleDataTool;
-import server.quest.MapleQuest;
 import server.quest.MapleQuestRequirementType;
+import tools.I18nMessage;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
-import tools.I18nMessage;
 
 public class MesoRequirement extends MapleQuestRequirement {
    private int meso = 0;
 
-   public MesoRequirement(MapleQuest quest, MapleData data) {
-      super(MapleQuestRequirementType.MESO);
+   public MesoRequirement(int questId, MapleData data) {
+      super(questId, MapleQuestRequirementType.MESO);
       processData(data);
    }
 
@@ -27,7 +26,8 @@ public class MesoRequirement extends MapleQuestRequirement {
       if (chr.getMeso() >= meso) {
          return true;
       } else {
-         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, I18nMessage.from("QUEST_COMPLETE_FAIL_NOT_ENOUGH_MESO"));
+         MessageBroadcaster.getInstance()
+               .sendServerNotice(chr, ServerNoticeType.PINK_TEXT, I18nMessage.from("QUEST_COMPLETE_FAIL_NOT_ENOUGH_MESO"));
          return false;
       }
    }

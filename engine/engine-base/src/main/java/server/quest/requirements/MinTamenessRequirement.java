@@ -4,14 +4,13 @@ import client.MapleCharacter;
 import client.inventory.MaplePet;
 import provider.MapleData;
 import provider.MapleDataTool;
-import server.quest.MapleQuest;
 import server.quest.MapleQuestRequirementType;
 
 public class MinTamenessRequirement extends MapleQuestRequirement {
    private int minTameness;
 
-   public MinTamenessRequirement(MapleQuest quest, MapleData data) {
-      super(MapleQuestRequirementType.MIN_PET_TAMENESS);
+   public MinTamenessRequirement(int questId, MapleData data) {
+      super(questId, MapleQuestRequirementType.MIN_PET_TAMENESS);
       processData(data);
    }
 
@@ -25,10 +24,13 @@ public class MinTamenessRequirement extends MapleQuestRequirement {
       int curCloseness = 0;
 
       for (MaplePet pet : chr.getPets()) {
-         if (pet == null) continue;
+         if (pet == null) {
+            continue;
+         }
 
-         if (pet.closeness() > curCloseness)
+         if (pet.closeness() > curCloseness) {
             curCloseness = pet.closeness();
+         }
       }
 
       return curCloseness >= minTameness;

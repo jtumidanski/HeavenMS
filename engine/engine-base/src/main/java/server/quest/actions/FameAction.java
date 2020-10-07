@@ -3,15 +3,13 @@ package server.quest.actions;
 import client.MapleCharacter;
 import provider.MapleData;
 import provider.MapleDataTool;
-import server.quest.MapleQuest;
 import server.quest.MapleQuestActionType;
 
 public class FameAction extends MapleQuestAction {
-   int fame;
+   private int fame;
 
-   public FameAction(MapleQuest quest, MapleData data) {
-      super(MapleQuestActionType.FAME, quest);
-      questID = quest.getId();
+   public FameAction(int questId, MapleData data) {
+      super(questId, MapleQuestActionType.FAME);
       processData(data);
    }
 

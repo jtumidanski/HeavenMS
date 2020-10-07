@@ -3,17 +3,13 @@ package server.quest.actions;
 import client.MapleCharacter;
 import provider.MapleData;
 import provider.MapleDataTool;
-import server.quest.MapleQuest;
 import server.quest.MapleQuestActionType;
 
 public class InfoAction extends MapleQuestAction {
-
    private String info;
-   private int questID;
 
-   public InfoAction(MapleQuest quest, MapleData data) {
-      super(MapleQuestActionType.INFO, quest);
-      questID = quest.getId();
+   public InfoAction(int questId, MapleData data) {
+      super(questId, MapleQuestActionType.INFO);
       processData(data);
    }
 
@@ -22,10 +18,8 @@ public class InfoAction extends MapleQuestAction {
       info = MapleDataTool.getString(data, "");
    }
 
-
    @Override
    public void run(MapleCharacter chr, Integer extSelection) {
-      chr.getAbstractPlayerInteraction().setQuestProgress(questID, info);
+      chr.getAbstractPlayerInteraction().setQuestProgress(questId, info);
    }
-
 }

@@ -10,10 +10,11 @@ import provider.MapleDataProvider;
 import provider.MapleDataProviderFactory;
 import provider.MapleDataTool;
 import server.MapleItemInformationProvider;
+import server.processor.QuestProcessor;
 import server.quest.MapleQuest;
+import tools.I18nMessage;
 import tools.MessageBroadcaster;
 import tools.Pair;
-import tools.I18nMessage;
 
 public class SearchCommand extends Command {
    private static MapleData npcStringData;
@@ -59,7 +60,8 @@ public class SearchCommand extends Command {
             data = mapStringData;
             searchType = 2;
          } else {
-            sb.append("#bInvalid search.\r\nSyntax: '!search [type] [name]', where [type] is MAP, QUEST, NPC, ITEM, MOB, or SKILL.");
+            sb.append(
+                  "#bInvalid search.\r\nSyntax: '!search [type] [name]', where [type] is MAP, QUEST, NPC, ITEM, MOB, or SKILL.");
          }
          if (data != null) {
             String name;
@@ -79,20 +81,22 @@ public class SearchCommand extends Command {
                      mapName = MapleDataTool.getString(searchData.getChildByPath("mapName"), "NO-NAME");
                      streetName = MapleDataTool.getString(searchData.getChildByPath("streetName"), "NO-NAME");
 
-                     if (mapName.toLowerCase().contains(search.toLowerCase()) || streetName.toLowerCase().contains(search.toLowerCase())) {
-                        sb.append("#b").append(Integer.parseInt(searchData.getName())).append("#k - #r").append(streetName).append(" - ").append(mapName).append("\r\n");
+                     if (mapName.toLowerCase().contains(search.toLowerCase()) || streetName.toLowerCase()
+                           .contains(search.toLowerCase())) {
+                        sb.append("#b").append(Integer.parseInt(searchData.getName())).append("#k - #r").append(streetName)
+                              .append(" - ").append(mapName).append("\r\n");
                      }
                   }
                }
             } else {
-               for (MapleQuest mq : MapleQuest.getMatchedQuests(search)) {
-                  sb.append("#b").append(mq.getId()).append("#k - #r");
+               for (MapleQuest mq : QuestProcessor.getInstance().getMatchedQuests(search)) {
+                  sb.append("#b").append(mq.id()).append("#k - #r");
 
-                  String parentName = mq.getParentName();
+                  String parentName = mq.parent();
                   if (!parentName.isEmpty()) {
                      sb.append(parentName).append(" - ");
                   }
-                  sb.append(mq.getName()).append("\r\n");
+                  sb.append(mq.name()).append("\r\n");
                }
             }
          }
@@ -111,7 +115,8 @@ public class SearchCommand extends Command {
       if (sb.length() == 0) {
          sb.append("#bNo ").append(params[0].toLowerCase()).append("s found.\r\n");
       }
-      sb.append("\r\n#kLoaded within ").append((double) (System.currentTimeMillis() - start) / 1000).append(" seconds.");//because I can, and it's free
+      sb.append("\r\n#kLoaded within ").append((double) (System.currentTimeMillis() - start) / 1000)
+            .append(" seconds.");//because I can, and it's free
 
       c.getAbstractPlayerInteraction().npcTalk(9010000, sb.toString());
    }

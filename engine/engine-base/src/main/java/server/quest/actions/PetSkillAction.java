@@ -6,18 +6,17 @@ import client.processor.ItemProcessor;
 import constants.inventory.ItemConstants;
 import provider.MapleData;
 import provider.MapleDataTool;
+import server.processor.QuestProcessor;
 import server.quest.MapleQuest;
 import server.quest.MapleQuestActionType;
 
 public class PetSkillAction extends MapleQuestAction {
-   int flag;
+   private int flag;
 
-   public PetSkillAction(MapleQuest quest, MapleData data) {
-      super(MapleQuestActionType.PET_SKILL, quest);
-      questID = quest.getId();
+   public PetSkillAction(int questId, MapleData data) {
+      super(questId, MapleQuestActionType.PET_SKILL);
       processData(data);
    }
-
 
    @Override
    public void processData(MapleData data) {
@@ -26,7 +25,7 @@ public class PetSkillAction extends MapleQuestAction {
 
    @Override
    public boolean check(MapleCharacter chr, Integer extSelection) {
-      MapleQuestStatus status = chr.getQuest(MapleQuest.getInstance(questID));
+      MapleQuestStatus status = chr.getQuest(QuestProcessor.getInstance().getQuest(questId));
       if (!(status.getStatus() == MapleQuestStatus.Status.NOT_STARTED && status.getForfeited() > 0)) {
          return false;
       }

@@ -9,6 +9,7 @@ import net.server.channel.packet.QuestActionPacket;
 import net.server.channel.packet.reader.QuestActionReader;
 import scripting.quest.QuestScriptManager;
 import server.life.MapleNPC;
+import server.processor.QuestProcessor;
 import server.quest.MapleQuest;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
@@ -23,7 +24,7 @@ public final class QuestActionHandler extends AbstractPacketHandler<QuestActionP
    @Override
    public void handlePacket(QuestActionPacket packet, MapleClient client) {
       MapleCharacter player = client.getPlayer();
-      MapleQuest quest = MapleQuest.getInstance(packet.questId());
+      MapleQuest quest = QuestProcessor.getInstance().getQuest(packet.questId());
 
       if (packet.action() == 0) { // Restore lost item
          quest.restoreLostItem(player, packet.itemId());
@@ -81,7 +82,7 @@ public final class QuestActionHandler extends AbstractPacketHandler<QuestActionP
          playerP = pos;
       }
 
-      if (!quest.isAutoStart() && !quest.isAutoComplete()) {
+      if (!quest.autoStart() && !quest.isAutoComplete()) {
          MapleNPC npc = player.getMap().getNPCById(npcId);
          if (npc == null) {
             return false;

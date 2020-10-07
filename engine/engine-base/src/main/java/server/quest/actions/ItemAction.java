@@ -15,7 +15,6 @@ import constants.inventory.ItemConstants;
 import provider.MapleData;
 import provider.MapleDataTool;
 import server.MapleItemInformationProvider;
-import server.quest.MapleQuest;
 import server.quest.MapleQuestActionType;
 import tools.I18nMessage;
 import tools.LogType;
@@ -29,13 +28,12 @@ import tools.ServerNoticeType;
 import tools.packet.showitemgaininchat.ShowItemGainInChat;
 
 public class ItemAction extends MapleQuestAction {
-   List<ItemData> items = new ArrayList<>();
+   private List<ItemData> items = new ArrayList<>();
 
-   public ItemAction(MapleQuest quest, MapleData data) {
-      super(MapleQuestActionType.ITEM, quest);
+   public ItemAction(int questId, MapleData data) {
+      super(questId, MapleQuestActionType.ITEM);
       processData(data);
    }
-
 
    @Override
    public void processData(MapleData data) {
@@ -132,7 +130,8 @@ public class ItemAction extends MapleQuestAction {
 
       for (ItemData iEntry : giveItem) {
          int itemId = iEntry.id(), count = iEntry.count(), period = iEntry.period();
-         MapleInventoryManipulator.addById(chr.getClient(), itemId, (short) count, "", -1, period > 0 ? (System.currentTimeMillis() + period * 60 * 1000) : -1);
+         MapleInventoryManipulator.addById(chr.getClient(), itemId, (short) count, "", -1,
+               period > 0 ? (System.currentTimeMillis() + period * 60 * 1000) : -1);
          PacketCreator.announce(chr, new ShowItemGainInChat(itemId, (short) count));
       }
    }
@@ -162,7 +161,6 @@ public class ItemAction extends MapleQuestAction {
             } else {
                randomList.add(new Pair<>(toItem, type));
             }
-
          } else {
             // Make sure they can hold the item.
             Item toItem = new Item(item.id(), (short) 0, (short) item.count());
@@ -174,7 +172,8 @@ public class ItemAction extends MapleQuestAction {
 
                int freeSlotCount = chr.getInventory(type).freeSlotCountById(item.id(), quantity);
                if (freeSlotCount == -1) {
-                  if (type.equals(MapleInventoryType.EQUIP) && chr.getInventory(MapleInventoryType.EQUIPPED).countById(item.id()) > quantity) {
+                  if (type.equals(MapleInventoryType.EQUIP)
+                        && chr.getInventory(MapleInventoryType.EQUIPPED).countById(item.id()) > quantity) {
                      continue;
                   }
 
@@ -200,7 +199,8 @@ public class ItemAction extends MapleQuestAction {
          for (Pair<Item, MapleInventoryType> it : randomList) {
             int idx = it.getRight().getType() - 1;
 
-            result = MapleInventoryManipulator.checkSpaceProgressively(c, it.getLeft().id(), it.getLeft().quantity(), "", rndUsed.get(idx), false);
+            result = MapleInventoryManipulator
+                  .checkSpaceProgressively(c, it.getLeft().id(), it.getLeft().quantity(), "", rndUsed.get(idx), false);
             if (result % 2 == 0) {
                announceInventoryLimit(Collections.singletonList(it.getLeft().id()), chr);
                return false;
@@ -230,7 +230,8 @@ public class ItemAction extends MapleQuestAction {
    private void announceInventoryLimit(List<Integer> itemIds, MapleCharacter chr) {
       for (Integer id : itemIds) {
          if (MapleItemInformationProvider.getInstance().isPickupRestricted(id) && chr.haveItemWithId(id, true)) {
-            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, I18nMessage.from("INVENTORY_ONE_OF_A_KIND_LIMIT"));
+            MessageBroadcaster.getInstance()
+                  .sendServerNotice(chr, ServerNoticeType.POP_UP, I18nMessage.from("INVENTORY_ONE_OF_A_KIND_LIMIT"));
             return;
          }
       }
@@ -256,7 +257,8 @@ public class ItemAction extends MapleQuestAction {
          }
       }
 
-      return chr.getAbstractPlayerInteraction().canHoldAllAfterRemoving(toAddItemIds, toAddQuantity, toRemoveItemIds, toRemoveQuantity);
+      return chr.getAbstractPlayerInteraction()
+            .canHoldAllAfterRemoving(toAddItemIds, toAddQuantity, toRemoveItemIds, toRemoveQuantity);
    }
 
    private boolean canGetItem(ItemData item, MapleCharacter chr) {
@@ -289,12 +291,14 @@ public class ItemAction extends MapleQuestAction {
             int missingQty = item.count() - chr.countItem(itemId);
             if (missingQty > 0) {
                if (!chr.canHold(itemId, missingQty)) {
-                  MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, I18nMessage.from("INVENTORY_LIMIT"));
+                  MessageBroadcaster.getInstance()
+                        .sendServerNotice(chr, ServerNoticeType.POP_UP, I18nMessage.from("INVENTORY_LIMIT"));
                   return false;
                }
 
                MapleInventoryManipulator.addById(chr.getClient(), item.id(), (short) missingQty);
-               LoggerUtil.printInfo(LoggerOriginator.ENGINE, LogType.QUEST_RESTORE_ITEM, chr + " obtained " + itemId + " qty. " + missingQty + " from quest " + questID);
+               LoggerUtil.printInfo(LoggerOriginator.ENGINE, LogType.QUEST_RESTORE_ITEM,
+                     chr + " obtained " + itemId + " qty. " + missingQty + " from quest " + questId);
             }
             return true;
          }

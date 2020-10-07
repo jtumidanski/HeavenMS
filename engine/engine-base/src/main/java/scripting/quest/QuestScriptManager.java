@@ -10,6 +10,7 @@ import client.MapleClient;
 import client.MapleQuestStatus;
 import constants.game.GameConstants;
 import scripting.AbstractScriptManager;
+import server.processor.QuestProcessor;
 import server.quest.MapleQuest;
 import tools.LogType;
 import tools.LoggerOriginator;
@@ -35,7 +36,7 @@ public class QuestScriptManager extends AbstractScriptManager {
    }
 
    public void start(MapleClient c, short questId, int npc) {
-      MapleQuest quest = MapleQuest.getInstance(questId);
+      MapleQuest quest = QuestProcessor.getInstance().getQuest(questId);
       try {
          QuestActionManager qm = new QuestActionManager(c, questId, npc, true);
          if (qms.containsKey(c)) {
@@ -83,7 +84,7 @@ public class QuestScriptManager extends AbstractScriptManager {
    }
 
    public void end(MapleClient c, short questId, int npc) {
-      MapleQuest quest = MapleQuest.getInstance(questId);
+      MapleQuest quest = QuestProcessor.getInstance().getQuest(questId);
       if (!c.getPlayer().getQuest(quest).getStatus().equals(MapleQuestStatus.Status.STARTED) || !c.getPlayer().getMap().containsNPC(npc)) {
          dispose(c);
          return;

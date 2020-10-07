@@ -4,19 +4,18 @@ import client.MapleCharacter;
 import client.MapleQuestStatus;
 import provider.MapleData;
 import provider.MapleDataTool;
+import server.processor.QuestProcessor;
 import server.quest.MapleQuest;
 import server.quest.MapleQuestRequirementType;
+import tools.I18nMessage;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
-import tools.I18nMessage;
 
 public class IntervalRequirement extends MapleQuestRequirement {
    private int interval = -1;
-   private int questID;
 
-   public IntervalRequirement(MapleQuest quest, MapleData data) {
-      super(MapleQuestRequirementType.INTERVAL);
-      questID = quest.getId();
+   public IntervalRequirement(int questId, MapleData data) {
+      super(questId, MapleQuestRequirementType.INTERVAL);
       processData(data);
    }
 
@@ -29,11 +28,10 @@ public class IntervalRequirement extends MapleQuestRequirement {
       interval = MapleDataTool.getInt(data) * 60 * 1000;
    }
 
-
    private static String getIntervalTimeLeft(MapleCharacter chr, IntervalRequirement r) {
       StringBuilder str = new StringBuilder();
 
-      long futureTime = chr.getQuest(MapleQuest.getInstance(r.questID)).getCompletionTime() + r.getInterval();
+      long futureTime = chr.getQuest(QuestProcessor.getInstance().getQuest(r.getQuestId())).getCompletionTime() + r.getInterval();
       long leftTime = futureTime - System.currentTimeMillis();
 
       byte mode = 0;
@@ -64,12 +62,14 @@ public class IntervalRequirement extends MapleQuestRequirement {
 
    @Override
    public boolean check(MapleCharacter chr, Integer npcId) {
-      boolean check = !chr.getQuest(MapleQuest.getInstance(questID)).getStatus().equals(MapleQuestStatus.Status.COMPLETED);
-      boolean check2 = chr.getQuest(MapleQuest.getInstance(questID)).getCompletionTime() <= System.currentTimeMillis() - interval;
+      boolean check = !chr.getQuest(QuestProcessor.getInstance().getQuest(getQuestId())).getStatus().equals(MapleQuestStatus.Status.COMPLETED);
+      boolean check2 =
+            chr.getQuest(QuestProcessor.getInstance().getQuest(getQuestId())).getCompletionTime() <= System.currentTimeMillis() - interval;
       if (check || check2) {
          return true;
       } else {
-         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, I18nMessage.from("QUEST_INTERVAL_STATUS").with(getIntervalTimeLeft(chr, this)));
+         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT,
+               I18nMessage.from("QUEST_INTERVAL_STATUS").with(getIntervalTimeLeft(chr, this)));
          return false;
       }
    }

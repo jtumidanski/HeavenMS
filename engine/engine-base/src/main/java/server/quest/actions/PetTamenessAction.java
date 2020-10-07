@@ -6,18 +6,15 @@ import client.inventory.MaplePet;
 import client.processor.PetProcessor;
 import provider.MapleData;
 import provider.MapleDataTool;
-import server.quest.MapleQuest;
 import server.quest.MapleQuestActionType;
 
 public class PetTamenessAction extends MapleQuestAction {
    int tameness;
 
-   public PetTamenessAction(MapleQuest quest, MapleData data) {
-      super(MapleQuestActionType.PET_TAMENESS, quest);
-      questID = quest.getId();
+   public PetTamenessAction(int questId, MapleData data) {
+      super(questId, MapleQuestActionType.PET_TAMENESS);
       processData(data);
    }
-
 
    @Override
    public void processData(MapleData data) {

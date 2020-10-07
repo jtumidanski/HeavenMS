@@ -3,14 +3,13 @@ package server.quest.requirements;
 import client.MapleCharacter;
 import provider.MapleData;
 import provider.MapleDataTool;
-import server.quest.MapleQuest;
 import server.quest.MapleQuestRequirementType;
 
 public class BuffRequirement extends MapleQuestRequirement {
    private int buffId = 1;
 
-   public BuffRequirement(MapleQuest quest, MapleData data) {
-      super(MapleQuestRequirementType.BUFF);
+   public BuffRequirement(int questId, MapleData data) {
+      super(questId, MapleQuestRequirementType.BUFF);
       processData(data);
    }
 

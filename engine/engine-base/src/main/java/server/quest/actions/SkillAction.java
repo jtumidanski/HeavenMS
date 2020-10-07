@@ -9,14 +9,13 @@ import client.MapleCharacter;
 import client.SkillFactory;
 import provider.MapleData;
 import provider.MapleDataTool;
-import server.quest.MapleQuest;
 import server.quest.MapleQuestActionType;
 
 public class SkillAction extends MapleQuestAction {
-   Map<Integer, SkillData> skillData = new HashMap<>();
+   private Map<Integer, SkillData> skillData = new HashMap<>();
 
-   public SkillAction(MapleQuest quest, MapleData data) {
-      super(MapleQuestActionType.SKILL, quest);
+   public SkillAction(int questId, MapleData data) {
+      super(questId, MapleQuestActionType.SKILL);
       processData(data);
    }
 

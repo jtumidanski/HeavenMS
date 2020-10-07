@@ -35,7 +35,7 @@ import server.life.MapleLifeFactory;
 import server.life.MapleMonster;
 import server.maps.MapleMapObject;
 import server.maps.MapleMapObjectType;
-import server.quest.MapleQuest;
+import server.processor.QuestProcessor;
 import tools.I18nMessage;
 import tools.LoggerOriginator;
 import tools.LoggerUtil;
@@ -91,7 +91,8 @@ public final class AdminCommandHandler extends AbstractPacketHandler<BaseAdminCo
       } else if (packet instanceof TestingPacket) {
          testingPacket(((TestingPacket) packet).printableInt());
       } else {
-         LoggerUtil.printDebug(LoggerOriginator.ENGINE, "New GM packet encountered (MODE : " + packet.mode() + ": " + packet.toString());
+         LoggerUtil.printDebug(LoggerOriginator.ENGINE,
+               "New GM packet encountered (MODE : " + packet.mode() + ": " + packet.toString());
       }
    }
 
@@ -99,7 +100,8 @@ public final class AdminCommandHandler extends AbstractPacketHandler<BaseAdminCo
       int[][] toSpawn = MapleItemInformationProvider.getInstance().getSummonMobs(summonItemId);
       for (int[] toSpawnChild : toSpawn) {
          if (Randomizer.nextInt(100) < toSpawnChild[1]) {
-            MapleLifeFactory.getMonster(toSpawnChild[0]).ifPresent(monster -> client.getPlayer().getMap().spawnMonsterOnGroundBelow(monster, client.getPlayer().position()));
+            MapleLifeFactory.getMonster(toSpawnChild[0]).ifPresent(
+                  monster -> client.getPlayer().getMap().spawnMonsterOnGroundBelow(monster, client.getPlayer().position()));
          }
       }
       PacketCreator.announce(client, new EnableActions());
@@ -109,7 +111,8 @@ public final class AdminCommandHandler extends AbstractPacketHandler<BaseAdminCo
       MapleInventory in = c.getPlayer().getInventory(MapleInventoryType.getByType(inventoryType));
       for (short i = 1; i <= in.getSlotLimit(); i++) { //TODO What is the point of this loop?
          if (in.getItem(i) != null) {
-            MapleInventoryManipulator.removeFromSlot(c, MapleInventoryType.getByType(inventoryType), i, in.getItem(i).quantity(), false);
+            MapleInventoryManipulator
+                  .removeFromSlot(c, MapleInventoryType.getByType(inventoryType), i, in.getItem(i).quantity(), false);
          }
          return;
       }
@@ -134,7 +137,8 @@ public final class AdminCommandHandler extends AbstractPacketHandler<BaseAdminCo
                   .map(MapleCharacter::getName)
                   .collect(StringBuilder::new, (sb, s1) -> sb.append(" ").append(s1), (sb1, sb2) -> sb1.append(sb2.toString()))
                   .toString();
-            MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("USERS_IN_MAP").with(names));
+            MessageBroadcaster.getInstance()
+                  .sendServerNotice(c.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("USERS_IN_MAP").with(names));
             break;
          case 12:
             break;
@@ -142,7 +146,9 @@ public final class AdminCommandHandler extends AbstractPacketHandler<BaseAdminCo
    }
 
    private void killMonster(MapleClient c, int mobToKill, int amount) {
-      List<MapleMapObject> monsters = c.getPlayer().getMap().getMapObjectsInRange(c.getPlayer().position(), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.MONSTER));
+      List<MapleMapObject> monsters = c.getPlayer().getMap()
+            .getMapObjectsInRange(c.getPlayer().position(), Double.POSITIVE_INFINITY,
+                  Collections.singletonList(MapleMapObjectType.MONSTER));
       for (int x = 0; x < amount; x++) {
          MapleMonster monster = (MapleMonster) monsters.get(x);
          if (monster.id() == mobToKill) {
@@ -152,7 +158,7 @@ public final class AdminCommandHandler extends AbstractPacketHandler<BaseAdminCo
    }
 
    private void questReset(MapleClient c, int questId) {
-      MapleQuest.getInstance(questId).reset(c.getPlayer());
+      QuestProcessor.getInstance().getQuest(questId).reset(c.getPlayer());
    }
 
    private void summon(MapleClient client, int mobId, int quantity) {
@@ -164,12 +170,16 @@ public final class AdminCommandHandler extends AbstractPacketHandler<BaseAdminCo
    }
 
    private void monsterHpBroadcast(MapleClient c, int mobHp) {
-      MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.NOTICE, I18nMessage.from("MONSTER_HP_TITLE"));
-      List<MapleMapObject> monsters = c.getPlayer().getMap().getMapObjectsInRange(c.getPlayer().position(), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.MONSTER));
+      MessageBroadcaster.getInstance()
+            .sendServerNotice(c.getPlayer(), ServerNoticeType.NOTICE, I18nMessage.from("MONSTER_HP_TITLE"));
+      List<MapleMapObject> monsters = c.getPlayer().getMap()
+            .getMapObjectsInRange(c.getPlayer().position(), Double.POSITIVE_INFINITY,
+                  Collections.singletonList(MapleMapObjectType.MONSTER));
       for (MapleMapObject mobs : monsters) {
          MapleMonster monster = (MapleMonster) mobs;
          if (monster.id() == mobHp) {
-            MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.NOTICE, I18nMessage.from("MONSTER_HP_BODY").with(monster.getName(), monster.getHp()));
+            MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.NOTICE,
+                  I18nMessage.from("MONSTER_HP_BODY").with(monster.getName(), monster.getHp()));
          }
       }
    }

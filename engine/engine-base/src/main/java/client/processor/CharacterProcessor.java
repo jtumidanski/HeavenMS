@@ -98,6 +98,7 @@ import server.maps.MapleMapManager;
 import server.maps.MaplePortal;
 import server.maps.SavedLocation;
 import server.maps.SavedLocationType;
+import server.processor.QuestProcessor;
 import server.quest.MapleQuest;
 import tools.LongTool;
 import tools.Pair;
@@ -105,9 +106,10 @@ import tools.Pair;
 public class CharacterProcessor {
    private static CharacterProcessor ourInstance = new CharacterProcessor();
 
-   private static final String[] BLOCKED_NAMES = {"admin", "owner", "moderator", "intern", "donor", "administrator", "FREDRICK", "help", "helper", "alert", "notice", "maplestory", "fuck", "wizet", "fucking", "negro", "fuk", "fuc", "penis", "pussy", "asshole", "gay",
-         "nigger", "homo", "suck", "cum", "shit", "shitty", "condom", "security", "official", "rape", "nigga", "sex", "tit", "boner", "orgy", "clit", "asshole", "fatass", "bitch", "support", "gamemaster", "cock", "gaay", "gm",
-         "operate", "master", "sysop", "party", "GameMaster", "community", "message", "event", "test", "meso", "Scania", "yata", "AsiaSoft", "henesys"};
+   private static final String[] BLOCKED_NAMES =
+         {"admin", "owner", "moderator", "intern", "donor", "administrator", "FREDRICK", "help", "helper", "alert", "notice", "maplestory", "fuck", "wizet", "fucking", "negro", "fuk", "fuc", "penis", "pussy", "asshole", "gay",
+               "nigger", "homo", "suck", "cum", "shit", "shitty", "condom", "security", "official", "rape", "nigga", "sex", "tit", "boner", "orgy", "clit", "asshole", "fatass", "bitch", "support", "gamemaster", "cock", "gaay", "gm",
+               "operate", "master", "sysop", "party", "GameMaster", "community", "message", "event", "test", "meso", "Scania", "yata", "AsiaSoft", "henesys"};
 
    public static CharacterProcessor getInstance() {
       return ourInstance;
@@ -127,15 +129,19 @@ public class CharacterProcessor {
    }
 
    public int getIdByName(String name) {
-      return DatabaseConnection.getInstance().withConnectionResult(connection -> CharacterProvider.getInstance().getIdForName(connection, name)).orElse(-1);
+      return DatabaseConnection.getInstance()
+            .withConnectionResult(connection -> CharacterProvider.getInstance().getIdForName(connection, name)).orElse(-1);
    }
 
    public String getNameById(int id) {
-      return DatabaseConnection.getInstance().withConnectionResult(connection -> CharacterProvider.getInstance().getNameForId(connection, id)).orElse(null);
+      return DatabaseConnection.getInstance()
+            .withConnectionResult(connection -> CharacterProvider.getInstance().getNameForId(connection, id)).orElse(null);
    }
 
    public CharacterIdNameAccountId getCharacterFromDatabase(String name) {
-      return DatabaseConnection.getInstance().withConnectionResult(connection -> CharacterProvider.getInstance().getByName(connection, name).orElse(null)).orElse(null);
+      return DatabaseConnection.getInstance()
+            .withConnectionResult(connection -> CharacterProvider.getInstance().getByName(connection, name).orElse(null))
+            .orElse(null);
    }
 
    public boolean doWorldTransfer(EntityManager entityManager, int characterId, int oldWorld, int newWorld, int worldTransferId) {
@@ -169,7 +175,6 @@ public class CharacterProcessor {
          return "Character is the leader of a guild.";
       }
 
-
       Calendar tempBan = AccountProvider.getInstance().getTempBanCalendar(entityManager, accountId);
       if (tempBan != null) {
          return "Account has been banned.";
@@ -193,8 +198,10 @@ public class CharacterProcessor {
          BuddyListProcessor.getInstance().deleteCharacter(player.getWorld(), cid);
 
          BbsThreadAdministrator.getInstance().deleteThreadsFromCharacter(entityManager, cid);
-         CharacterProvider.getInstance().getGuildDataForCharacter(entityManager, cid, senderAccId).ifPresent(result -> MapleGuildProcessor.getInstance().removeGuildCharacter(
-               new MapleGuildCharacter(player, cid, 0, result.name(), (byte) -1, (byte) -1, 0, result.guildRank(), result.guildId(), false, result.allianceRank())));
+         CharacterProvider.getInstance().getGuildDataForCharacter(entityManager, cid, senderAccId)
+               .ifPresent(result -> MapleGuildProcessor.getInstance().removeGuildCharacter(
+                     new MapleGuildCharacter(player, cid, 0, result.name(), (byte) -1, (byte) -1, 0, result.guildRank(),
+                           result.guildId(), false, result.allianceRank())));
          CashShopProcessor.getInstance().deleteWishListForCharacter(cid);
          CoolDownAdministrator.getInstance().deleteForCharacter(entityManager, cid);
          PlayerDiseaseAdministrator.getInstance().deleteForCharacter(entityManager, cid);
@@ -283,7 +290,7 @@ public class CharacterProcessor {
    private void loadQuests(EntityManager entityManager, CharacterData characterData, MapleCharacter mapleCharacter) {
       Map<Integer, MapleQuestStatus> loadedQuestStatus = new LinkedHashMap<>();
       QuestStatusProvider.getInstance().getQuestData(entityManager, characterData.id()).forEach(questData -> {
-         MapleQuest q = MapleQuest.getInstance(questData.questId());
+         MapleQuest q = QuestProcessor.getInstance().getQuest(questData.questId());
          MapleQuestStatus status = new MapleQuestStatus(q, MapleQuestStatus.Status.getById(questData.status()));
          if (questData.time() > -1) {
             status.setCompletionTime(questData.time() * 1000);
@@ -295,7 +302,7 @@ public class CharacterProcessor {
 
          status.setForfeited(questData.forfeited());
          status.setCompleted(questData.completed());
-         mapleCharacter.addQuest(q.getId(), status);
+         mapleCharacter.addQuest(q.id(), status);
          loadedQuestStatus.put(questData.questStatusId(), status);
       });
       QuestProgressProvider.getInstance().getProgress(entityManager, characterData.id()).forEach(questProgress -> {
@@ -337,7 +344,8 @@ public class CharacterProcessor {
 
    private void loadMessengerData(CharacterData data, MapleCharacter mapleCharacter, World world) {
       if (data.messengerId() > 0 && data.messengerPosition() < 4 && data.messengerPosition() > -1) {
-         world.getMessenger(data.messengerId()).ifPresent(messenger -> mapleCharacter.setMessenger(messenger, data.messengerPosition()));
+         world.getMessenger(data.messengerId())
+               .ifPresent(messenger -> mapleCharacter.setMessenger(messenger, data.messengerPosition()));
       }
    }
 
@@ -370,7 +378,8 @@ public class CharacterProcessor {
    private void loadPetIgnores(EntityManager entityManager, CharacterData data, MapleCharacter mapleCharacter) {
       InventoryItemProvider.getInstance().getPetsForCharacter(entityManager, data.id()).forEach(petId -> {
          mapleCharacter.resetExcluded(petId);
-         PetIgnoreProvider.getInstance().getIgnoresForPet(entityManager, petId).forEach(itemId -> mapleCharacter.addExcluded(petId, itemId));
+         PetIgnoreProvider.getInstance().getIgnoresForPet(entityManager, petId)
+               .forEach(itemId -> mapleCharacter.addExcluded(petId, itemId));
       });
       mapleCharacter.commitExcludedItems();
    }
@@ -443,12 +452,14 @@ public class CharacterProcessor {
 
          CharacterProcessor.getInstance().loadTeleportLocations(connection, characterData, mapleCharacter);
 
-         DatabaseConnection.getInstance().withConnection(entityManager -> AccountProvider.getInstance().getAccountDataById(entityManager, characterData.accountId()).ifPresent(accountData -> {
-            MapleClient retClient = mapleCharacter.getClient();
-            retClient.setAccountName(accountData.name());
-            retClient.setCharacterSlots(accountData.characterSlots().byteValue());
-            retClient.setLocale(new Locale(accountData.language(), accountData.country()));
-         }));
+         DatabaseConnection.getInstance().withConnection(
+               entityManager -> AccountProvider.getInstance().getAccountDataById(entityManager, characterData.accountId())
+                     .ifPresent(accountData -> {
+                        MapleClient retClient = mapleCharacter.getClient();
+                        retClient.setAccountName(accountData.name());
+                        retClient.setCharacterSlots(accountData.characterSlots().byteValue());
+                        retClient.setLocale(new Locale(accountData.language(), accountData.country()));
+                     }));
 
          AreaInfoProvider.getInstance().getAreaInfo(connection, characterData.id())
                .forEach(areaInfo -> mapleCharacter.getAreaInfos().put(areaInfo.area().shortValue(), areaInfo.info()));
@@ -460,8 +471,10 @@ public class CharacterProcessor {
          mapleCharacter.initCashShop();
          mapleCharacter.initAutoBanManager();
 
-         CharacterProvider.getInstance().getHighestLevelOtherCharacterData(connection, characterData.accountId(), characterData.id())
-               .ifPresent(otherCharacterData -> mapleCharacter.setLinkedCharacterInformation(otherCharacterData.name(), otherCharacterData.level()));
+         CharacterProvider.getInstance()
+               .getHighestLevelOtherCharacterData(connection, characterData.accountId(), characterData.id())
+               .ifPresent(otherCharacterData -> mapleCharacter
+                     .setLinkedCharacterInformation(otherCharacterData.name(), otherCharacterData.level()));
 
          if (channelServer) {
             CharacterProcessor.getInstance().loadQuests(connection, characterData, mapleCharacter);
@@ -471,19 +484,24 @@ public class CharacterProcessor {
 
             SkillMacroProvider.getInstance().getForCharacter(connection, characterData.id()).forEach(skillMacroData -> {
                int position = skillMacroData.position();
-               SkillMacro macro = new SkillMacro(skillMacroData.name(), skillMacroData.shout(), skillMacroData.skill1Id(), skillMacroData.skill2Id(),
+               SkillMacro macro = new SkillMacro(skillMacroData.name(), skillMacroData.shout(), skillMacroData.skill1Id(),
+                     skillMacroData.skill2Id(),
                      skillMacroData.skill3Id(),
                      position);
                mapleCharacter.updateMacros(position, macro);
             });
 
             KeyMapProvider.getInstance().getForCharacter(connection, characterData.id())
-                  .forEach(keyMapData -> mapleCharacter.getKeymap().put(keyMapData.key(), new KeyBinding(keyMapData.theType(), keyMapData.action())));
+                  .forEach(keyMapData -> mapleCharacter.getKeymap()
+                        .put(keyMapData.key(), new KeyBinding(keyMapData.theType(), keyMapData.action())));
 
             SavedLocationProvider.getInstance().getForCharacter(connection, characterData.id())
-                  .forEach(savedLocationData -> mapleCharacter.updateSavedLocation(SavedLocationType.valueOf(savedLocationData.locationType()).ordinal(), new SavedLocation(savedLocationData.mapId(), savedLocationData.portalId())));
+                  .forEach(savedLocationData -> mapleCharacter
+                        .updateSavedLocation(SavedLocationType.valueOf(savedLocationData.locationType()).ordinal(),
+                              new SavedLocation(savedLocationData.mapId(), savedLocationData.portalId())));
 
-            FameLogProvider.getInstance().getForCharacter(connection, characterData.id()).forEach(fameLogData -> mapleCharacter.giveFame(fameLogData.getLeft(), fameLogData.getRight().getTime()));
+            FameLogProvider.getInstance().getForCharacter(connection, characterData.id())
+                  .forEach(fameLogData -> mapleCharacter.giveFame(fameLogData.getLeft(), fameLogData.getRight().getTime()));
 
             BuddyListProcessor.getInstance().loadBuddies(mapleCharacter);
             mapleCharacter.setStorage(world.getAccountStorage(characterData.accountId()));
@@ -499,7 +517,8 @@ public class CharacterProcessor {
                mountItemId = mapleCharacter.getInventory(MapleInventoryType.EQUIPPED).getItem((short) -18).id();
             }
 
-            mapleMount = new MapleMount(mountItemId, mountId, characterData.mountLevel(), characterData.mountExp(), characterData.mountTiredness(), false);
+            mapleMount = new MapleMount(mountItemId, mountId, characterData.mountLevel(), characterData.mountExp(),
+                  characterData.mountTiredness(), false);
             mapleCharacter.setMount(mapleMount);
 
             QuickSlotKeyMapProvider.getInstance().getForAccount(connection, characterData.accountId()).ifPresent(keyMap -> {
@@ -633,13 +652,17 @@ public class CharacterProcessor {
       return ret;
    }
 
-
    public final boolean insertNewChar(MapleCharacter character) {
       DatabaseConnection.getInstance().withConnection(entityManager -> {
          entityManager.getTransaction().begin();
-         int key = CharacterAdministrator.getInstance().create(entityManager, character.getStr(), character.getDex(), character.getLuk(), character.getInt(), character.gmLevel(), character.getSkinColor().getId(),
-               character.getGender(), character.getJob().getId(), character.getHair(), character.getFace(), character.getMapId(), Math.abs(character.getMeso()), character.getAccountID(), character.getName(), character.getWorld(), character.getHp(), character.getMp(),
-               character.getMaxHp(), character.getMaxMp(), character.getLevel(), character.getRemainingAp(), character.getRemainingSps());
+         int key = CharacterAdministrator.getInstance()
+               .create(entityManager, character.getStr(), character.getDex(), character.getLuk(), character.getInt(),
+                     character.gmLevel(), character.getSkinColor().getId(),
+                     character.getGender(), character.getJob().getId(), character.getHair(), character.getFace(),
+                     character.getMapId(), Math.abs(character.getMeso()), character.getAccountID(), character.getName(),
+                     character.getWorld(), character.getHp(), character.getMp(),
+                     character.getMaxHp(), character.getMaxMp(), character.getLevel(), character.getRemainingAp(),
+                     character.getRemainingSps());
          character.setId(key);
 
          // Select a key binding method
@@ -657,9 +680,9 @@ public class CharacterProcessor {
             selectedAction = GameConstants.getCustomAction(false);
          }
 
-
          for (int i = 0; i < selectedKey.length; i++) {
-            KeyMapAdministrator.getInstance().create(entityManager, character.getId(), selectedKey[i], selectedType[i], selectedAction[i]);
+            KeyMapAdministrator.getInstance()
+                  .create(entityManager, character.getId(), selectedKey[i], selectedType[i], selectedAction[i]);
          }
 
          createQuickSlots(entityManager, character);
@@ -686,26 +709,31 @@ public class CharacterProcessor {
 
    public void createQuickSlots(EntityManager entityManager, MapleCharacter character) {
       boolean noChanges = character.getQuickSlotLoaded() == null ||
-            (character.getQuickSlotLoaded() != null && Arrays.equals(character.getQuickSlotLoaded(), character.getQuickSlotBinding().getQuickSlotKeyMapped()));
+            (character.getQuickSlotLoaded() != null && Arrays
+                  .equals(character.getQuickSlotLoaded(), character.getQuickSlotBinding().getQuickSlotKeyMapped()));
       if (!noChanges) {
          long value = LongTool.BytesToLong(character.getQuickSlotBinding().getQuickSlotKeyMapped());
 
          QuickSlotKeyMapProvider.getInstance().getForAccount(entityManager, character.getAccountID()).ifPresentOrElse(
-               keyMap -> QuickSlotKeyMapAdministrator.getInstance().update(entityManager, character.getAccountID(), BigInteger.valueOf(value)),
-               () -> QuickSlotKeyMapAdministrator.getInstance().create(entityManager, character.getAccountID(), BigInteger.valueOf(value)));
+               keyMap -> QuickSlotKeyMapAdministrator.getInstance()
+                     .update(entityManager, character.getAccountID(), BigInteger.valueOf(value)),
+               () -> QuickSlotKeyMapAdministrator.getInstance()
+                     .create(entityManager, character.getAccountID(), BigInteger.valueOf(value)));
       }
    }
 
    public Optional<Byte> canDeleteCharacter(int characterId) {
       return DatabaseConnection.getInstance().withConnectionResult(connection -> {
-         Optional<CharacterGuildFamilyData> guildFamilyData = CharacterProvider.getInstance().getGuildFamilyInformation(connection, characterId);
+         Optional<CharacterGuildFamilyData> guildFamilyData =
+               CharacterProvider.getInstance().getGuildFamilyInformation(connection, characterId);
          if (guildFamilyData.isEmpty()) {
             return (byte) 0x09;
          }
          if (guildFamilyData.get().guildId() != 0 && guildFamilyData.get().guildRank() <= 1) {
             return (byte) 0x16;
          } else if (guildFamilyData.get().familyId() != -1) {
-            MapleFamily family = Server.getInstance().getWorld(guildFamilyData.get().world()).getFamily(guildFamilyData.get().familyId());
+            MapleFamily family =
+                  Server.getInstance().getWorld(guildFamilyData.get().world()).getFamily(guildFamilyData.get().familyId());
             if (family != null && family.getTotalMembers() > 1) {
                return (byte) 0x1D;
             }

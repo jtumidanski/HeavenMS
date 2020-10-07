@@ -31,7 +31,7 @@ public class QuestStatusAdministrator extends AbstractQueryExecutor implements D
    public int create(EntityManager entityManager, int characterId, MapleQuestStatus mapleQuestStatus) {
       QuestStatus questStatus = new QuestStatus();
       questStatus.setCharacterId(characterId);
-      questStatus.setQuest((int) mapleQuestStatus.getQuest().getId());
+      questStatus.setQuest((int) mapleQuestStatus.getQuest().id());
       questStatus.setStatus(mapleQuestStatus.getStatus().getId());
       questStatus.setTime((int) (mapleQuestStatus.getCompletionTime() / 1000));
       questStatus.setExpires(mapleQuestStatus.getExpirationTime());

@@ -6,13 +6,14 @@ import java.util.List;
 import client.MapleCharacter;
 import server.life.MapleMonsterInformationProvider;
 import server.life.MonsterDropEntry;
+import server.processor.QuestProcessor;
 import server.quest.MapleQuest;
 
 public class MapleLootManager {
 
    private static boolean isRelevantDrop(MonsterDropEntry dropEntry, List<MapleCharacter> players, List<MapleLootInventory> playersInv) {
       int qStartAmount = 0, qCompleteAmount = 0;
-      MapleQuest quest = MapleQuest.getInstance(dropEntry.questId());
+      MapleQuest quest = QuestProcessor.getInstance().getQuest(dropEntry.questId());
       if (quest != null) {
          qStartAmount = quest.getStartItemAmountNeeded(dropEntry.itemId());
          qCompleteAmount = quest.getCompleteItemAmountNeeded(dropEntry.itemId());

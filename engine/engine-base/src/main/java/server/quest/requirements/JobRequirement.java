@@ -7,14 +7,13 @@ import client.MapleCharacter;
 import client.MapleJob;
 import provider.MapleData;
 import provider.MapleDataTool;
-import server.quest.MapleQuest;
 import server.quest.MapleQuestRequirementType;
 
 public class JobRequirement extends MapleQuestRequirement {
    List<Integer> jobs = new ArrayList<>();
 
-   public JobRequirement(MapleQuest quest, MapleData data) {
-      super(MapleQuestRequirementType.JOB);
+   public JobRequirement(int questId, MapleData data) {
+      super(questId, MapleQuestRequirementType.JOB);
       processData(data);
    }
 

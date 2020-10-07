@@ -3,14 +3,13 @@ package server.quest.requirements;
 import client.MapleCharacter;
 import provider.MapleData;
 import provider.MapleDataTool;
-import server.quest.MapleQuest;
 import server.quest.MapleQuestRequirementType;
 
 public class ScriptRequirement extends MapleQuestRequirement {
    private boolean reqScript;
 
-   public ScriptRequirement(MapleQuest quest, MapleData data) {
-      super(MapleQuestRequirementType.BUFF);
+   public ScriptRequirement(int questId, MapleData data) {
+      super(questId, MapleQuestRequirementType.BUFF);
       processData(data);
    }
 

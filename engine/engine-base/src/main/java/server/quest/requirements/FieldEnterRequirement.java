@@ -3,15 +3,13 @@ package server.quest.requirements;
 import client.MapleCharacter;
 import provider.MapleData;
 import provider.MapleDataTool;
-import server.quest.MapleQuest;
 import server.quest.MapleQuestRequirementType;
 
 public class FieldEnterRequirement extends MapleQuestRequirement {
    private int mapId = -1;
 
-
-   public FieldEnterRequirement(MapleQuest quest, MapleData data) {
-      super(MapleQuestRequirementType.FIELD_ENTER);
+   public FieldEnterRequirement(int questId, MapleData data) {
+      super(questId, MapleQuestRequirementType.FIELD_ENTER);
       processData(data);
    }
 
@@ -22,7 +20,6 @@ public class FieldEnterRequirement extends MapleQuestRequirement {
          mapId = MapleDataTool.getInt(zeroField);
       }
    }
-
 
    @Override
    public boolean check(MapleCharacter chr, Integer npcId) {

@@ -120,8 +120,8 @@ public class CharacterPacketFactory extends AbstractPacketFactory {
       ArrayList<Short> medalQuests = new ArrayList<>();
       List<MapleQuestStatus> completed = chr.getCompletedQuests();
       for (MapleQuestStatus q : completed) {
-         if (q.getQuest().getId() >= 29000) { // && q.getQuest().getId() <= 29923
-            medalQuests.add(q.getQuest().getId());
+         if (q.getQuest().id() >= 29000) { // && q.getQuest().getId() <= 29923
+            medalQuests.add(q.getQuest().id());
          }
       }
 
