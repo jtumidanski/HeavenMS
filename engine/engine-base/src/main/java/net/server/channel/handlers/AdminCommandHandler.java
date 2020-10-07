@@ -158,7 +158,7 @@ public final class AdminCommandHandler extends AbstractPacketHandler<BaseAdminCo
    }
 
    private void questReset(MapleClient c, int questId) {
-      QuestProcessor.getInstance().getQuest(questId).reset(c.getPlayer());
+      QuestProcessor.getInstance().reset(c.getPlayer(), questId);
    }
 
    private void summon(MapleClient client, int mobId, int quantity) {

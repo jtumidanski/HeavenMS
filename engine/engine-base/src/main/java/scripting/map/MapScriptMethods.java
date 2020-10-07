@@ -44,12 +44,15 @@ public class MapScriptMethods extends AbstractPlayerInteraction {
             lockUI();
             PacketCreator.announce(c, new ShowIntro("Effect/Direction1.img/aranTutorial/Scene0"));
          }
-         case 914090011 -> PacketCreator.announce(c, new ShowIntro("Effect/Direction1.img/aranTutorial/Scene1" + c.getPlayer().getGender()));
-         case 914090012 -> PacketCreator.announce(c, new ShowIntro("Effect/Direction1.img/aranTutorial/Scene2" + c.getPlayer().getGender()));
+         case 914090011 -> PacketCreator
+               .announce(c, new ShowIntro("Effect/Direction1.img/aranTutorial/Scene1" + c.getPlayer().getGender()));
+         case 914090012 -> PacketCreator
+               .announce(c, new ShowIntro("Effect/Direction1.img/aranTutorial/Scene2" + c.getPlayer().getGender()));
          case 914090013 -> PacketCreator.announce(c, new ShowIntro("Effect/Direction1.img/aranTutorial/Scene3"));
          case 914090100 -> {
             lockUI();
-            PacketCreator.announce(c, new ShowIntro("Effect/Direction1.img/aranTutorial/HandedPoleArm" + c.getPlayer().getGender()));
+            PacketCreator
+                  .announce(c, new ShowIntro("Effect/Direction1.img/aranTutorial/HandedPoleArm" + c.getPlayer().getGender()));
          }
       }
    }
@@ -86,7 +89,8 @@ public class MapScriptMethods extends AbstractPlayerInteraction {
    public void explorerQuest(short questId, String questName) {
       MapleQuest quest = QuestProcessor.getInstance().getQuest(questId);
       if (!isQuestStarted(questId)) {
-         if (!quest.forceStart(getPlayer(), 9000066)) {
+         boolean success = QuestProcessor.getInstance().forceStart(getPlayer(), quest, 9000066);
+         if (!success) {
             return;
          }
       }
@@ -95,7 +99,7 @@ public class MapScriptMethods extends AbstractPlayerInteraction {
          return;
       }
       String status = Integer.toString(q.getMedalProgress());
-      String infoEx = q.getInfoEx(0);
+      String infoEx = quest.getInfoEx(q.getStatus(), 0);
       getPlayer().announceUpdateQuest(MapleCharacter.DelayedQuestUpdate.UPDATE, q, true);
       StringBuilder smp = new StringBuilder();
       StringBuilder etm = new StringBuilder();
@@ -115,7 +119,8 @@ public class MapScriptMethods extends AbstractPlayerInteraction {
    public void touchTheSky() { //29004
       MapleQuest quest = QuestProcessor.getInstance().getQuest(29004);
       if (!isQuestStarted(29004)) {
-         if (!quest.forceStart(getPlayer(), 9000066)) {
+         boolean success = QuestProcessor.getInstance().forceStart(getPlayer(), quest, 9000066);
+         if (!success) {
             return;
          }
       }
@@ -127,7 +132,7 @@ public class MapScriptMethods extends AbstractPlayerInteraction {
       getPlayer().announceUpdateQuest(MapleCharacter.DelayedQuestUpdate.UPDATE, q, true);
       PacketCreator.announce(getPlayer(), new ShowTitleEarned(status + "/5 Completed"));
       PacketCreator.announce(getPlayer(), new ShowTitleEarned("The One Who's Touched the Sky title in progress."));
-      if (Integer.toString(q.getMedalProgress()).equals(q.getInfoEx(0))) {
+      if (Integer.toString(q.getMedalProgress()).equals(quest.getInfoEx(q.getStatus(), 0))) {
          showInfoText("The One Who's Touched the Sky" + rewardString);
          PacketCreator.announce(getPlayer(), new ShowQuestComplete(quest.id()));
       } else {

@@ -42,6 +42,7 @@ import server.maps.MapleMap;
 import server.maps.MapleMapManager;
 import server.maps.MaplePortal;
 import server.maps.MapleReactor;
+import server.processor.QuestProcessor;
 import tools.LogType;
 import tools.LoggerOriginator;
 import tools.LoggerUtil;
@@ -858,7 +859,7 @@ public class EventInstanceManager {
             MapleCharacter chr = mapChars.get(evChr.getId());
 
             if (chr != null && chr.isLoggedInWorld()) {
-               chr.raiseQuestMobCount(mobId);
+               QuestProcessor.getInstance().raiseQuestMobCount(chr, mobId);
             }
          }
       }

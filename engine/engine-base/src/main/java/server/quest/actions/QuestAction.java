@@ -8,7 +8,6 @@ import client.MapleQuestStatus;
 import provider.MapleData;
 import provider.MapleDataTool;
 import server.processor.QuestProcessor;
-import server.quest.MapleQuest;
 import server.quest.MapleQuestActionType;
 
 public class QuestAction extends MapleQuestAction {
@@ -34,7 +33,8 @@ public class QuestAction extends MapleQuestAction {
    public void run(MapleCharacter chr, Integer extSelection) {
       for (Integer questID : quests.keySet()) {
          int stat = quests.get(questID);
-         chr.updateQuestStatus(new MapleQuestStatus(QuestProcessor.getInstance().getQuest(questID), MapleQuestStatus.Status.getById(stat)));
+         QuestProcessor.getInstance().updateQuestStatus(chr,
+               new MapleQuestStatus(QuestProcessor.getInstance().getQuest(questID), MapleQuestStatus.Status.getById(stat)));
       }
    }
 } 

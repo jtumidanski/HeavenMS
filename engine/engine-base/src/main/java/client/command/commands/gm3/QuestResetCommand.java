@@ -28,7 +28,7 @@ public class QuestResetCommand extends Command {
       if (player.getQuestStatus(questId) != 0) {
          MapleQuest quest = QuestProcessor.getInstance().getQuest(questId);
          if (quest != null) {
-            quest.reset(player);
+            QuestProcessor.getInstance().reset(player, quest);
             MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT,
                   I18nMessage.from("QUEST_RESET_COMMAND_SUCCESS").with(questId));
          } else {    // should not occur

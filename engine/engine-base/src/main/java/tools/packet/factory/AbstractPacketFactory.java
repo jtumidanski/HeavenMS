@@ -29,6 +29,7 @@ import constants.inventory.ItemConstants;
 import net.server.PlayerCoolDownValueHolder;
 import server.MapleItemInformationProvider;
 import server.maps.MapleMiniGame;
+import server.processor.QuestProcessor;
 import tools.LogType;
 import tools.LoggerOriginator;
 import tools.LoggerUtil;
@@ -467,17 +468,17 @@ public abstract class AbstractPacketFactory implements PacketFactory {
       List<MapleQuestStatus> started = character.getStartedQuests();
       int startedSize = 0;
       for (MapleQuestStatus qs : started) {
-         if (qs.getInfoNumber() > 0) {
+         if (QuestProcessor.getInstance().getInfoNumber(qs) > 0) {
             startedSize++;
          }
          startedSize++;
       }
       writer.writeShort(startedSize);
       for (MapleQuestStatus qs : started) {
-         writer.writeShort(qs.getQuest().id());
+         writer.writeShort(qs.getQuestId());
          writer.writeMapleAsciiString(qs.getProgressData());
 
-         short infoNumber = qs.getInfoNumber();
+         short infoNumber = QuestProcessor.getInstance().getInfoNumber(qs);
          if (infoNumber > 0) {
             MapleQuestStatus iqs = character.getQuest(infoNumber);
             writer.writeShort(infoNumber);
@@ -487,7 +488,7 @@ public abstract class AbstractPacketFactory implements PacketFactory {
       List<MapleQuestStatus> completed = character.getCompletedQuests();
       writer.writeShort(completed.size());
       for (MapleQuestStatus qs : completed) {
-         writer.writeShort(qs.getQuest().id());
+         writer.writeShort(qs.getQuestId());
          writer.writeLong(getTime(qs.getCompletionTime()));
       }
    }

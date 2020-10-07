@@ -761,7 +761,7 @@ public class EventManager {
 
    public void startQuest(MapleCharacter chr, int id, int npcId) {
       try {
-         QuestProcessor.getInstance().getQuest(id).forceStart(chr, npcId);
+         QuestProcessor.getInstance().forceStart(chr, id, npcId);
       } catch (NullPointerException ex) {
          ex.printStackTrace();
       }
@@ -769,7 +769,7 @@ public class EventManager {
 
    public void completeQuest(MapleCharacter chr, int id, int npcId) {
       try {
-         QuestProcessor.getInstance().getQuest(id).forceComplete(chr, npcId);
+         QuestProcessor.getInstance().forceComplete(chr, id, npcId);
       } catch (NullPointerException ex) {
          ex.printStackTrace();
       }

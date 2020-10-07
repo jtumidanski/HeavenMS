@@ -7,74 +7,61 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import server.processor.QuestProcessor;
 import server.quest.MapleQuest;
-import tools.StringUtil;
 
 public class MapleQuestStatus {
-   //private boolean updated;   //maybe this can be of use for someone?
    private final Map<Integer, String> progress = new LinkedHashMap<>();
-   private final List<Integer> medalProgress = new LinkedList<>();
-   private short questID;
-   private Status status;
-   private int npc;
-   private long completionTime, expirationTime;
-   private int forfeited = 0, completed = 0;
-   private String customData;
-   public MapleQuestStatus(MapleQuest quest, Status status) {
-      this.questID = quest.id();
-      this.setStatus(status);
-      this.completionTime = System.currentTimeMillis();
-      this.expirationTime = 0;
-      //this.updated = true;
-      if (status == Status.STARTED)
-         registerMobs();
-   }
 
-   public MapleQuestStatus(MapleQuest quest, Status status, int npc) {
-      this.questID = quest.id();
-      this.setStatus(status);
-      this.setNpc(npc);
+   private final List<Integer> medalProgress = new LinkedList<>();
+
+   private final short questId;
+
+   private Status status;
+
+   private int npc;
+
+   private long completionTime;
+
+   private long expirationTime;
+
+   private int forfeited = 0;
+
+   private int completed = 0;
+
+   private String customData;
+
+   public MapleQuestStatus(MapleQuest quest, Status status) {
+      this.questId = quest.id();
+      this.status = status;
       this.completionTime = System.currentTimeMillis();
       this.expirationTime = 0;
       //this.updated = true;
       if (status == Status.STARTED) {
-         registerMobs();
+         quest.relevantMobs().forEach(mob -> progress.put(mob, "000"));
       }
    }
 
-   public MapleQuest getQuest() {
-      return QuestProcessor.getInstance().getQuest(questID);
+   public MapleQuestStatus(MapleQuest quest, Status status, int npc) {
+      this(quest, status);
+      this.npc = npc;
    }
 
-   public short getQuestID() {
-      return questID;
+   public short getQuestId() {
+      return questId;
    }
 
    public Status getStatus() {
       return status;
    }
 
-   public final void setStatus(Status status) {
-      this.status = status;
-   }
-
    public int getNpc() {
       return npc;
    }
 
-   public final void setNpc(int npc) {
-      this.npc = npc;
-   }
-
-   private void registerMobs() {
-      for (int i : QuestProcessor.getInstance().getQuest(questID).getRelevantMobs()) {
-         progress.put(i, "000");
-      }
-   }
-
    public boolean addMedalMap(int mapId) {
-      if (medalProgress.contains(mapId)) return false;
+      if (medalProgress.contains(mapId)) {
+         return false;
+      }
       medalProgress.add(mapId);
       return true;
    }
@@ -85,21 +72,6 @@ public class MapleQuestStatus {
 
    public List<Integer> getMedalMaps() {
       return medalProgress;
-   }
-
-   public boolean progress(int id) {
-      String currentStr = progress.get(id);
-      if (currentStr == null) {
-         return false;
-      }
-      int current = Integer.parseInt(currentStr);
-      if (current >= this.getQuest().getMobAmountNeeded(id)) {
-         return false;
-      }
-
-      String str = StringUtil.getLeftPaddedStr(Integer.toString(++current), '0', 3);
-      progress.put(id, str);
-      return true;
    }
 
    public void setProgress(int id, String pr) {
@@ -127,27 +99,6 @@ public class MapleQuestStatus {
 
    public Map<Integer, String> getProgress() {
       return Collections.unmodifiableMap(progress);
-   }
-
-   public short getInfoNumber() {
-      MapleQuest q = this.getQuest();
-      Status s = this.getStatus();
-
-      return q.getInfoNumber(s);
-   }
-
-   public String getInfoEx(int index) {
-      MapleQuest q = this.getQuest();
-      Status s = this.getStatus();
-
-      return q.getInfoEx(s, index);
-   }
-
-   public List<String> getInfoEx() {
-      MapleQuest q = this.getQuest();
-      Status s = this.getStatus();
-
-      return q.getInfoEx(s);
    }
 
    public long getCompletionTime() {

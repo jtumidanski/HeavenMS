@@ -415,7 +415,7 @@ public class AbstractPlayerInteraction {
    }
 
    public void setQuestProgress(int id, int infoNumber, String progress) {
-      c.getPlayer().setQuestProgress(id, infoNumber, progress);
+      QuestProcessor.getInstance().setQuestProgress(c.getPlayer(), id, infoNumber, progress);
    }
 
    public String getQuestProgress(int id) {
@@ -425,7 +425,7 @@ public class AbstractPlayerInteraction {
    public String getQuestProgress(int id, int infoNumber) {
       MapleQuestStatus qs = getPlayer().getQuest(QuestProcessor.getInstance().getQuest(id));
 
-      if (qs.getInfoNumber() == infoNumber && infoNumber > 0) {
+      if (QuestProcessor.getInstance().getInfoNumber(qs) == infoNumber && infoNumber > 0) {
          qs = getPlayer().getQuest(QuestProcessor.getInstance().getQuest(infoNumber));
          infoNumber = 0;
       }
@@ -511,7 +511,7 @@ public class AbstractPlayerInteraction {
 
    public boolean startQuest(int id, int npcId) {
       try {
-         return QuestProcessor.getInstance().getQuest(id).forceStart(getPlayer(), npcId);
+         return QuestProcessor.getInstance().forceStart(getPlayer(), id, npcId);
       } catch (NullPointerException ex) {
          ex.printStackTrace();
          return false;
@@ -520,7 +520,7 @@ public class AbstractPlayerInteraction {
 
    public boolean completeQuest(int id, int npcId) {
       try {
-         return QuestProcessor.getInstance().getQuest(id).forceComplete(getPlayer(), npcId);
+         return QuestProcessor.getInstance().forceComplete(getPlayer(), id, npcId);
       } catch (NullPointerException ex) {
          ex.printStackTrace();
          return false;
