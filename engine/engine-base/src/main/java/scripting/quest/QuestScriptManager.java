@@ -7,7 +7,7 @@ import javax.script.Invocable;
 import javax.script.ScriptEngine;
 
 import client.MapleClient;
-import client.MapleQuestStatus;
+import client.QuestStatus;
 import constants.game.GameConstants;
 import scripting.AbstractScriptManager;
 import server.processor.QuestProcessor;
@@ -85,7 +85,8 @@ public class QuestScriptManager extends AbstractScriptManager {
 
    public void end(MapleClient c, short questId, int npc) {
       MapleQuest quest = QuestProcessor.getInstance().getQuest(questId);
-      if (!c.getPlayer().getQuest(quest).getStatus().equals(MapleQuestStatus.Status.STARTED) || !c.getPlayer().getMap().containsNPC(npc)) {
+      if (!QuestProcessor.getInstance().questIsStatus(c.getPlayer(), quest, QuestStatus.STARTED)
+            || !c.getPlayer().getMap().containsNPC(npc)) {
          dispose(c);
          return;
       }

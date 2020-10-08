@@ -19,7 +19,6 @@ import client.MapleClient;
 import client.MapleFamily;
 import client.MapleJob;
 import client.MapleMount;
-import client.MapleQuestStatus;
 import client.MapleSkinColor;
 import client.Ring;
 import client.Skill;
@@ -74,11 +73,8 @@ import database.provider.FameLogProvider;
 import database.provider.InventoryEquipmentProvider;
 import database.provider.InventoryItemProvider;
 import database.provider.KeyMapProvider;
-import database.provider.MedalMapProvider;
 import database.provider.PetIgnoreProvider;
 import database.provider.PlayerDiseaseProvider;
-import database.provider.QuestProgressProvider;
-import database.provider.QuestStatusProvider;
 import database.provider.QuickSlotKeyMapProvider;
 import database.provider.SavedLocationProvider;
 import database.provider.SkillMacroProvider;
@@ -99,7 +95,6 @@ import server.maps.MaplePortal;
 import server.maps.SavedLocation;
 import server.maps.SavedLocationType;
 import server.processor.QuestProcessor;
-import server.quest.MapleQuest;
 import tools.LongTool;
 import tools.Pair;
 
@@ -211,7 +206,7 @@ public class CharacterProcessor {
          FamilyCharacterAdministrator.getInstance().deleteForCharacter(entityManager, cid);
          FameLogAdministrator.getInstance().deleteForCharacter(entityManager, cid);
          cleanupInventoryEquipment(entityManager, cid);
-         deleteQuestProgressWhereCharacterId(entityManager, cid);
+         QuestProcessor.getInstance().deleteQuestProgressWhereCharacterId(entityManager, cid);
          FredrickProcessor.removeFredrickLog(cid);
          MtsItemAdministrator.getInstance().deleteForCharacter(entityManager, cid);
          MtsCartAdministrator.getInstance().deleteForCharacter(entityManager, cid);
@@ -242,12 +237,6 @@ public class CharacterProcessor {
             MapleCashIdGenerator.getInstance().freeCashId(pair.getRight());
          }
       });
-   }
-
-   public void deleteQuestProgressWhereCharacterId(EntityManager entityManager, int cid) {
-      MedalMapAdministrator.getInstance().deleteForCharacter(entityManager, cid);
-      QuestProgressAdministrator.getInstance().deleteForCharacter(entityManager, cid);
-      QuestStatusAdministrator.getInstance().deleteForCharacter(entityManager, cid);
    }
 
    private void loadPlayerDiseases(EntityManager entityManager, CharacterData characterData, MapleCharacter mapleCharacter) {
@@ -285,39 +274,6 @@ public class CharacterProcessor {
             mapleCharacter.addSkill((skill.get()), skillEntry);
          }
       });
-   }
-
-   private void loadQuests(EntityManager entityManager, CharacterData characterData, MapleCharacter mapleCharacter) {
-      Map<Integer, MapleQuestStatus> loadedQuestStatus = new LinkedHashMap<>();
-      QuestStatusProvider.getInstance().getQuestData(entityManager, characterData.id()).forEach(questData -> {
-         MapleQuest q = QuestProcessor.getInstance().getQuest(questData.questId());
-         MapleQuestStatus status = new MapleQuestStatus(q, MapleQuestStatus.Status.getById(questData.status()));
-         if (questData.time() > -1) {
-            status.setCompletionTime(questData.time() * 1000);
-         }
-
-         if (questData.expires() > 0) {
-            status.setExpirationTime(questData.expires());
-         }
-
-         status.setForfeited(questData.forfeited());
-         status.setCompleted(questData.completed());
-         mapleCharacter.addQuest(q.id(), status);
-         loadedQuestStatus.put(questData.questStatusId(), status);
-      });
-      QuestProgressProvider.getInstance().getProgress(entityManager, characterData.id()).forEach(questProgress -> {
-         MapleQuestStatus status = loadedQuestStatus.get(questProgress.questStatusId());
-         if (status != null) {
-            status.setProgress(questProgress.progressId(), questProgress.progress());
-         }
-      });
-      MedalMapProvider.getInstance().get(entityManager, characterData.id()).forEach(medalMap -> {
-         MapleQuestStatus status = loadedQuestStatus.get(medalMap.getLeft());
-         if (status != null) {
-            status.addMedalMap(medalMap.getRight());
-         }
-      });
-      loadedQuestStatus.clear();
    }
 
    private void loadTeleportLocations(EntityManager entityManager, CharacterData data, MapleCharacter mapleCharacter) {
@@ -477,7 +433,7 @@ public class CharacterProcessor {
                      .setLinkedCharacterInformation(otherCharacterData.name(), otherCharacterData.level()));
 
          if (channelServer) {
-            CharacterProcessor.getInstance().loadQuests(connection, characterData, mapleCharacter);
+            QuestProcessor.getInstance().loadQuests(connection, characterData, mapleCharacter);
             CharacterProcessor.getInstance().loadSkills(connection, characterData, mapleCharacter);
             CharacterProcessor.getInstance().loadCoolDowns(connection, characterData, mapleCharacter);
             CharacterProcessor.getInstance().loadPlayerDiseases(connection, characterData, mapleCharacter);

@@ -1,6 +1,7 @@
 package database.provider;
 
 import java.util.List;
+import java.util.Optional;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
@@ -23,8 +24,17 @@ public class QuestStatusProvider extends AbstractQueryExecutor {
    }
 
    public List<QuestData> getQuestData(EntityManager entityManager, int characterId) {
-      TypedQuery<QuestStatus> query = entityManager.createQuery("FROM QuestStatus q WHERE q.characterId = :characterId", QuestStatus.class);
+      TypedQuery<QuestStatus> query =
+            entityManager.createQuery("FROM QuestStatus q WHERE q.characterId = :characterId", QuestStatus.class);
       query.setParameter("characterId", characterId);
       return getResultList(query, new QuestStatusTransformer());
+   }
+
+   public Optional<QuestData> getQuestStatus(EntityManager entityManager, int characterId, int questId) {
+      TypedQuery<QuestStatus> query = entityManager
+            .createQuery("FROM QuestStatus q WHERE q.characterId = :characterId AND q.quest = :questId", QuestStatus.class);
+      query.setParameter("characterId", characterId);
+      query.setParameter("questId", questId);
+      return getSingleOptional(query, new QuestStatusTransformer());
    }
 }

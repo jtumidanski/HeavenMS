@@ -29,6 +29,14 @@ public class MedalMapAdministrator extends AbstractQueryExecutor implements Dele
       execute(entityManager, query);
    }
 
+   public void deleteForQuest(EntityManager entityManager, int characterId, int questStatusId) {
+      Query query = entityManager.createQuery("DELETE FROM MedalMap WHERE characterId = :characterId AND questStatusId = "
+            + ":questStatusId");
+      query.setParameter("characterId", characterId);
+      query.setParameter("questStatusId", questStatusId);
+      execute(entityManager, query);
+   }
+
    public void create(EntityManager entityManager, int characterId, int questId, List<Integer> medalMaps) {
       List<MedalMap> medalMapList = medalMaps.stream().map(mapId -> {
          MedalMap medalMap = new MedalMap();

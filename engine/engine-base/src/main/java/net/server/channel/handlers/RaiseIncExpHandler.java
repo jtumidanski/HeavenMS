@@ -4,7 +4,7 @@ import java.util.Map;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import client.MapleQuestStatus;
+import client.QuestStatus;
 import client.inventory.MapleInventory;
 import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
@@ -39,7 +39,7 @@ public class RaiseIncExpHandler extends AbstractPacketHandler<UseItemUIPacket> {
 
             MapleCharacter chr = client.getPlayer();
             MapleQuest quest = QuestProcessor.getInstance().getInstanceFromInfoNumber(infoNumber);
-            if (!chr.getQuest(quest).getStatus().equals(MapleQuestStatus.Status.STARTED)) {
+            if (!QuestProcessor.getInstance().questIsStatus(chr, quest, QuestStatus.STARTED)) {
                PacketCreator.announce(client, new EnableActions());
                return;
             }

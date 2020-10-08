@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import client.MapleQuestStatus.Status;
+import client.QuestStatus;
 import config.YamlConfig;
 import server.quest.actions.MapleQuestAction;
 import server.quest.requirements.InfoExRequirement;
@@ -71,8 +71,8 @@ public record MapleQuest(short id, String name, String parent, int timeLimit, in
       return mobRequirement.getRequiredMobCount(mid);
    }
 
-   public short getInfoNumber(Status qs) {
-      boolean checkEnd = qs.equals(Status.STARTED);
+   public short getInfoNumber(QuestStatus qs) {
+      boolean checkEnd = qs.equals(QuestStatus.STARTED);
       Map<MapleQuestRequirementType, MapleQuestRequirement> reqs = !checkEnd ? startReqs : completeReqs;
 
       MapleQuestRequirement req = reqs.get(MapleQuestRequirementType.INFO_NUMBER);
@@ -84,8 +84,8 @@ public record MapleQuest(short id, String name, String parent, int timeLimit, in
       }
    }
 
-   public String getInfoEx(Status qs, int index) {
-      boolean checkEnd = qs.equals(Status.STARTED);
+   public String getInfoEx(QuestStatus qs, int index) {
+      boolean checkEnd = qs.equals(QuestStatus.STARTED);
       Map<MapleQuestRequirementType, MapleQuestRequirement> reqs = !checkEnd ? startReqs : completeReqs;
       try {
          MapleQuestRequirement req = reqs.get(MapleQuestRequirementType.INFO_EX);
@@ -96,8 +96,8 @@ public record MapleQuest(short id, String name, String parent, int timeLimit, in
       }
    }
 
-   public List<String> getInfoEx(Status qs) {
-      boolean checkEnd = qs.equals(Status.STARTED);
+   public List<String> getInfoEx(QuestStatus qs) {
+      boolean checkEnd = qs.equals(QuestStatus.STARTED);
       Map<MapleQuestRequirementType, MapleQuestRequirement> reqs = !checkEnd ? startReqs : completeReqs;
       try {
          MapleQuestRequirement req = reqs.get(MapleQuestRequirementType.INFO_EX);

@@ -8,7 +8,6 @@ import client.MapleQuestStatus;
 import provider.MapleData;
 import provider.MapleDataTool;
 import server.processor.QuestProcessor;
-import server.quest.MapleQuest;
 import server.quest.MapleQuestRequirementType;
 import tools.LogType;
 import tools.LoggerOriginator;
@@ -33,7 +32,7 @@ public class MobRequirement extends MapleQuestRequirement {
 
    @Override
    public boolean check(MapleCharacter chr, Integer npcId) {
-      MapleQuestStatus status = chr.getQuest(QuestProcessor.getInstance().getQuest(getQuestId()));
+      MapleQuestStatus status = QuestProcessor.getInstance().getQuestStatus(chr, getQuestId());
       for (Integer mobID : mobs.keySet()) {
          int countReq = mobs.get(mobID);
          int progress;

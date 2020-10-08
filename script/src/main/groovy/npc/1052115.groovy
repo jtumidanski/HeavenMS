@@ -70,10 +70,11 @@ class NPC1052115 {
             }
          } else if (selection == 3) {
             MapleQuestStatus record = cm.getQuestRecord(7662)
-            String data = record.getCustomData()
+            String data = record.customData()
             if (data == null) {
-               record.setCustomData("0")
-               data = record.getCustomData()
+               record = record.setCustomData("0")
+               cm.addQuest(record)
+               data = record.customData()
             }
             int mons = data.toInteger()
             if (mons < 10000) {

@@ -3,6 +3,7 @@ package net.server.channel.handlers;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.MapleQuestStatus;
+import client.QuestStatus;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.RaiseUIStatePacket;
 import net.server.channel.packet.reader.RaiseUIStateReader;
@@ -21,11 +22,11 @@ public class RaiseUIStateHandler extends AbstractPacketHandler<RaiseUIStatePacke
       if (client.tryAcquireClient()) {
          try {
             MapleQuest quest = QuestProcessor.getInstance().getQuest(packet.questId());
-            MapleQuestStatus mqs = client.getPlayer().getQuest(quest);
-            if (mqs.getStatus() == MapleQuestStatus.Status.NOT_STARTED) {
+            MapleQuestStatus mqs = QuestProcessor.getInstance().getQuestStatus(client.getPlayer(), quest);
+            if (mqs.status() == QuestStatus.NOT_STARTED) {
                QuestProcessor.getInstance().forceStart(client.getPlayer(), quest, 22000);
                client.getPlayer().getAbstractPlayerInteraction().setQuestProgress(quest.id(), packet.questId(), 0);
-            } else if (mqs.getStatus() == MapleQuestStatus.Status.STARTED) {
+            } else if (mqs.status() == QuestStatus.STARTED) {
                short infoNumber = QuestProcessor.getInstance().getInfoNumber(mqs);
                client.getPlayer().announceUpdateQuest(MapleCharacter.DelayedQuestUpdate.UPDATE, mqs, infoNumber > 0);
             }

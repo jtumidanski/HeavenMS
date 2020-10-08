@@ -1,5 +1,6 @@
 package npc
-import tools.I18nMessage
+import tools.I18nMessage
+
 
 import client.MapleQuestStatus
 import scripting.npc.NPCConversationManager
@@ -50,29 +51,37 @@ class NPC9000011 {
             status--
          }
          if (status == 0) {
-            cm.sendNext(I18nMessage.from("9000011_CAN_I_HANG_OUT").with(cm.getNpc()))
+            cm.sendNext(I18nMessage.from("9000011_CAN_I_HANG_OUT").with(cm.getNpc()))
+
          } else if (status == 1) {
-            cm.sendSimple(I18nMessage.from("9000011_WHAT_KIND_OF_EVENT"))
+            cm.sendSimple(I18nMessage.from("9000011_WHAT_KIND_OF_EVENT"))
+
          } else if (status == 2) {
             if (selection == 0) {
-               cm.sendNext(I18nMessage.from("9000011_ALL_THIS_MONTH"))
+               cm.sendNext(I18nMessage.from("9000011_ALL_THIS_MONTH"))
+
                cm.dispose()
             } else if (selection == 1) {
-               cm.sendSimple(I18nMessage.from("9000011_MANY_GAMES"))
+               cm.sendSimple(I18nMessage.from("9000011_MANY_GAMES"))
+
             } else if (selection == 2) {
                MapleQuestStatus questStatus = cm.getQuestRecord(100295)
-               if (questStatus.getCustomData() == null) {
-                  questStatus.setCustomData("0")
+               if (questStatus.customData() == null) {
+                  questStatus = questStatus.setCustomData("0")
+                  cm.addQuest(questStatus)
                }
-               int dat = (questStatus.getCustomData()).toInteger()
+               int dat = (questStatus.customData()).toInteger()
                if (dat + 3600000 >= cm.getCurrentTime()) {
-                  cm.sendNext(I18nMessage.from("9000011_YOU_HAVE_ENTERED_THE_EVENT_ALREADY"))
+                  cm.sendNext(I18nMessage.from("9000011_YOU_HAVE_ENTERED_THE_EVENT_ALREADY"))
+
                } else if (!cm.canHold(4031019)) {
-                  cm.sendNext(I18nMessage.from("9000011_SAVE_INVENTORY_SPACE"))
+                  cm.sendNext(I18nMessage.from("9000011_SAVE_INVENTORY_SPACE"))
+
                } else if (cm.getClient().getChannelServer().getEvent() > -1 && !cm.haveItem(4031019)) {
                   cm.getPlayer().saveLocation("EVENT")
                   cm.getPlayer().setChalkboard(null)
-                  questStatus.setCustomData("" + cm.getCurrentTime())
+                  questStatus = questStatus.setCustomData("" + cm.getCurrentTime())
+                  cm.addQuest(questStatus)
 
                   int eventMapId = cm.getClient().getChannelServer().getEvent().getMapId()
                   if (eventMapId == 109080000 || eventMapId == 109080010) {
@@ -81,7 +90,8 @@ class NPC9000011 {
                      cm.warp(eventMapId, "join00")
                   }
                } else {
-                  cm.sendNext(I18nMessage.from("9000011_EVENT_NOT_BEEN_STARTED"))
+                  cm.sendNext(I18nMessage.from("9000011_EVENT_NOT_BEEN_STARTED"))
+
                }
                cm.dispose()
             } else if (selection == 3) {
@@ -94,22 +104,28 @@ class NPC9000011 {
             }
          } else if (status == 3) {
             if (selection == 0) {
-               cm.sendNext(I18nMessage.from("9000011_OLA_OLA_INFO"))
+               cm.sendNext(I18nMessage.from("9000011_OLA_OLA_INFO"))
+
                cm.dispose()
             } else if (selection == 1) {
-               cm.sendNext(I18nMessage.from("9000011_FITNESS_INFO"))
+               cm.sendNext(I18nMessage.from("9000011_FITNESS_INFO"))
+
                cm.dispose()
             } else if (selection == 2) {
-               cm.sendNext(I18nMessage.from("9000011_SNOWBALL_INFO"))
+               cm.sendNext(I18nMessage.from("9000011_SNOWBALL_INFO"))
+
                cm.dispose()
             } else if (selection == 3) {
-               cm.sendNext(I18nMessage.from("9000011_COCONUT_INFO"))
+               cm.sendNext(I18nMessage.from("9000011_COCONUT_INFO"))
+
                cm.dispose()
             } else if (selection == 4) {
-               cm.sendNext(I18nMessage.from("9000011_OX_QUIZ_INFO"))
+               cm.sendNext(I18nMessage.from("9000011_OX_QUIZ_INFO"))
+
                cm.dispose()
             } else if (selection == 5) {
-               cm.sendNext(I18nMessage.from("9000011_TREASURE_INFO"))
+               cm.sendNext(I18nMessage.from("9000011_TREASURE_INFO"))
+
                cm.dispose()
             }
          } else if (status == 10) {
@@ -156,9 +172,11 @@ class NPC9000011 {
             }
             int rand = Math.floor(Math.random() * pri.length).intValue()
             if (!cm.haveItem(ite, quantity)) {
-               cm.sendOk(I18nMessage.from("9000011_YOU_NEED").with(quantity, ite))
+               cm.sendOk(I18nMessage.from("9000011_YOU_NEED").with(quantity, ite))
+
             } else if (cm.getInventory(1).getNextFreeSlot() <= -1 || cm.getInventory(2).getNextFreeSlot() <= -1 || cm.getInventory(3).getNextFreeSlot() <= -1 || cm.getInventory(4).getNextFreeSlot() <= -1) {
-               cm.sendOk(I18nMessage.from("9000011_NEED_SPACE_FOR_ITEM"))
+               cm.sendOk(I18nMessage.from("9000011_NEED_SPACE_FOR_ITEM"))
+
             } else {
                cm.gainItem(pri[rand], (short) 1)
                cm.gainItem(ite, (short) -quantity)

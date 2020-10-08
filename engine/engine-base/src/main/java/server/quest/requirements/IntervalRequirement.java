@@ -1,11 +1,10 @@
 package server.quest.requirements;
 
 import client.MapleCharacter;
-import client.MapleQuestStatus;
+import client.QuestStatus;
 import provider.MapleData;
 import provider.MapleDataTool;
 import server.processor.QuestProcessor;
-import server.quest.MapleQuest;
 import server.quest.MapleQuestRequirementType;
 import tools.I18nMessage;
 import tools.MessageBroadcaster;
@@ -31,7 +30,7 @@ public class IntervalRequirement extends MapleQuestRequirement {
    private static String getIntervalTimeLeft(MapleCharacter chr, IntervalRequirement r) {
       StringBuilder str = new StringBuilder();
 
-      long futureTime = chr.getQuest(QuestProcessor.getInstance().getQuest(r.getQuestId())).getCompletionTime() + r.getInterval();
+      long futureTime = QuestProcessor.getInstance().getQuestStatus(chr, r.getQuestId()).completionTime() + r.getInterval();
       long leftTime = futureTime - System.currentTimeMillis();
 
       byte mode = 0;
@@ -62,9 +61,10 @@ public class IntervalRequirement extends MapleQuestRequirement {
 
    @Override
    public boolean check(MapleCharacter chr, Integer npcId) {
-      boolean check = !chr.getQuest(QuestProcessor.getInstance().getQuest(getQuestId())).getStatus().equals(MapleQuestStatus.Status.COMPLETED);
+      boolean check = !QuestProcessor.getInstance().questIsStatus(chr, getQuestId(), QuestStatus.COMPLETED);
       boolean check2 =
-            chr.getQuest(QuestProcessor.getInstance().getQuest(getQuestId())).getCompletionTime() <= System.currentTimeMillis() - interval;
+            QuestProcessor.getInstance().getQuestStatus(chr, getQuestId()).completionTime()
+                  <= System.currentTimeMillis() - interval;
       if (check || check2) {
          return true;
       } else {

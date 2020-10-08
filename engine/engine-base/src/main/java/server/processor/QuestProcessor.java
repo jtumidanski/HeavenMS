@@ -5,14 +5,28 @@ import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.persistence.EntityManager;
 
 import client.MapleCharacter;
 import client.MapleQuestStatus;
+import client.MapleQuestStatusBuilder;
+import client.QuestStatus;
+import client.database.data.CharacterData;
+import client.database.data.QuestData;
 import config.YamlConfig;
+import database.DatabaseConnection;
+import database.administrator.MedalMapAdministrator;
+import database.administrator.QuestProgressAdministrator;
+import database.administrator.QuestStatusAdministrator;
+import database.provider.MedalMapProvider;
+import database.provider.QuestProgressProvider;
+import database.provider.QuestStatusProvider;
 import provider.MapleData;
 import provider.MapleDataProvider;
 import provider.MapleDataProviderFactory;
@@ -63,6 +77,7 @@ import tools.LoggerOriginator;
 import tools.LoggerUtil;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
+import tools.Pair;
 import tools.ServerNoticeType;
 import tools.StringUtil;
 import tools.packet.foreigneffect.ShowForeignEffect;
@@ -128,12 +143,12 @@ public class QuestProcessor {
 
             int infoNumber;
 
-            infoNumber = quest.getInfoNumber(MapleQuestStatus.Status.STARTED);
+            infoNumber = quest.getInfoNumber(QuestStatus.STARTED);
             if (infoNumber > 0) {
                infoNumberQuests.put(infoNumber, questId);
             }
 
-            infoNumber = quest.getInfoNumber(MapleQuestStatus.Status.COMPLETED);
+            infoNumber = quest.getInfoNumber(QuestStatus.COMPLETED);
             if (infoNumber > 0) {
                infoNumberQuests.put(infoNumber, questId);
             }
@@ -256,11 +271,7 @@ public class QuestProcessor {
          case BUFF -> new BuffRequirement(questId, data);
          case EXCEPT_BUFF -> new BuffExceptRequirement(questId, data);
          case SCRIPT -> new ScriptRequirement(questId, data);
-         default -> {
-            LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXCEPTION_CAUGHT,
-                  "Unhandled Requirement Type: " + type.toString() + " QuestID: " + questId);
-            yield null;
-         }
+         default -> null;
       };
    }
 
@@ -278,11 +289,7 @@ public class QuestProcessor {
          case PET_TAMENESS -> new PetTamenessAction(questId, data);
          case PET_SPEED -> new PetSpeedAction(questId, data);
          case INFO -> new InfoAction(questId, data);
-         default -> {
-            LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXCEPTION_CAUGHT,
-                  "Unhandled Action Type: " + type.toString() + " QuestID: " + questId);
-            yield null;
-         }
+         default -> null;
       };
    }
 
@@ -293,6 +300,22 @@ public class QuestProcessor {
          quests.put(questId, result);
       }
       return result;
+   }
+
+   public MapleQuestStatus getQuestStatus(MapleCharacter character, int questId) {
+      return getQuestStatus(character, getQuest(questId));
+   }
+
+   public MapleQuestStatus getQuestStatus(MapleCharacter character, MapleQuest quest) {
+      return character.getQuestStatus(quest.id(), () -> new MapleQuestStatusBuilder(quest, QuestStatus.NOT_STARTED).build());
+   }
+
+   public boolean questIsStatus(MapleCharacter character, int questId, QuestStatus status) {
+      return questIsStatus(character, getQuest(questId), status);
+   }
+
+   public boolean questIsStatus(MapleCharacter character, MapleQuest quest, QuestStatus status) {
+      return getQuestStatus(character, quest).status().equals(status);
    }
 
    public void clearCache() {
@@ -323,22 +346,22 @@ public class QuestProcessor {
    }
 
    public short getInfoNumber(MapleQuestStatus questStatus) {
-      return getQuest(questStatus.getQuestId()).getInfoNumber(questStatus.getStatus());
+      return getQuest(questStatus.questId()).getInfoNumber(questStatus.status());
    }
 
-   protected boolean progress(MapleQuest quest, MapleQuestStatus questStatus, int mobId) {
-      String currentStr = questStatus.getProgress().get(mobId);
+   protected Optional<MapleQuestStatus> progress(MapleQuest quest, MapleQuestStatus questStatus, int mobId) {
+      String currentStr = questStatus.progress().get(mobId);
       if (currentStr == null) {
-         return false;
+         return Optional.empty();
       }
       int current = Integer.parseInt(currentStr);
       if (current >= quest.getMobAmountNeeded(mobId)) {
-         return false;
+         return Optional.empty();
       }
 
       String str = StringUtil.getLeftPaddedStr(Integer.toString(++current), '0', 3);
-      questStatus.setProgress(mobId, str);
-      return true;
+      MapleQuestStatus newStatus = questStatus.setProgress(mobId, str);
+      return Optional.of(newStatus);
    }
 
    public void raiseQuestMobCount(MapleCharacter character, int mobId) {
@@ -354,20 +377,14 @@ public class QuestProcessor {
 
       int lastQuestProcessed = 0;
       try {
-         synchronized (quests) {
-            for (MapleQuestStatus qs : character.getQuests()) {
-               MapleQuest quest = getQuest(qs.getQuestId());
-               lastQuestProcessed = quest.id();
-               if (qs.getStatus() == MapleQuestStatus.Status.COMPLETED || canComplete(character, quest, null)) {
-                  continue;
-               }
-               if (progress(quest, qs, mobId)) {
-                  character.announceUpdateQuest(MapleCharacter.DelayedQuestUpdate.UPDATE, qs, false);
-                  if (getInfoNumber(qs) > 0) {
-                     character.announceUpdateQuest(MapleCharacter.DelayedQuestUpdate.UPDATE, qs, true);
-                  }
-               }
+         for (MapleQuestStatus questStatus : character.getQuests()) {
+            MapleQuest quest = getQuest(questStatus.questId());
+            lastQuestProcessed = quest.id();
+            if (questStatus.status() == QuestStatus.COMPLETED || canComplete(character, quest, null)) {
+               continue;
             }
+            Optional<MapleQuestStatus> progressedStatus = progress(quest, questStatus, mobId);
+            progressedStatus.ifPresent(newStatus -> updateQuestStatus(character, newStatus));
          }
       } catch (Exception e) {
          LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXCEPTION_CAUGHT, e,
@@ -376,62 +393,93 @@ public class QuestProcessor {
    }
 
    public void setQuestProgress(MapleCharacter character, int questId, int infoNumber, String progress) {
-      MapleQuest q = getQuest(questId);
-      MapleQuestStatus qs = character.getQuest(q);
+      MapleQuestStatus qs = getQuestStatus(character, questId);
 
-      if (QuestProcessor.getInstance().getInfoNumber(qs) == infoNumber && infoNumber > 0) {
-         MapleQuest iq = QuestProcessor.getInstance().getQuest(infoNumber);
-         MapleQuestStatus iqs = character.getQuest(iq);
-         iqs.setProgress(0, progress);
+      if (getInfoNumber(qs) == infoNumber && infoNumber > 0) {
+         qs = getQuestStatus(character, infoNumber).setProgress(0, progress);
       } else {
-         qs.setProgress(infoNumber,
-               progress);   // quest progress is thoroughly a string match, infoNumber is actually another quest id
+         // quest progress is thoroughly a string match, infoNumber is actually another quest id
+         qs = qs.setProgress(infoNumber, progress);
       }
 
-      character.announceUpdateQuest(MapleCharacter.DelayedQuestUpdate.UPDATE, qs, false);
-      if (QuestProcessor.getInstance().getInfoNumber(qs) > 0) {
-         character.announceUpdateQuest(MapleCharacter.DelayedQuestUpdate.UPDATE, qs, true);
-      }
+      updateQuestStatus(character, qs);
+   }
+
+   public void loadQuests(EntityManager entityManager, CharacterData characterData, MapleCharacter mapleCharacter) {
+      Map<Integer, MapleQuestStatusBuilder> loadedQuestStatus = new LinkedHashMap<>();
+      QuestStatusProvider.getInstance().getQuestData(entityManager, characterData.id()).forEach(questData -> {
+         MapleQuest q = QuestProcessor.getInstance().getQuest(questData.questId());
+         MapleQuestStatusBuilder builder = new MapleQuestStatusBuilder(q, QuestStatus.getById(questData.status()));
+         if (questData.time() > -1) {
+            builder.setCompletionTime(questData.time() * 1000);
+         }
+
+         if (questData.expires() > 0) {
+            builder.setExpirationTime(questData.expires());
+         }
+
+         builder.setForfeited(questData.forfeited());
+         builder.setCompleted(questData.completed());
+         loadedQuestStatus.put(questData.questStatusId(), builder);
+      });
+      QuestProgressProvider.getInstance().getProgress(entityManager, characterData.id()).forEach(questProgress -> {
+         MapleQuestStatusBuilder status = loadedQuestStatus.get(questProgress.questStatusId());
+         if (status != null) {
+            status.setProgress(questProgress.progressId(), questProgress.progress());
+         }
+      });
+      MedalMapProvider.getInstance().get(entityManager, characterData.id()).forEach(medalMap -> {
+         MapleQuestStatusBuilder status = loadedQuestStatus.get(medalMap.getLeft());
+         if (status != null) {
+            status.addMedalMap(medalMap.getRight());
+         }
+      });
+      loadedQuestStatus.forEach((i, builder) -> {
+         MapleQuestStatus status = builder.build();
+         mapleCharacter.addQuest(status.questId(), status);
+      });
+      loadedQuestStatus.clear();
    }
 
    public void updateQuestStatus(MapleCharacter character, MapleQuestStatus questStatus) {
-      character.addQuest(questStatus.getQuestId(), questStatus);
-
-      if (questStatus.getStatus().equals(MapleQuestStatus.Status.STARTED)) {
+      if (questStatus.status().equals(QuestStatus.STARTED)) {
          character.announceUpdateQuest(MapleCharacter.DelayedQuestUpdate.UPDATE, questStatus, false);
-         if (QuestProcessor.getInstance().getInfoNumber(questStatus) > 0) {
+         if (getInfoNumber(questStatus) > 0) {
             character.announceUpdateQuest(MapleCharacter.DelayedQuestUpdate.UPDATE, questStatus, true);
          }
          character.announceUpdateQuest(MapleCharacter.DelayedQuestUpdate.INFO, questStatus);
-      } else if (questStatus.getStatus().equals(MapleQuestStatus.Status.COMPLETED)) {
-         MapleQuest quest = QuestProcessor.getInstance().getQuest(questStatus.getQuestId());
+      } else if (questStatus.status().equals(QuestStatus.COMPLETED)) {
+         MapleQuest quest = getQuest(questStatus.questId());
          short questId = quest.id();
-         if (!quest.isSameDayRepeatable() && !QuestProcessor.getInstance().isExploitableQuest(questId)) {
+         if (!quest.isSameDayRepeatable() && !isExploitableQuest(questId)) {
             character.awardQuestPoint(YamlConfig.config.server.QUEST_POINT_PER_QUEST_COMPLETE);
          }
-         questStatus.setCompleted(questStatus.getCompleted() + 1);
-
-         character.announceUpdateQuest(MapleCharacter.DelayedQuestUpdate.COMPLETE, questId, questStatus.getCompletionTime());
-      } else if (questStatus.getStatus().equals(MapleQuestStatus.Status.NOT_STARTED)) {
+         questStatus = questStatus.setCompleted(questStatus.completed() + 1);
+         character.announceUpdateQuest(MapleCharacter.DelayedQuestUpdate.COMPLETE, questId, questStatus.completionTime());
+      } else if (questStatus.status().equals(QuestStatus.NOT_STARTED)) {
          character.announceUpdateQuest(MapleCharacter.DelayedQuestUpdate.UPDATE, questStatus, false);
-         if (QuestProcessor.getInstance().getInfoNumber(questStatus) > 0) {
+         if (getInfoNumber(questStatus) > 0) {
             character.announceUpdateQuest(MapleCharacter.DelayedQuestUpdate.UPDATE, questStatus, true);
          }
       }
+
+      // Update local and database tracking.
+      character.addQuest(questStatus.questId(), questStatus);
+      persistQuestStatusUpdate(character, questStatus);
    }
 
    protected boolean canStartQuestByStatus(MapleCharacter character, MapleQuest quest) {
-      MapleQuestStatus mqs = character.getQuest(quest);
-      return !(!mqs.getStatus().equals(MapleQuestStatus.Status.NOT_STARTED) && !(
-            mqs.getStatus().equals(MapleQuestStatus.Status.COMPLETED) && quest.repeatable()));
+      MapleQuestStatus mqs = getQuestStatus(character, quest);
+      return !(!mqs.status().equals(QuestStatus.NOT_STARTED) && !(
+            mqs.status().equals(QuestStatus.COMPLETED) && quest.repeatable()));
    }
 
    protected boolean canQuestByInfoProgress(MapleCharacter character, MapleQuest quest) {
-      MapleQuestStatus mqs = character.getQuest(quest);
-      List<String> ix = quest.getInfoEx(mqs.getStatus());
+      MapleQuestStatus mqs = getQuestStatus(character, quest);
+      List<String> ix = quest.getInfoEx(mqs.status());
       if (!ix.isEmpty()) {
-         short questId = mqs.getQuestId();
-         short infoNumber = quest.getInfoNumber(mqs.getStatus());
+         short questId = mqs.questId();
+         short infoNumber = quest.getInfoNumber(mqs.status());
          if (infoNumber <= 0) {
             infoNumber = questId;  // on default infoNumber mimics quest id
          }
@@ -509,8 +557,8 @@ public class QuestProcessor {
    }
 
    protected boolean canComplete(MapleCharacter character, MapleQuest quest, Integer npcId) {
-      MapleQuestStatus mqs = character.getQuest(quest);
-      if (!mqs.getStatus().equals(MapleQuestStatus.Status.STARTED)) {
+      MapleQuestStatus mqs = getQuestStatus(character, quest);
+      if (!mqs.status().equals(QuestStatus.STARTED)) {
          return false;
       }
 
@@ -555,7 +603,7 @@ public class QuestProcessor {
             a.run(character, selection);
          }
          if (!quest.hasNextQuestAction()) {
-            character.announceUpdateQuest(MapleCharacter.DelayedQuestUpdate.INFO, character.getQuest(quest));
+            character.announceUpdateQuest(MapleCharacter.DelayedQuestUpdate.INFO, getQuestStatus(character, quest));
          }
       }
    }
@@ -565,20 +613,20 @@ public class QuestProcessor {
    }
 
    public void reset(MapleCharacter character, MapleQuest quest) {
-      MapleQuestStatus newStatus = new MapleQuestStatus(quest, MapleQuestStatus.Status.NOT_STARTED);
+      MapleQuestStatus newStatus = new MapleQuestStatusBuilder(quest, QuestStatus.NOT_STARTED).build();
       updateQuestStatus(character, newStatus);
    }
 
    public boolean forfeit(MapleCharacter character, MapleQuest quest) {
-      if (!character.getQuest(quest).getStatus().equals(MapleQuestStatus.Status.STARTED)) {
+      if (!getQuestStatus(character, quest).status().equals(QuestStatus.STARTED)) {
          return false;
       }
       if (quest.timeLimit() > 0) {
          PacketCreator.announce(character, new RemoveQuestTimeLimit(quest.id()));
       }
-      MapleQuestStatus newStatus = new MapleQuestStatus(quest, MapleQuestStatus.Status.NOT_STARTED);
-      newStatus.setForfeited(character.getQuest(quest).getForfeited() + 1);
-      updateQuestStatus(character, newStatus);
+      MapleQuestStatusBuilder newStatusBuilder = new MapleQuestStatusBuilder(quest, QuestStatus.NOT_STARTED);
+      newStatusBuilder.setForfeited(getQuestStatus(character, quest).forfeited() + 1);
+      updateQuestStatus(character, newStatusBuilder.build());
       return true;
    }
 
@@ -587,37 +635,38 @@ public class QuestProcessor {
    }
 
    public boolean forceStart(MapleCharacter character, MapleQuest quest, int npc) {
-      MapleQuestStatus newStatus = new MapleQuestStatus(quest, MapleQuestStatus.Status.STARTED, npc);
+      MapleQuestStatusBuilder newStatusBuilder = new MapleQuestStatusBuilder(quest, QuestStatus.STARTED, npc);
 
-      MapleQuestStatus oldStatus = character.getQuest(quest.id());
-      for (Map.Entry<Integer, String> e : oldStatus.getProgress().entrySet()) {
-         newStatus.setProgress(e.getKey(), e.getValue());
+      MapleQuestStatus oldStatus = getQuestStatus(character, quest);
+      for (Map.Entry<Integer, String> e : oldStatus.progress().entrySet()) {
+         newStatusBuilder.setProgress(e.getKey(), e.getValue());
       }
 
       if (quest.id() / 100 == 35 && YamlConfig.config.server.TOT_MOB_QUEST_REQUIREMENT > 0) {
          int setProgress = 999 - Math.min(999, YamlConfig.config.server.TOT_MOB_QUEST_REQUIREMENT);
 
-         for (Integer pid : newStatus.getProgress().keySet()) {
+         for (Integer pid : newStatusBuilder.getProgress().keySet()) {
             if (pid >= 8200000 && pid <= 8200012) {
                String pr = StringUtil.getLeftPaddedStr(Integer.toString(setProgress), '0', 3);
-               newStatus.setProgress(pid, pr);
+               newStatusBuilder.setProgress(pid, pr);
             }
          }
       }
 
-      newStatus.setForfeited(character.getQuest(quest).getForfeited());
-      newStatus.setCompleted(character.getQuest(quest).getCompleted());
+      newStatusBuilder.setForfeited(getQuestStatus(character, quest).forfeited());
+      newStatusBuilder.setCompleted(getQuestStatus(character, quest).completed());
 
       if (quest.timeLimit() > 0) {
-         newStatus.setExpirationTime(System.currentTimeMillis() + (quest.timeLimit() * 1000));
+         newStatusBuilder.setExpirationTime(System.currentTimeMillis() + (quest.timeLimit() * 1000));
          character.questTimeLimit(quest, quest.timeLimit());
       }
       if (quest.timeLimit2() > 0) {
-         newStatus.setExpirationTime(System.currentTimeMillis() + quest.timeLimit2());
-         character.questTimeLimit2(quest, newStatus.getExpirationTime());
+         long expirationTime = System.currentTimeMillis() + quest.timeLimit2();
+         newStatusBuilder.setExpirationTime(expirationTime);
+         character.questTimeLimit2(quest, expirationTime);
       }
 
-      updateQuestStatus(character, newStatus);
+      updateQuestStatus(character, newStatusBuilder.build());
 
       return true;
    }
@@ -631,11 +680,11 @@ public class QuestProcessor {
          PacketCreator.announce(character, new RemoveQuestTimeLimit(quest.id()));
       }
 
-      MapleQuestStatus newStatus = new MapleQuestStatus(quest, MapleQuestStatus.Status.COMPLETED, npc);
-      newStatus.setForfeited(character.getQuest(quest).getForfeited());
-      newStatus.setCompleted(character.getQuest(quest).getCompleted());
-      newStatus.setCompletionTime(System.currentTimeMillis());
-      updateQuestStatus(character, newStatus);
+      MapleQuestStatusBuilder newStatusBuilder = new MapleQuestStatusBuilder(quest, QuestStatus.COMPLETED, npc);
+      newStatusBuilder.setForfeited(getQuestStatus(character, quest).forfeited());
+      newStatusBuilder.setCompleted(getQuestStatus(character, quest).completed());
+      newStatusBuilder.setCompletionTime(System.currentTimeMillis());
+      updateQuestStatus(character, newStatusBuilder.build());
 
       PacketCreator.announce(character, new ShowSpecialEffect(9)); // Quest completion
       character.getMap().broadcastMessage(character, new ShowForeignEffect(character.getId(), 9)); //use 9 instead of 12 for both
@@ -679,11 +728,47 @@ public class QuestProcessor {
    }
 
    public void restoreLostItem(MapleCharacter character, MapleQuest quest, int itemId) {
-      if (character.getQuest(quest).getStatus().equals(MapleQuestStatus.Status.STARTED)) {
+      if (getQuestStatus(character, quest).status().equals(QuestStatus.STARTED)) {
          ItemAction itemAct = (ItemAction) quest.startActs().get(MapleQuestActionType.ITEM);
          if (itemAct != null) {
             itemAct.restoreLostItem(character, itemId);
          }
       }
+   }
+
+   public void persistQuestStatusUpdate(MapleCharacter character, MapleQuestStatus questStatus) {
+      DatabaseConnection.getInstance().withConnection(entityManager -> {
+         Optional<QuestData> existingStatus =
+               QuestStatusProvider.getInstance().getQuestStatus(entityManager, character.getId(), questStatus.questId());
+         QuestData questData;
+         if (existingStatus.isPresent()) {
+            questData = existingStatus.get();
+            QuestStatusAdministrator.getInstance().update(entityManager, questData.questStatusId(), questStatus.status(),
+                  questStatus.completionTime(), questStatus.expirationTime(), questStatus.forfeited(),
+                  questStatus.completed());
+         } else {
+            questData = QuestStatusAdministrator.getInstance().create(entityManager, character.getId(), questStatus);
+         }
+
+         QuestProgressAdministrator.getInstance()
+               .deleteForQuest(entityManager, character.getId(), questData.questStatusId());
+         List<Pair<Integer, String>> progressData = questStatus.progress()
+               .keySet()
+               .stream()
+               .map(key -> new Pair<>(key, questStatus.getProgress(key)))
+               .collect(Collectors.toList());
+         QuestProgressAdministrator.getInstance()
+               .create(entityManager, character.getId(), questData.questStatusId(), progressData);
+         MedalMapAdministrator.getInstance().deleteForQuest(entityManager, character.getId(),
+               questData.questStatusId());
+         MedalMapAdministrator.getInstance().create(entityManager, character.getId(), questData.questStatusId(),
+               questStatus.medalMaps());
+      });
+   }
+
+   public void deleteQuestProgressWhereCharacterId(EntityManager entityManager, int cid) {
+      MedalMapAdministrator.getInstance().deleteForCharacter(entityManager, cid);
+      QuestProgressAdministrator.getInstance().deleteForCharacter(entityManager, cid);
+      QuestStatusAdministrator.getInstance().deleteForCharacter(entityManager, cid);
    }
 }

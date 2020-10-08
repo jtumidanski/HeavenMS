@@ -40,7 +40,8 @@ import tools.packet.PacketInput;
 
 public abstract class AbstractPacketFactory implements PacketFactory {
    protected final long ZERO_TIME = 94354848000000000L;//00 40 E0 FD 3B 37 4F 01
-   protected final long FT_UT_OFFSET = 116444736010800000L + (10000L * TimeZone.getDefault().getOffset(System.currentTimeMillis())); // normalize with timezone offset suggested by Ari
+   protected final long FT_UT_OFFSET = 116444736010800000L + (10000L * TimeZone.getDefault().getOffset(System.currentTimeMillis()));
+   // normalize with timezone offset suggested by Ari
    protected final long DEFAULT_TIME = 150842304000000000L;//00 80 05 BB 46 E6 17 02
    protected final long PERMANENT = 150841440000000000L; // 00 C0 9B 90 7D E5 17 02
 
@@ -52,7 +53,8 @@ public abstract class AbstractPacketFactory implements PacketFactory {
       if (handler.isPresent()) {
          return handler.get().apply(packetInput);
       }
-      LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.PACKET_LOG, "Trying to handle invalid input " + packetInput.toString());
+      LoggerUtil
+            .printError(LoggerOriginator.ENGINE, LogType.PACKET_LOG, "Trying to handle invalid input " + packetInput.toString());
       return new byte[0];
    }
 
@@ -101,8 +103,8 @@ public abstract class AbstractPacketFactory implements PacketFactory {
 
       for (int i = 0; i < 3; i++) {
          MaplePet pet = character.getPet(i);
-         if (pet != null) //Checked GMS.. and your pets stay when going into the cash shop.
-         {
+         //Checked GMS.. and your pets stay when going into the cash shop.
+         if (pet != null) {
             writer.writeLong(pet.uniqueId());
          } else {
             writer.writeLong(0);
@@ -475,12 +477,12 @@ public abstract class AbstractPacketFactory implements PacketFactory {
       }
       writer.writeShort(startedSize);
       for (MapleQuestStatus qs : started) {
-         writer.writeShort(qs.getQuestId());
+         writer.writeShort(qs.questId());
          writer.writeMapleAsciiString(qs.getProgressData());
 
          short infoNumber = QuestProcessor.getInstance().getInfoNumber(qs);
          if (infoNumber > 0) {
-            MapleQuestStatus iqs = character.getQuest(infoNumber);
+            MapleQuestStatus iqs = QuestProcessor.getInstance().getQuestStatus(character, infoNumber);
             writer.writeShort(infoNumber);
             writer.writeMapleAsciiString(iqs.getProgressData());
          }
@@ -488,8 +490,8 @@ public abstract class AbstractPacketFactory implements PacketFactory {
       List<MapleQuestStatus> completed = character.getCompletedQuests();
       writer.writeShort(completed.size());
       for (MapleQuestStatus qs : completed) {
-         writer.writeShort(qs.getQuestId());
-         writer.writeLong(getTime(qs.getCompletionTime()));
+         writer.writeShort(qs.questId());
+         writer.writeLong(getTime(qs.completionTime()));
       }
    }
 
@@ -540,8 +542,11 @@ public abstract class AbstractPacketFactory implements PacketFactory {
             writer.writeInt(1112803); // Engagement Ring's Outcome (doesn't matter for engagement)
             writer.writeInt(1112803); // Engagement Ring's Outcome (doesn't matter for engagement)
          }
-         writer.writeAsciiString(StringUtil.getRightPaddedStr(character.getGender() == 0 ? character.getName() : CharacterProcessor.getInstance().getNameById(character.getPartnerId()), '\0', 13));
-         writer.writeAsciiString(StringUtil.getRightPaddedStr(character.getGender() == 0 ? CharacterProcessor.getInstance().getNameById(character.getPartnerId()) : character.getName(), '\0', 13));
+         writer.writeAsciiString(StringUtil.getRightPaddedStr(character.getGender() == 0 ? character.getName() :
+               CharacterProcessor.getInstance().getNameById(character.getPartnerId()), '\0', 13));
+         writer.writeAsciiString(StringUtil.getRightPaddedStr(
+               character.getGender() == 0 ? CharacterProcessor.getInstance().getNameById(character.getPartnerId()) :
+                     character.getName(), '\0', 13));
       } else {
          writer.writeShort(0);
       }

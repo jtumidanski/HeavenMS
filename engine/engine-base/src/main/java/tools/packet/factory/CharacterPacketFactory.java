@@ -1,8 +1,7 @@
 package tools.packet.factory;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import client.MapleCharacter;
 import client.MapleMount;
@@ -91,7 +90,8 @@ public class CharacterPacketFactory extends AbstractPacketFactory {
       writer.write(0); //end of pets
 
       Item mountItem;     //mounts can potentially crash the client if the player's level is not properly checked
-      if (chr.getMount() != null && (mountItem = chr.getInventory(MapleInventoryType.EQUIPPED).getItem((short) -18)) != null && MapleItemInformationProvider.getInstance().getEquipLevelReq(mountItem.id()) <= chr.getLevel()) {
+      if (chr.getMount() != null && (mountItem = chr.getInventory(MapleInventoryType.EQUIPPED).getItem((short) -18)) != null
+            && MapleItemInformationProvider.getInstance().getEquipLevelReq(mountItem.id()) <= chr.getLevel()) {
          MapleMount mount = chr.getMount();
          writer.write(mount.id()); //mount
          writer.writeInt(mount.level()); //level
@@ -110,22 +110,21 @@ public class CharacterPacketFactory extends AbstractPacketFactory {
       writer.writeInt(book.getNormalCard());
       writer.writeInt(book.getSpecialCard());
       writer.writeInt(book.getTotalCards());
-      writer.writeInt(chr.getMonsterBookCover() > 0 ? MapleItemInformationProvider.getInstance().getCardMobId(chr.getMonsterBookCover()) : 0);
+      writer.writeInt(
+            chr.getMonsterBookCover() > 0 ? MapleItemInformationProvider.getInstance().getCardMobId(chr.getMonsterBookCover()) : 0);
       Item medal = chr.getInventory(MapleInventoryType.EQUIPPED).getItem((short) -49);
       if (medal != null) {
          writer.writeInt(medal.id());
       } else {
          writer.writeInt(0);
       }
-      ArrayList<Short> medalQuests = new ArrayList<>();
-      List<MapleQuestStatus> completed = chr.getCompletedQuests();
-      for (MapleQuestStatus q : completed) {
-         if (q.getQuestId() >= 29000) { // && q.getQuest().getId() <= 29923
-            medalQuests.add(q.getQuestId());
-         }
-      }
 
-      Collections.sort(medalQuests);
+      List<Short> medalQuests = chr.getCompletedQuests().stream()
+            .filter(questStatus -> questStatus.questId() >= 29000) // && q.getQuest().getId() <= 29923
+            .map(MapleQuestStatus::questId)
+            .sorted()
+            .collect(Collectors.toList());
+
       writer.writeShort(medalQuests.size());
       for (Short s : medalQuests) {
          writer.writeShort(s);

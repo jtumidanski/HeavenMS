@@ -25,7 +25,7 @@ public class NextQuestAction extends MapleQuestAction {
 
    @Override
    public void run(MapleCharacter chr, Integer extSelection) {
-      MapleQuestStatus status = chr.getQuest(QuestProcessor.getInstance().getQuest(questId));
-      PacketCreator.announce(chr, new QuestFinish((short) questId, status.getNpc(), (short) nextQuest));
+      MapleQuestStatus status = QuestProcessor.getInstance().getQuestStatus(chr, questId);
+      PacketCreator.announce(chr, new QuestFinish((short) questId, status.npcId(), (short) nextQuest));
    }
 } 

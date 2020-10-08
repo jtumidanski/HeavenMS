@@ -27,6 +27,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.persistence.EntityManager;
@@ -95,12 +96,9 @@ import database.administrator.EventStatAdministrator;
 import database.administrator.FameLogAdministrator;
 import database.administrator.GuildAdministrator;
 import database.administrator.KeyMapAdministrator;
-import database.administrator.MedalMapAdministrator;
 import database.administrator.NameChangeAdministrator;
 import database.administrator.PetIgnoreAdministrator;
 import database.administrator.PlayerDiseaseAdministrator;
-import database.administrator.QuestProgressAdministrator;
-import database.administrator.QuestStatusAdministrator;
 import database.administrator.SavedLocationAdministrator;
 import database.administrator.SkillAdministrator;
 import database.administrator.SkillMacroAdministrator;
@@ -4009,7 +4007,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    public final List<MapleQuestStatus> getCompletedQuests() {
       List<MapleQuestStatus> ret = new LinkedList<>();
       for (MapleQuestStatus qs : getQuests()) {
-         if (qs.getStatus().equals(MapleQuestStatus.Status.COMPLETED)) {
+         if (qs.status().equals(QuestStatus.COMPLETED)) {
             ret.add(qs);
          }
       }
@@ -5100,47 +5098,35 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       return possibleReports;
    }
 
+   @Deprecated
    public final byte getQuestStatus(final int quest) {
       synchronized (quests) {
          MapleQuestStatus mqs = quests.get((short) quest);
          if (mqs != null) {
-            return (byte) mqs.getStatus().getId();
+            return (byte) mqs.status().getId();
          } else {
             return 0;
          }
       }
    }
 
-   public MapleQuestStatus getQuest(final int quest) {
-      return getQuest(QuestProcessor.getInstance().getQuest(quest));
-   }
-
-   public MapleQuestStatus getQuest(MapleQuest quest) {
+   /**
+    * Gets the status of a quest for the character. If no status is present, use the default supplied.
+    *
+    * @param questId         the quest identifier
+    * @param defaultSupplier a supplier which produces a default quest status
+    * @return the status of the quest provided
+    */
+   public MapleQuestStatus getQuestStatus(short questId, Supplier<MapleQuestStatus> defaultSupplier) {
       synchronized (quests) {
-         short questId = quest.id();
-         MapleQuestStatus qs = quests.get(questId);
-         if (qs == null) {
-            qs = new MapleQuestStatus(quest, MapleQuestStatus.Status.NOT_STARTED);
-            quests.put(questId, qs);
+         MapleQuestStatus questStatus;
+         if (!quests.containsKey(questId)) {
+            questStatus = defaultSupplier.get();
+            quests.put(questId, questStatus);
+         } else {
+            questStatus = quests.get(questId);
          }
-         return qs;
-      }
-   }
-
-   public final MapleQuestStatus getQuestNAdd(final MapleQuest quest) {
-      synchronized (quests) {
-         if (!quests.containsKey(quest.id())) {
-            final MapleQuestStatus status = new MapleQuestStatus(quest, MapleQuestStatus.Status.NOT_STARTED);
-            quests.put(quest.id(), status);
-            return status;
-         }
-         return quests.get(quest.id());
-      }
-   }
-
-   public final MapleQuestStatus getQuestNoAdd(final MapleQuest quest) {
-      synchronized (quests) {
-         return quests.get(quest.id());
+         return questStatus;
       }
    }
 
@@ -5269,7 +5255,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    public final List<MapleQuestStatus> getStartedQuests() {
       List<MapleQuestStatus> ret = new LinkedList<>();
       for (MapleQuestStatus qs : getQuests()) {
-         if (qs.getStatus().equals(MapleQuestStatus.Status.STARTED)) {
+         if (qs.status().equals(QuestStatus.STARTED)) {
             ret.add(qs);
          }
       }
@@ -6314,10 +6300,10 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
    public void reloadQuestExpiration() {
       getStartedQuests().stream()
-            .filter(questStatus -> questStatus.getExpirationTime() > 0)
+            .filter(questStatus -> questStatus.expirationTime() > 0)
             .forEach(questStatus -> {
-               MapleQuest quest = QuestProcessor.getInstance().getQuest(questStatus.getQuestId());
-               questTimeLimit2(quest, questStatus.getExpirationTime());
+               MapleQuest quest = QuestProcessor.getInstance().getQuest(questStatus.questId());
+               questTimeLimit2(quest, questStatus.expirationTime());
             });
    }
 
@@ -6905,7 +6891,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          updateTeleportRockLocations(entityManager);
          updateAreaInfo(entityManager);
          updateEventStats(entityManager);
-         updateQuestInfo(entityManager);
 
          MapleFamilyProcessor.getInstance().saveCharactersFamilyReputation(entityManager, getFamilyEntry());
 
@@ -6923,19 +6908,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
          entityManager.getTransaction().commit();
       });
-   }
-
-   private void updateQuestInfo(EntityManager entityManager) {
-      CharacterProcessor.getInstance().deleteQuestProgressWhereCharacterId(entityManager, id);
-
-      synchronized (quests) {
-         for (MapleQuestStatus q : getQuests()) {
-            int questId = QuestStatusAdministrator.getInstance().create(entityManager, id, q);
-            QuestProgressAdministrator.getInstance().create(entityManager, id, questId,
-                  q.getProgress().keySet().stream().map(key -> new Pair<>(key, q.getProgress(key))).collect(Collectors.toList()));
-            MedalMapAdministrator.getInstance().create(entityManager, id, questId, q.getMedalMaps());
-         }
-      }
    }
 
    private void updateEventStats(EntityManager entityManager) {
@@ -7741,7 +7713,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          case UPDATE -> {
             MapleQuestStatus questStatus = (MapleQuestStatus) objs[0];
             PacketCreator.announce(this,
-                  new UpdateQuest(questStatus.getQuestId(), questStatus.getStatus().getId(),
+                  new UpdateQuest(questStatus.questId(), questStatus.status().getId(),
                         QuestProcessor.getInstance().getInfoNumber(questStatus),
                         questStatus.getProgressData(), (Boolean) objs[1]));
          }
@@ -7749,7 +7721,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          case COMPLETE -> PacketCreator.announce(this, new CompleteQuest((Short) objs[0], (Long) objs[1]));
          case INFO -> {
             MapleQuestStatus qs = (MapleQuestStatus) objs[0];
-            PacketCreator.announce(this, new UpdateQuestInfo(qs.getQuestId(), qs.getNpc()));
+            PacketCreator.announce(this, new UpdateQuestInfo(qs.questId(), qs.npcId()));
          }
       }
    }
@@ -7791,10 +7763,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    public void forfeitExpirableQuests() {
       evtLock.lock();
       try {
-         for (MapleQuest quest : questExpirationTimes.keySet()) {
-            QuestProcessor.getInstance().forfeit(this, quest);
-         }
-
+         questExpirationTimes.keySet().forEach(quest -> QuestProcessor.getInstance().forfeit(this, quest));
          questExpirationTimes.clear();
       } finally {
          evtLock.unlock();
@@ -7816,19 +7785,16 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       evtLock.lock();
       try {
          long timeNow = Server.getInstance().getCurrentTime();
-         List<MapleQuest> expireList = new LinkedList<>();
-
-         for (Entry<MapleQuest, Long> qe : questExpirationTimes.entrySet()) {
-            if (qe.getValue() <= timeNow) {
-               expireList.add(qe.getKey());
-            }
-         }
+         List<MapleQuest> expireList = questExpirationTimes.entrySet().stream()
+               .filter(entry -> entry.getValue() <= timeNow)
+               .map(Entry::getKey)
+               .collect(Collectors.toList());
 
          if (!expireList.isEmpty()) {
-            for (MapleQuest quest : expireList) {
+            expireList.forEach(quest -> {
                QuestProcessor.getInstance().expireQuest(this, quest);
                questExpirationTimes.remove(quest);
-            }
+            });
 
             if (questExpirationTimes.isEmpty()) {
                scheduler.cancel(MapleCharacterScheduler.Type.QUEST_EXPIRE);
@@ -7843,7 +7809,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       evtLock.lock();
       try {
          scheduler.addIfNotExists(MapleCharacterScheduler.Type.QUEST_EXPIRE, this::runQuestExpireTask, 10 * 1000);
-
          questExpirationTimes.put(quest, Server.getInstance().getCurrentTime() + time);
       } finally {
          evtLock.unlock();

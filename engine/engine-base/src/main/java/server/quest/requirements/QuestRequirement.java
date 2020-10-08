@@ -5,6 +5,7 @@ import java.util.Map;
 
 import client.MapleCharacter;
 import client.MapleQuestStatus;
+import client.QuestStatus;
 import provider.MapleData;
 import provider.MapleDataTool;
 import server.processor.QuestProcessor;
@@ -31,13 +32,13 @@ public class QuestRequirement extends MapleQuestRequirement {
    public boolean check(MapleCharacter chr, Integer npcId) {
       for (Integer questID : quests.keySet()) {
          int stateReq = quests.get(questID);
-         MapleQuestStatus q = chr.getQuest(QuestProcessor.getInstance().getQuest(questID));
+         MapleQuestStatus q = QuestProcessor.getInstance().getQuestStatus(chr, questID);
 
-         if (q == null && MapleQuestStatus.Status.getById(stateReq).equals(MapleQuestStatus.Status.NOT_STARTED)) {
+         if (q == null && QuestStatus.NOT_STARTED.equals(QuestStatus.getById(stateReq))) {
             continue;
          }
 
-         if (q == null || !q.getStatus().equals(MapleQuestStatus.Status.getById(stateReq))) {
+         if (q == null || !q.status().equals(QuestStatus.getById(stateReq))) {
             return false;
          }
       }

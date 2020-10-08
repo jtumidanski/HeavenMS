@@ -1,6 +1,5 @@
 package scripting.map;
 
-import client.MapleCharacter;
 import client.MapleClient;
 import client.MapleQuestStatus;
 import scripting.AbstractPlayerInteraction;
@@ -94,13 +93,15 @@ public class MapScriptMethods extends AbstractPlayerInteraction {
             return;
          }
       }
-      MapleQuestStatus q = getPlayer().getQuest(quest);
-      if (!q.addMedalMap(getPlayer().getMapId())) {
+      MapleQuestStatus questStatus = QuestProcessor.getInstance().getQuestStatus(getPlayer(), questId);
+      if (!questStatus.hasMedalMap(getPlayer().getMapId())) {
          return;
       }
-      String status = Integer.toString(q.getMedalProgress());
-      String infoEx = quest.getInfoEx(q.getStatus(), 0);
-      getPlayer().announceUpdateQuest(MapleCharacter.DelayedQuestUpdate.UPDATE, q, true);
+      questStatus = questStatus.addMedalMap(getPlayer().getMapId());
+      QuestProcessor.getInstance().updateQuestStatus(getPlayer(), questStatus);
+
+      String status = Integer.toString(questStatus.getMedalProgress());
+      String infoEx = quest.getInfoEx(questStatus.status(), 0);
       StringBuilder smp = new StringBuilder();
       StringBuilder etm = new StringBuilder();
       if (status.equals(infoEx)) {
@@ -108,9 +109,9 @@ public class MapScriptMethods extends AbstractPlayerInteraction {
          smp.append("You have earned the <").append(questName).append(">").append(rewardString);
          PacketCreator.announce(getPlayer(), new ShowQuestComplete(quest.id()));
       } else {
-         PacketCreator.announce(getPlayer(), new ShowTitleEarned(status + "/" + infoEx + " regions explored."));
          etm.append("Trying for the ").append(questName).append(" title.");
          smp.append("You made progress on the ").append(questName).append(" title. ").append(status).append("/").append(infoEx);
+         PacketCreator.announce(getPlayer(), new ShowTitleEarned(status + "/" + infoEx + " regions explored."));
       }
       PacketCreator.announce(getPlayer(), new ShowTitleEarned(etm.toString()));
       showInfoText(smp.toString());
@@ -124,15 +125,17 @@ public class MapScriptMethods extends AbstractPlayerInteraction {
             return;
          }
       }
-      MapleQuestStatus q = getPlayer().getQuest(quest);
-      if (!q.addMedalMap(getPlayer().getMapId())) {
+      MapleQuestStatus questStatus = QuestProcessor.getInstance().getQuestStatus(getPlayer(), quest);
+      if (!questStatus.hasMedalMap(getPlayer().getMapId())) {
          return;
       }
-      String status = Integer.toString(q.getMedalProgress());
-      getPlayer().announceUpdateQuest(MapleCharacter.DelayedQuestUpdate.UPDATE, q, true);
+      questStatus = questStatus.addMedalMap(getPlayer().getMapId());
+      QuestProcessor.getInstance().updateQuestStatus(getPlayer(), questStatus);
+
+      String status = Integer.toString(questStatus.getMedalProgress());
       PacketCreator.announce(getPlayer(), new ShowTitleEarned(status + "/5 Completed"));
       PacketCreator.announce(getPlayer(), new ShowTitleEarned("The One Who's Touched the Sky title in progress."));
-      if (Integer.toString(q.getMedalProgress()).equals(quest.getInfoEx(q.getStatus(), 0))) {
+      if (Integer.toString(questStatus.getMedalProgress()).equals(quest.getInfoEx(questStatus.status(), 0))) {
          showInfoText("The One Who's Touched the Sky" + rewardString);
          PacketCreator.announce(getPlayer(), new ShowQuestComplete(quest.id()));
       } else {

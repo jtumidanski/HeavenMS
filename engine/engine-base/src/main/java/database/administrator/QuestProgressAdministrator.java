@@ -30,11 +30,19 @@ public class QuestProgressAdministrator extends AbstractQueryExecutor implements
       execute(entityManager, query);
    }
 
-   public void create(EntityManager entityManager, int characterId, int questId, List<Pair<Integer, String>> progressData) {
+   public void deleteForQuest(EntityManager entityManager, int characterId, int questStatusId) {
+      Query query = entityManager.createQuery("DELETE FROM QuestProgress WHERE characterId = :characterId AND questStatusId "
+            + " = :questStatusId");
+      query.setParameter("characterId", characterId);
+      query.setParameter("questStatusId", questStatusId);
+      execute(entityManager, query);
+   }
+
+   public void create(EntityManager entityManager, int characterId, int questStatusId, List<Pair<Integer, String>> progressData) {
       List<QuestProgress> questProgressList = progressData.stream().map(data -> {
          QuestProgress questProgress = new QuestProgress();
          questProgress.setCharacterId(characterId);
-         questProgress.setQuestStatusId(questId);
+         questProgress.setQuestStatusId(questStatusId);
          questProgress.setProgressId(data.getLeft());
          questProgress.setProgress(data.getRight());
          return questProgress;
