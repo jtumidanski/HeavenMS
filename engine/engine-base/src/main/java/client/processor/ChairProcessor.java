@@ -1,7 +1,7 @@
 package client.processor;
 
-import client.MapleJob;
 import config.YamlConfig;
+import constants.MapleJob;
 import constants.skills.Beginner;
 import constants.skills.Legend;
 import constants.skills.Noblesse;

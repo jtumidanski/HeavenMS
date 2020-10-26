@@ -4,8 +4,8 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.inventory.Item;
 import client.inventory.MapleInventory;
-import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
+import constants.MapleInventoryType;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.UseSolomonPacket;
 import net.server.channel.packet.reader.UseSolomonReader;
@@ -34,7 +34,8 @@ public final class UseSolomonHandler extends AbstractPacketHandler<UseSolomonPac
                }
 
                long gachaponExp = ii.getExpById(packet.itemId());
-               if (slotItem.id() != packet.itemId() || slotItem.quantity() <= 0 || chr.getLevel() > ii.getMaxLevelById(packet.itemId())) {
+               if (slotItem.id() != packet.itemId() || slotItem.quantity() <= 0 || chr.getLevel() > ii
+                     .getMaxLevelById(packet.itemId())) {
                   return;
                }
                if (gachaponExp + chr.getGachaponExperience() > Integer.MAX_VALUE) {

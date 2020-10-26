@@ -1,16 +1,16 @@
 package tools.packet.factory;
 
-import java.awt.Point;
+import java.awt.*;
 import java.util.Set;
 
 import client.MapleBuffStat;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.MapleMount;
-import client.inventory.MapleInventoryType;
 import client.inventory.MaplePet;
 import client.newyear.NewYearCardRecord;
-import constants.inventory.ItemConstants;
+import constants.ItemConstants;
+import constants.MapleInventoryType;
 import net.server.guild.MapleGuildSummary;
 import server.life.MapleMonster;
 import server.maps.MapleMiniGame;
@@ -95,7 +95,6 @@ public class SpawnPacketFactory extends AbstractPacketFactory {
       writer.writePos(packet.position());
    }
 
-
    /**
     * Gets a packet to remove a door.
     */
@@ -121,7 +120,8 @@ public class SpawnPacketFactory extends AbstractPacketFactory {
       writer.writePos(packet.position());
       writer.write(packet.stance());
       writer.writeShort(0);
-      writer.write(packet.movementType()); // 0 = don't move, 1 = follow (4th magician summons?), 2/4 = only teleport follow, 3 = bird follow
+      writer.write(
+            packet.movementType()); // 0 = don't move, 1 = follow (4th magician summons?), 2/4 = only teleport follow, 3 = bird follow
       writer.write(packet.puppet() ? 0 : 1); // 0 and the summon can't attack - but puppets don't attack with 1 either ^.-
       writer.write(packet.animated() ? 0 : 1);
    }
@@ -458,7 +458,9 @@ public class SpawnPacketFactory extends AbstractPacketFactory {
 
    protected void spawnMist(MaplePacketLittleEndianWriter writer, SpawnMist packet) {
       writer.writeInt(packet.getObjectId());
-      writer.writeInt(packet.getMist().isMobMist() ? 0 : packet.getMist().isPoisonMist() ? 1 : packet.getMist().isRecoveryMist() ? 4 : 2); // mob mist = 0, player poison = 1, smokescreen = 2, unknown = 3, recovery = 4
+      writer.writeInt(packet.getMist().isMobMist() ? 0 : packet.getMist().isPoisonMist() ? 1 :
+            packet.getMist().isRecoveryMist() ? 4 :
+                  2); // mob mist = 0, player poison = 1, smokescreen = 2, unknown = 3, recovery = 4
       writer.writeInt(packet.getOwnerId());
       writer.writeInt(packet.getSkillId());
       writer.write(packet.getLevel());

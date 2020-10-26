@@ -1,6 +1,6 @@
 package client.processor;
 
-import client.MapleJob;
+import constants.MapleJob;
 
 public class MapleJobProcessor {
    private static MapleJobProcessor ourInstance = new MapleJobProcessor();
@@ -15,9 +15,11 @@ public class MapleJobProcessor {
    public MapleJob getJobStyleInternal(int jobId, byte opt) {
       int jobType = jobId / 100;
 
-      if (jobType == MapleJob.WARRIOR.getId() / 100 || jobType == MapleJob.DAWN_WARRIOR_1.getId() / 100 || jobType == MapleJob.ARAN1.getId() / 100) {
+      if (jobType == MapleJob.WARRIOR.getId() / 100 || jobType == MapleJob.DAWN_WARRIOR_1.getId() / 100
+            || jobType == MapleJob.ARAN1.getId() / 100) {
          return (MapleJob.WARRIOR);
-      } else if (jobType == MapleJob.MAGICIAN.getId() / 100 || jobType == MapleJob.BLAZE_WIZARD_1.getId() / 100 || jobType == MapleJob.EVAN1.getId() / 100) {
+      } else if (jobType == MapleJob.MAGICIAN.getId() / 100 || jobType == MapleJob.BLAZE_WIZARD_1.getId() / 100
+            || jobType == MapleJob.EVAN1.getId() / 100) {
          return (MapleJob.MAGICIAN);
       } else if (jobType == MapleJob.BOWMAN.getId() / 100 || jobType == MapleJob.WIND_ARCHER_1.getId() / 100) {
          if (jobId / 10 == MapleJob.CROSSBOWMAN.getId() / 10) {

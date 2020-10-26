@@ -8,8 +8,8 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.inventory.Item;
 import client.inventory.MapleInventory;
-import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
+import constants.MapleInventoryType;
 import server.maps.MaplePlayerShopItem;
 import tools.Pair;
 
@@ -30,7 +30,8 @@ public class MapleHiredMerchantProcessor {
    }
 
    public boolean check(MapleCharacter chr, List<MaplePlayerShopItem> items) {
-      List<Pair<Item, MapleInventoryType>> result = items.stream().map(this::getItemMapleInventoryTypePair).collect(Collectors.toList());
+      List<Pair<Item, MapleInventoryType>> result =
+            items.stream().map(this::getItemMapleInventoryTypePair).collect(Collectors.toList());
       return MapleInventory.checkSpotsAndOwnership(chr, result);
    }
 

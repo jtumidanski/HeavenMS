@@ -1,6 +1,6 @@
 package net.server.channel.handlers;
 
-import java.awt.Point;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -13,13 +13,13 @@ import client.Skill;
 import client.SkillFactory;
 import client.inventory.Item;
 import client.inventory.MapleInventory;
-import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import client.status.MonsterStatus;
 import client.status.MonsterStatusEffect;
 import config.YamlConfig;
+import constants.ItemConstants;
+import constants.MapleInventoryType;
 import constants.game.GameConstants;
-import constants.inventory.ItemConstants;
 import constants.skills.Aran;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.TakeDamagePacket;
@@ -121,7 +121,8 @@ public final class TakeDamageHandler extends AbstractPacketHandler<TakeDamagePac
 
                               for (byte b = 0; b < qty; b++) {
                                  pos.x = playerXPosition + ((d % 2 == 0) ? (25 * (d + 1) / 2) : -(25 * (d / 2)));
-                                 map.spawnItemDrop(chr, chr, new Item(loseItem.id(), (short) 0, (short) 1), map.calcDropPos(pos, chr.position()), true, true);
+                                 map.spawnItemDrop(chr, chr, new Item(loseItem.id(), (short) 0, (short) 1),
+                                       map.calcDropPos(pos, chr.position()), true, true);
                                  d++;
                               }
                            }
@@ -136,7 +137,8 @@ public final class TakeDamageHandler extends AbstractPacketHandler<TakeDamagePac
          } catch (ClassCastException e) {
             //this happens due to mob on last map damaging player just before changing maps
             e.printStackTrace();
-            LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXCEPTION_CAUGHT, "Attacker is not a mob-type, rather is a " + map.getMapObject(oid).getClass().getName() + " entity.");
+            LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXCEPTION_CAUGHT,
+                  "Attacker is not a mob-type, rather is a " + map.getMapObject(oid).getClass().getName() + " entity.");
             return;
          }
       }
@@ -173,7 +175,8 @@ public final class TakeDamageHandler extends AbstractPacketHandler<TakeDamagePac
                         int finalBounceDamage = bounceDamage;
                         MasterBroadcaster.getInstance().sendToAllInMap(map, new DamageMonster(oid, finalBounceDamage), true, chr);
                         PacketCreator.announce(chr, new ShowOwnBuffEffect(id, 5));
-                        MasterBroadcaster.getInstance().sendToAllInMap(map, new ShowBuffEffect(chr.getId(), id, 5, (byte) 3), false, chr);
+                        MasterBroadcaster.getInstance()
+                              .sendToAllInMap(map, new ShowBuffEffect(chr.getId(), id, 5, (byte) 3), false, chr);
                      }
                   }
                }
@@ -201,12 +204,15 @@ public final class TakeDamageHandler extends AbstractPacketHandler<TakeDamagePac
          if (attacker != null) {
             if (damageFrom == -1) {
                if (chr.getBuffedValue(MapleBuffStat.POWER_GUARD) != null) { // PG works on bosses, but only at half of the rate.
-                  int bounceDamage = (int) (damage * (chr.getBuffedValue(MapleBuffStat.POWER_GUARD).doubleValue() / (attacker.isBoss() ? 200 : 100)));
+                  int bounceDamage =
+                        (int) (damage * (chr.getBuffedValue(MapleBuffStat.POWER_GUARD).doubleValue() / (attacker.isBoss() ? 200 :
+                              100)));
                   bounceDamage = Math.min(bounceDamage, attacker.getMaxHp() / 10);
                   damage -= bounceDamage;
                   map.damageMonster(chr, attacker, bounceDamage);
                   int finalBounceDamage = bounceDamage;
-                  MasterBroadcaster.getInstance().sendToAllInMapRange(map, new DamageMonster(oid, finalBounceDamage), false, chr, true);
+                  MasterBroadcaster.getInstance()
+                        .sendToAllInMapRange(map, new DamageMonster(oid, finalBounceDamage), false, chr, true);
                   attacker.aggroMonsterDamage(chr, bounceDamage);
                }
                MapleStatEffect bPressure = chr.getBuffEffect(MapleBuffStat.BODY_PRESSURE);
@@ -215,7 +221,9 @@ public final class TakeDamageHandler extends AbstractPacketHandler<TakeDamagePac
                   if (skill.isPresent()) {
                      if (!attacker.alreadyBuffedStats().contains(MonsterStatus.NEUTRALISE)) {
                         if (!attacker.isBoss() && bPressure.makeChanceResult()) {
-                           attacker.applyStatus(chr, new MonsterStatusEffect(Collections.singletonMap(MonsterStatus.NEUTRALISE, 1), skill.get(), null, false), false, (bPressure.getDuration() / 10) * 2, false);
+                           attacker.applyStatus(chr,
+                                 new MonsterStatusEffect(Collections.singletonMap(MonsterStatus.NEUTRALISE, 1), skill.get(), null,
+                                       false), false, (bPressure.getDuration() / 10) * 2, false);
                         }
                      }
                   }
@@ -275,9 +283,13 @@ public final class TakeDamageHandler extends AbstractPacketHandler<TakeDamagePac
          }
       }
       if (!chr.isHidden()) {
-         MasterBroadcaster.getInstance().sendToAllInMap(map, new DamageCharacter(damageFrom, monsterIdFrom, chr.getId(), damage, fake, direction, is_pgmr, pgmr, is_pg, oid, pos_x, pos_y), false, chr);
+         MasterBroadcaster.getInstance().sendToAllInMap(map,
+               new DamageCharacter(damageFrom, monsterIdFrom, chr.getId(), damage, fake, direction, is_pgmr, pgmr, is_pg, oid,
+                     pos_x, pos_y), false, chr);
       } else {
-         map.broadcastGMMessage(chr, new DamageCharacter(damageFrom, monsterIdFrom, chr.getId(), damage, fake, direction, is_pgmr, pgmr, is_pg, oid, pos_x, pos_y), false);
+         map.broadcastGMMessage(chr,
+               new DamageCharacter(damageFrom, monsterIdFrom, chr.getId(), damage, fake, direction, is_pgmr, pgmr, is_pg, oid,
+                     pos_x, pos_y), false);
       }
       if (GameConstants.isDojo(map.getId())) {
          chr.setDojoEnergy(chr.getDojoEnergy() + YamlConfig.config.server.DOJO_ENERGY_DMG);

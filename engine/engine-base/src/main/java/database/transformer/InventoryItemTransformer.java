@@ -2,10 +2,10 @@ package database.transformer;
 
 import client.database.data.GetInventoryItems;
 import client.inventory.Item;
-import client.inventory.MapleInventoryType;
 import client.inventory.MaplePet;
 import client.processor.ItemProcessor;
 import client.processor.PetProcessor;
+import constants.MapleInventoryType;
 import tools.Pair;
 import transformer.SqlTransformer;
 

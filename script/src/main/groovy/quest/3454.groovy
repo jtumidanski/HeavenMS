@@ -1,7 +1,8 @@
 package quest
-import tools.I18nMessage
+import tools.I18nMessage
 
-import client.inventory.MapleInventoryType
+
+import constants.MapleInventoryType
 import scripting.quest.QuestActionManager
 
 class Quest3454 {
@@ -29,7 +30,8 @@ class Quest3454 {
 
          if (status == 0) {
             if (qm.getPlayer().getInventory(MapleInventoryType.ETC).getNumFreeSlot() < 1) {
-               qm.sendOk(I18nMessage.from("3454_ETC_ROOM_NEEDED"))
+               qm.sendOk(I18nMessage.from("3454_ETC_ROOM_NEEDED"))
+
                qm.dispose()
                return
             }
@@ -46,7 +48,8 @@ class Quest3454 {
                qm.gainItem(4031927, (short) 1)
             }
 
-            qm.sendOk(I18nMessage.from("3454_GO_MEET"))
+            qm.sendOk(I18nMessage.from("3454_GO_MEET"))
+
             qm.forceCompleteQuest()
          } else if (status == 1) {
             qm.dispose()

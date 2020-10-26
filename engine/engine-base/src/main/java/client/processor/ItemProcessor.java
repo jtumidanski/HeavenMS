@@ -9,8 +9,8 @@ import client.inventory.Item;
 import client.inventory.StatUpgrade;
 import client.inventory.manipulator.MapleKarmaManipulator;
 import config.YamlConfig;
+import constants.ItemConstants;
 import constants.game.ExpTable;
-import constants.inventory.ItemConstants;
 import server.MapleItemInformationProvider;
 import tools.I18nMessage;
 import tools.LoggerOriginator;
@@ -56,7 +56,8 @@ public class ItemProcessor {
    }
 
    public boolean isUnableToBeTraded(Item item) {
-      return ((item.flag() & ItemConstants.UNTRADEABLE) == ItemConstants.UNTRADEABLE) || (MapleItemInformationProvider.getInstance().isDropRestricted(item.id()) && !MapleKarmaManipulator.hasKarmaFlag(item));
+      return ((item.flag() & ItemConstants.UNTRADEABLE) == ItemConstants.UNTRADEABLE) || (
+            MapleItemInformationProvider.getInstance().isDropRestricted(item.id()) && !MapleKarmaManipulator.hasKarmaFlag(item));
    }
 
    public int getStatModifier(boolean isAttribute) {
@@ -126,7 +127,8 @@ public class ItemProcessor {
       }
 
       String eqpName = ii.getName(equip.id());
-      String eqpInfo = reachedMaxLevel(equip) ? " #e#rMAX LEVEL#k#n" : (" EXP: #e#b" + (int) equip.itemExp() + "#k#n / " + ExpTable.getEquipExpNeededForLevel(equip.itemLevel()));
+      String eqpInfo = reachedMaxLevel(equip) ? " #e#rMAX LEVEL#k#n" :
+            (" EXP: #e#b" + (int) equip.itemExp() + "#k#n / " + ExpTable.getEquipExpNeededForLevel(equip.itemLevel()));
 
       return "'" + eqpName + "' -> LV: #e#b" + equip.itemLevel() + "#k#n    " + eqpInfo + "\r\n";
    }
@@ -140,7 +142,6 @@ public class ItemProcessor {
 
       return equip.itemLevel() >= YamlConfig.config.server.USE_EQUIPMNT_LVLUP;
    }
-
 
    public synchronized void gainItemExp(Equip equip, MapleClient c, int gain) {
       MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
@@ -156,7 +157,9 @@ public class ItemProcessor {
 
       int reqLevel = ii.getEquipLevelReq(result.id());
 
-      float masteryModifier = (float) (YamlConfig.config.server.EQUIP_EXP_RATE * ExpTable.getExpNeededForLevel(1)) / (float) normalizedMasteryExp(reqLevel);
+      float masteryModifier =
+            (float) (YamlConfig.config.server.EQUIP_EXP_RATE * ExpTable.getExpNeededForLevel(1)) / (float) normalizedMasteryExp(
+                  reqLevel);
       float elementModifier = (result.elemental()) ? 0.85f : 0.6f;
 
       float baseExpGain = gain * elementModifier * masteryModifier;
@@ -165,7 +168,10 @@ public class ItemProcessor {
       int expNeeded = ExpTable.getEquipExpNeededForLevel(result.itemLevel());
 
       if (YamlConfig.config.server.USE_DEBUG_SHOW_INFO_EQPEXP) {
-         LoggerUtil.printDebug(LoggerOriginator.ENGINE, "'" + ii.getName(result.id()) + "' -> EXP Gain: " + gain + " Mastery: " + masteryModifier + " Base gain: " + baseExpGain + " exp: " + result.itemExp() + " / " + expNeeded + ", Kills TNL: " + expNeeded / (baseExpGain / c.getPlayer().getExpRate()));
+         LoggerUtil.printDebug(LoggerOriginator.ENGINE,
+               "'" + ii.getName(result.id()) + "' -> EXP Gain: " + gain + " Mastery: " + masteryModifier + " Base gain: "
+                     + baseExpGain + " exp: " + result.itemExp() + " / " + expNeeded + ", Kills TNL: " + expNeeded / (baseExpGain
+                     / c.getPlayer().getExpRate()));
       }
 
       if (result.itemExp() >= expNeeded) {
@@ -191,7 +197,8 @@ public class ItemProcessor {
       List<Pair<StatUpgrade, Integer>> stats = new LinkedList<>();
 
       if (result.elemental()) {
-         List<Pair<String, Integer>> elementalStats = MapleItemInformationProvider.getInstance().getItemLevelUpStats(result.id(), result.itemLevel());
+         List<Pair<String, Integer>> elementalStats =
+               MapleItemInformationProvider.getInstance().getItemLevelUpStats(result.id(), result.itemLevel());
 
          for (Pair<String, Integer> p : elementalStats) {
             if (p.getRight() > 0) {
@@ -242,7 +249,9 @@ public class ItemProcessor {
       c.getPlayer().equipChanged();
 
       showLevelUpMessage(showStr, c);
-      MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.LIGHT_BLUE, I18nMessage.from("ITEM_LEVEL_UP_MESSAGE").with(itemName, result.itemLevel(), res.getLeft(), (gotVicious ? "+VICIOUS" : ""), (gotSlot ? "+UPGSLOT" : "")));
+      MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.LIGHT_BLUE,
+            I18nMessage.from("ITEM_LEVEL_UP_MESSAGE")
+                  .with(itemName, result.itemLevel(), res.getLeft(), (gotVicious ? "+VICIOUS" : ""), (gotSlot ? "+UPGSLOT" : "")));
 
       PacketCreator.announce(c, new ShowSpecialEffect(15));
       c.getPlayer().getMap().broadcastMessage(c.getPlayer(), new ShowForeignEffect(c.getPlayer().getId(), 15));
@@ -250,10 +259,12 @@ public class ItemProcessor {
       return result;
    }
 
-   private Equip getUnitStatUpgrade(Equip equip, List<Pair<StatUpgrade, Integer>> stats, StatUpgrade name, int curStat, boolean isAttribute) {
+   private Equip getUnitStatUpgrade(Equip equip, List<Pair<StatUpgrade, Integer>> stats, StatUpgrade name, int curStat,
+                                    boolean isAttribute) {
       Equip result = Equip.newBuilder(equip).setUpgradeable(true).build();
 
-      int maxUpgrade = randomizeStatUpgrade((int) (1 + (curStat / (getStatModifier(isAttribute) * (isNotWeaponAffinity(equip, name) ? 2.7 : 1)))));
+      int maxUpgrade = randomizeStatUpgrade(
+            (int) (1 + (curStat / (getStatModifier(isAttribute) * (isNotWeaponAffinity(equip, name) ? 2.7 : 1)))));
       if (maxUpgrade == 0) {
          return result;
       }

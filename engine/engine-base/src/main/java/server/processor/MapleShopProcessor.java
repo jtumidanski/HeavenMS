@@ -7,11 +7,11 @@ import java.util.Set;
 
 import client.MapleClient;
 import client.inventory.Item;
-import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import client.processor.PetProcessor;
+import constants.ItemConstants;
+import constants.MapleInventoryType;
 import constants.ShopTransactionOperation;
-import constants.inventory.ItemConstants;
 import database.DatabaseConnection;
 import database.provider.ShopItemProvider;
 import database.provider.ShopProvider;
@@ -93,7 +93,8 @@ public class MapleShopProcessor {
          }
          if (ret.isPresent()) {
             MapleShop shop = ret.get();
-            MapleShopItem[] result = ShopItemProvider.getInstance().getItemsForShop(connection, shop.id(), rechargeableItems).toArray(MapleShopItem[]::new);
+            MapleShopItem[] result = ShopItemProvider.getInstance().getItemsForShop(connection, shop.id(), rechargeableItems)
+                  .toArray(MapleShopItem[]::new);
             shop.setItems(result);
          }
          return ret.orElse(null);
@@ -134,11 +135,9 @@ public class MapleShopProcessor {
             } else {
                PacketCreator.announce(c, new ConfirmShopTransaction(ShopTransactionOperation.INVENTORY_FULL));
             }
-
          } else {
             PacketCreator.announce(c, new ConfirmShopTransaction(ShopTransactionOperation.NOT_ENOUGH_MESO));
          }
-
       } else if (item.pitch() > 0) {
          int amount = (int) Math.min((float) item.pitch() * quantity, Integer.MAX_VALUE);
 
@@ -157,7 +156,6 @@ public class MapleShopProcessor {
                PacketCreator.announce(c, new ConfirmShopTransaction(ShopTransactionOperation.INVENTORY_FULL));
             }
          }
-
       } else if (c.getPlayer().getInventory(MapleInventoryType.CASH).countById(shop.token()) != 0) {
          int amount = c.getPlayer().getInventory(MapleInventoryType.CASH).countById(shop.token());
          int value = amount * shop.tokenValue();

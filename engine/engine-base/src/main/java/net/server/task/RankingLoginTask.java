@@ -2,15 +2,14 @@ package net.server.task;
 
 import java.util.List;
 import java.util.function.Supplier;
-
 import javax.persistence.EntityManager;
 
-import client.MapleJob;
+import client.database.data.CharacterRankData;
+import config.YamlConfig;
+import constants.MapleJob;
 import database.DatabaseConnection;
 import database.administrator.CharacterAdministrator;
-import client.database.data.CharacterRankData;
 import database.provider.CharacterProvider;
-import config.YamlConfig;
 import net.server.Server;
 import tools.TriConsumer;
 
@@ -35,12 +34,14 @@ public class RankingLoginTask implements Runnable {
       if (job != -1) {
          performRanking(
                () -> CharacterProvider.getInstance().getRankByJob(entityManager, world, job),
-               (characterId, rank, rankMove) -> CharacterAdministrator.getInstance().updateJobRank(entityManager, characterId, rank, rankMove)
+               (characterId, rank, rankMove) -> CharacterAdministrator.getInstance()
+                     .updateJobRank(entityManager, characterId, rank, rankMove)
          );
       } else {
          performRanking(
                () -> CharacterProvider.getInstance().getRank(entityManager, world),
-               (characterId, rank, rankMove) -> CharacterAdministrator.getInstance().updateRank(entityManager, characterId, rank, rankMove)
+               (characterId, rank, rankMove) -> CharacterAdministrator.getInstance()
+                     .updateRank(entityManager, characterId, rank, rankMove)
          );
       }
    }

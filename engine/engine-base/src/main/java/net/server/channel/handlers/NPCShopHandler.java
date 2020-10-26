@@ -2,7 +2,7 @@ package net.server.channel.handlers;
 
 import client.MapleClient;
 import client.autoban.AutoBanFactory;
-import constants.inventory.ItemConstants;
+import constants.ItemConstants;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.NPCShopPacket;
 import net.server.channel.packet.reader.NPCShopReader;

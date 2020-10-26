@@ -1,7 +1,7 @@
 package quest
 
-import client.MapleJob
-import client.inventory.MapleInventoryType
+import constants.MapleJob
+import constants.MapleInventoryType
 import scripting.quest.QuestActionManager
 import tools.I18nMessage
 

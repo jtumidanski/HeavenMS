@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import client.MapleJob;
+import constants.MapleJob;
 
 public class LeaderSearchMetadata {
    private final Integer minLevel;

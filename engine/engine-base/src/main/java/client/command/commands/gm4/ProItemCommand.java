@@ -4,10 +4,10 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
 import client.inventory.Equip;
-import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import client.processor.ItemProcessor;
-import constants.inventory.ItemConstants;
+import constants.ItemConstants;
+import constants.MapleInventoryType;
 import server.MapleItemInformationProvider;
 import tools.I18nMessage;
 import tools.MessageBroadcaster;
@@ -59,7 +59,8 @@ public class ProItemCommand extends Command {
                .build();
          MapleInventoryManipulator.addFromDrop(c, equip);
       } else {
-         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("PRO_ITEM_NOT_EQUIP"));
+         MessageBroadcaster.getInstance()
+               .sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("PRO_ITEM_NOT_EQUIP"));
       }
    }
 }

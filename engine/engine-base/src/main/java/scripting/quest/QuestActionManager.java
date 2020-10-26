@@ -1,25 +1,28 @@
 package scripting.quest;
 
+import builder.InputObjectBuilder;
+import builder.ResultObjectBuilder;
 import client.MapleClient;
+import rest.RestService;
+import rest.UriBuilder;
+import rest.master.attributes.CharacterAttributes;
+import rest.master.attributes.builders.CharacterAttributesBuilder;
 import scripting.npc.NPCConversationManager;
 import server.MapleItemInformationProvider;
 import server.processor.QuestProcessor;
-import server.quest.MapleQuest;
-import server.quest.actions.ExpAction;
-import server.quest.actions.MesoAction;
 
 public class QuestActionManager extends NPCConversationManager {
-   private boolean start; // this is if the script in question is start or end
-   private int quest;
+   private final boolean start; // this is if the script in question is start or end
+   private final int questId;
 
-   public QuestActionManager(MapleClient c, int quest, int npc, boolean start) {
+   public QuestActionManager(MapleClient c, int questId, int npc, boolean start) {
       super(c, npc, null);
-      this.quest = quest;
+      this.questId = questId;
       this.start = start;
    }
 
-   public int getQuest() {
-      return quest;
+   public int getQuestId() {
+      return questId;
    }
 
    public boolean isStart() {
@@ -32,11 +35,11 @@ public class QuestActionManager extends NPCConversationManager {
    }
 
    public boolean forceStartQuest() {
-      return forceStartQuest(quest);
+      return forceStartQuest(questId);
    }
 
    public boolean forceCompleteQuest() {
-      return forceCompleteQuest(quest);
+      return forceCompleteQuest(questId);
    }
 
    // For compatibility with some older scripts...
@@ -51,16 +54,24 @@ public class QuestActionManager extends NPCConversationManager {
 
    @Override
    public void gainExp(int gain) {
-      ExpAction.runAction(getPlayer(), gain);
+      UriBuilder.service(RestService.MASTER).path("characters").path(getPlayer().getId())
+            .getRestClient()
+            .update(new InputObjectBuilder().setData(new ResultObjectBuilder(CharacterAttributes.class, getPlayer().getId())
+                  .setAttribute(new CharacterAttributesBuilder().setExperience(gain))
+                  .build()));
    }
 
    @Override
    public void gainMeso(int gain) {
-      MesoAction.runAction(getPlayer(), gain);
+      UriBuilder.service(RestService.MASTER).path("characters").path(getPlayer().getId())
+            .getRestClient()
+            .update(new InputObjectBuilder().setData(new ResultObjectBuilder(CharacterAttributes.class, getPlayer().getId())
+                  .setAttribute(new CharacterAttributesBuilder().setMeso(gain))
+                  .build()));
    }
 
    public String getMedalName() {  // usable only for medal quests (id 299XX)
-      MapleQuest q = QuestProcessor.getInstance().getQuest(quest);
-      return MapleItemInformationProvider.getInstance().getName(q.medalId());
+      int medalId = QuestProcessor.getInstance().getQuestMedalId(questId);
+      return MapleItemInformationProvider.getInstance().getName(medalId);
    }
 }

@@ -112,7 +112,4 @@ public class MessageBroadcaster {
    public void yellowMessage(MapleCharacter character, UserMessage message) {
       MasterBroadcaster.getInstance().send(Collections.singletonList(character), recipient -> PacketCreator.create(new YellowTip(message.to(recipient).evaluate())));
    }
-
-   public void sendServerNotice(MapleCharacter character, ServerNoticeType noticeType, String s) {
-   }
 }

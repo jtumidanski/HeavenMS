@@ -5,11 +5,11 @@ import java.util.Optional;
 import client.MapleCharacter;
 import client.database.data.PetData;
 import client.inventory.Item;
-import client.inventory.MapleInventoryType;
 import client.inventory.MaplePet;
 import client.inventory.PetDataFactory;
-import client.inventory.PetFlag;
 import client.inventory.manipulator.MapleCashIdGenerator;
+import constants.MapleInventoryType;
+import constants.PetFlag;
 import constants.game.ExpTable;
 import database.DatabaseConnection;
 import database.administrator.PetAdministrator;
@@ -42,7 +42,8 @@ public class PetProcessor {
    }
 
    public MaplePet loadFromDb(int itemId, short position, int petId) {
-      Optional<PetData> result = DatabaseConnection.getInstance().withConnectionResult(connection -> PetProvider.getInstance().loadPet(connection, petId));
+      Optional<PetData> result = DatabaseConnection.getInstance()
+            .withConnectionResult(connection -> PetProvider.getInstance().loadPet(connection, petId));
       if (result.isPresent()) {
          PetData petData = result.get();
          return MaplePet.newBuilder(itemId)
@@ -64,7 +65,8 @@ public class PetProcessor {
    }
 
    public void deleteFromDb(MapleCharacter owner, int petId) {
-      DatabaseConnection.getInstance().withConnection(connection -> PetAdministrator.getInstance().deleteAllPetData(connection, petId));
+      DatabaseConnection.getInstance()
+            .withConnection(connection -> PetAdministrator.getInstance().deleteAllPetData(connection, petId));
       owner.resetExcluded(petId);
       MapleCashIdGenerator.getInstance().freeCashId(petId);
    }
@@ -74,14 +76,17 @@ public class PetProcessor {
    }
 
    public int createPet(int itemId, byte level, int closeness, int fullness) {
-      return DatabaseConnection.getInstance().withConnectionResult(connection -> PetAdministrator.getInstance().createPet(connection, itemId, level, closeness, fullness)).orElse(-1);
+      return DatabaseConnection.getInstance().withConnectionResult(
+            connection -> PetAdministrator.getInstance().createPet(connection, itemId, level, closeness, fullness)).orElse(-1);
    }
 
    public void saveToDb(MaplePet pet) {
-      DatabaseConnection.getInstance().withConnection(connection -> PetAdministrator.getInstance().updatePet(connection, pet.name(), pet.level(), pet.closeness(), pet.fullness(), pet.summoned(), pet.petFlag(), pet.uniqueId()));
+      DatabaseConnection.getInstance().withConnection(connection -> PetAdministrator.getInstance()
+            .updatePet(connection, pet.name(), pet.level(), pet.closeness(), pet.fullness(), pet.summoned(), pet.petFlag(),
+                  pet.uniqueId()));
    }
 
-   public void gainClosenessFullness(MapleCharacter owner, byte slot, int incCloseness, int incFullness, int type) {
+   public void gainClosenessFullness(MapleCharacter owner, byte slot, int incCloseness, int incFullness) {
       boolean enjoyed;
       MaplePet pet = owner.getPet(slot);
 
@@ -144,7 +149,6 @@ public class PetProcessor {
       return MapleItemInformationProvider.getInstance().canPetConsume(pet.id(), itemId);
    }
 
-
    public void runFullnessSchedule(MapleCharacter character, byte slot) {
       MaplePet pet = character.getPet(slot);
       if (pet == null) {
@@ -156,7 +160,8 @@ public class PetProcessor {
          pet = character.updateAndGetPet(slot, myPet -> myPet.degradeFullness(15));
          saveToDb(pet);
          unequipPet(character, slot, true);
-         MessageBroadcaster.getInstance().sendServerNotice(character, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("PET_FULLNESS_LOW"));
+         MessageBroadcaster.getInstance()
+               .sendServerNotice(character, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("PET_FULLNESS_LOW"));
       } else {
          pet = character.updateAndGetPet(slot, myPet -> myPet.degradeFullness(newFullness));
          PetProcessor.getInstance().saveToDb(pet);
@@ -179,7 +184,8 @@ public class PetProcessor {
          PetProcessor.getInstance().saveToDb(pet);
       }
 
-      MasterBroadcaster.getInstance().sendToAllInMap(character.getMap(), new ShowPet(character, pet, true, hunger), true, character);
+      MasterBroadcaster.getInstance()
+            .sendToAllInMap(character.getMap(), new ShowPet(character, pet, true, hunger), true, character);
       character.removePet(pet, shift_left);
       character.commitExcludedItems();
 

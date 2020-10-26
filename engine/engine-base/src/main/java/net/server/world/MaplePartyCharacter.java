@@ -3,7 +3,7 @@ package net.server.world;
 import java.util.Optional;
 
 import client.MapleCharacter;
-import client.MapleJob;
+import constants.MapleJob;
 
 public class MaplePartyCharacter {
    private String name;
@@ -129,5 +129,4 @@ public class MaplePartyCharacter {
    public int getWorld() {
       return world;
    }
-
 }

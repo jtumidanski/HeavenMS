@@ -1,8 +1,8 @@
 package tools.packet.factory;
 
 import client.MapleCharacter;
-import client.inventory.MapleInventoryType;
-import constants.inventory.ItemConstants;
+import constants.ItemConstants;
+import constants.MapleInventoryType;
 import server.maps.AbstractMapleMapObject;
 import server.maps.MapleHiredMerchant;
 import server.maps.MaplePlayerShop;

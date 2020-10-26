@@ -4,10 +4,10 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
 import client.inventory.Item;
-import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
-import tools.MessageBroadcaster;
+import constants.MapleInventoryType;
 import tools.I18nMessage;
+import tools.MessageBroadcaster;
 
 public class ClearSlotCommand extends Command {
    {
@@ -60,8 +60,9 @@ public class ClearSlotCommand extends Command {
    private void clearSlotsForType(MapleClient client, MapleInventoryType type) {
       for (int i = 0; i < 101; i++) {
          Item tempItem = client.getPlayer().getInventory(type).getItem((byte) i);
-         if (tempItem == null)
+         if (tempItem == null) {
             continue;
+         }
          MapleInventoryManipulator.removeFromSlot(client, type, (byte) i, tempItem.quantity(), false, false);
       }
    }

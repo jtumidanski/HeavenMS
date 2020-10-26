@@ -8,6 +8,7 @@ services:
       - engine-net
       - bos-net
       - cos-net
+      - qos-net
     ports:
       - '80:80'
     expose:
@@ -28,6 +29,7 @@ services:
       - engine-net
       - bos-net
       - cos-net
+      - qos-net
     ports:
       - '3306:3306'
     expose:
@@ -77,9 +79,29 @@ services:
       - engine-net
       - bos-net
       - cos-net
+      - qos-net
     expose:
       - '8080'
     container_name: ms-logs
+  qos:
+    image: ms-qos:latest
+    depends_on:
+      - "db"
+      - "engine"
+      - "nginx"
+      - "logs"
+    ports:
+      - '8584:5005'
+    environment:
+      WAIT_HOSTS: db:3306, nginx:80
+    networks:
+      - qos-net
+    expose:
+      - '8080'
+    volumes:
+      - ./wz:/wz:ro
+      - ./config.yaml:/config.yaml:ro
+    container_name: ms-qos
   engine:
     user: root
     build:
@@ -115,6 +137,9 @@ networks:
     driver: bridge
   cos-net:
     name: cos-net
+    driver: bridge
+  qos-net:
+    name: qos-net
     driver: bridge
   engine-net:
     name: engine-net

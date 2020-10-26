@@ -3,7 +3,7 @@ package tools.packet.storage;
 import java.util.Collection;
 
 import client.inventory.Item;
-import client.inventory.MapleInventoryType;
+import constants.MapleInventoryType;
 import net.opcodes.SendOpcode;
 import tools.packet.PacketInput;
 

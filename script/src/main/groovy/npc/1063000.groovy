@@ -1,6 +1,6 @@
 package npc
 
-import client.inventory.MapleInventoryType
+import constants.MapleInventoryType
 import scripting.npc.NPCConversationManager
 import tools.I18nMessage
 

@@ -12,11 +12,11 @@ import client.SkillFactory;
 import client.inventory.Equip;
 import client.inventory.Item;
 import client.inventory.MapleInventory;
-import client.inventory.MapleInventoryType;
 import client.inventory.ModifyInventory;
 import client.inventory.ScrollResult;
 import client.inventory.manipulator.MapleInventoryManipulator;
-import constants.inventory.ItemConstants;
+import constants.ItemConstants;
+import constants.MapleInventoryType;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.ScrollPacket;
 import net.server.channel.packet.reader.ScrollReader;
@@ -115,7 +115,8 @@ public final class ScrollHandler extends AbstractPacketHandler<ScrollPacket> {
             ScrollResult scrollSuccess = ScrollResult.FAIL; // fail
             if (scrolled == null) {
                scrollSuccess = ScrollResult.CURSE;
-            } else if (scrolled.level() > oldLevel || (ItemConstants.isCleanSlate(scroll.id()) && scrolled.slots() == oldSlots + 1) || ItemConstants.isFlagModifier(scroll.id(), scrolled.flag())) {
+            } else if (scrolled.level() > oldLevel || (ItemConstants.isCleanSlate(scroll.id()) && scrolled.slots() == oldSlots + 1)
+                  || ItemConstants.isFlagModifier(scroll.id(), scrolled.flag())) {
                scrollSuccess = ScrollResult.SUCCESS;
             }
 
@@ -132,7 +133,8 @@ public final class ScrollHandler extends AbstractPacketHandler<ScrollPacket> {
                      return;
                   }
 
-                  MapleInventoryManipulator.removeFromSlot(client, MapleInventoryType.USE, whiteScroll.position(), (short) 1, false, false);
+                  MapleInventoryManipulator
+                        .removeFromSlot(client, MapleInventoryType.USE, whiteScroll.position(), (short) 1, false, false);
                }
 
                MapleInventoryManipulator.removeFromSlot(client, MapleInventoryType.USE, scroll.position(), (short) 1, false);
@@ -179,7 +181,8 @@ public final class ScrollHandler extends AbstractPacketHandler<ScrollPacket> {
             ScrollResult finalScrollSuccess = scrollSuccess;
             boolean finalHasLegendarySpirit = hasLegendarySpirit;
             boolean finalIsWhiteScroll = isWhiteScroll;
-            MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new ShowScrollEffect(chr.getId(), finalScrollSuccess, finalHasLegendarySpirit, finalIsWhiteScroll));
+            MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(),
+                  new ShowScrollEffect(chr.getId(), finalScrollSuccess, finalHasLegendarySpirit, finalIsWhiteScroll));
             if (packet.destination() < 0 && (scrollSuccess == ScrollResult.SUCCESS || scrollSuccess == ScrollResult.CURSE)) {
                chr.equipChanged();
             }

@@ -2,7 +2,7 @@ package net.server.channel.handlers;
 
 import client.MapleClient;
 import client.inventory.Item;
-import client.inventory.MapleInventoryType;
+import constants.MapleInventoryType;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.UseItemEffectPacket;
 import net.server.channel.packet.reader.UseItemEffectReader;
@@ -30,6 +30,8 @@ public final class UseItemEffectHandler extends AbstractPacketHandler<UseItemEff
          }
       }
       client.getPlayer().setItemEffect(itemId);
-      MasterBroadcaster.getInstance().sendToAllInMap(client.getPlayer().getMap(), new ShowItemEffect(client.getPlayer().getId(), itemId), false, client.getPlayer());
+      MasterBroadcaster.getInstance()
+            .sendToAllInMap(client.getPlayer().getMap(), new ShowItemEffect(client.getPlayer().getId(), itemId), false,
+                  client.getPlayer());
    }
 }

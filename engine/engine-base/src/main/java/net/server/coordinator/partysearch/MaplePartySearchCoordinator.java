@@ -13,8 +13,8 @@ import java.util.Objects;
 import java.util.Set;
 
 import client.MapleCharacter;
-import client.MapleJob;
 import config.YamlConfig;
+import constants.MapleJob;
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.MonitoredReadLock;
 import net.server.audit.locks.MonitoredReentrantReadWriteLock;

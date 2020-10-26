@@ -4,7 +4,7 @@ import java.util.List;
 
 import client.inventory.Item;
 import client.inventory.ItemFactory;
-import client.inventory.MapleInventoryType;
+import constants.MapleInventoryType;
 import tools.Pair;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.fredrick.FredrickMessage;

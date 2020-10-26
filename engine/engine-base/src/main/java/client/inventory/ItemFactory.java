@@ -7,6 +7,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 
+import constants.MapleInventoryType;
 import database.DatabaseConnection;
 import database.administrator.InventoryEquipmentAdministrator;
 import database.administrator.InventoryItemAdministrator;

@@ -5,10 +5,10 @@ import client.MapleClient;
 import client.autoban.AutoBanManager;
 import client.inventory.Item;
 import client.inventory.MapleInventory;
-import client.inventory.MapleInventoryType;
 import client.inventory.MaplePet;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import client.processor.PetProcessor;
+import constants.MapleInventoryType;
 import net.server.AbstractPacketHandler;
 import net.server.Server;
 import net.server.channel.packet.pet.PetFoodPacket;
@@ -63,7 +63,7 @@ public final class PetFoodHandler extends AbstractPacketHandler<PetFoodPacket> {
                   return;
                }
 
-               PetProcessor.getInstance().gainClosenessFullness(chr, slot, (pet.fullness() <= 75) ? 1 : 0, 30, 1);   // 25+ "emptiness" to get +1 closeness
+               PetProcessor.getInstance().gainClosenessFullness(chr, slot, (pet.fullness() <= 75) ? 1 : 0, 30);   // 25+ "emptiness" to get +1 closeness
                MapleInventoryManipulator.removeFromSlot(client, MapleInventoryType.USE, packet.position(), (short) 1, false);
             } finally {
                useInv.unlockInventory();

@@ -1,22 +1,22 @@
 package net.server.channel.handlers;
 
+import client.MapleAbnormalStatus;
 import client.MapleCharacter;
 import client.MapleClient;
-import client.MapleAbnormalStatus;
 import client.inventory.Item;
-import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import config.YamlConfig;
-import constants.inventory.ItemConstants;
+import constants.ItemConstants;
+import constants.MapleInventoryType;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.UseItemPacket;
 import net.server.channel.packet.reader.UseItemReader;
 import server.MapleItemInformationProvider;
 import server.MapleStatEffect;
+import tools.I18nMessage;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
-import tools.I18nMessage;
 import tools.packet.stat.EnableActions;
 
 public final class UseItemHandler extends AbstractPacketHandler<UseItemPacket> {
@@ -78,7 +78,8 @@ public final class UseItemHandler extends AbstractPacketHandler<UseItemPacket> {
             if (ii.getItemEffect(toUse.id()).applyTo(chr)) {
                remove(client, packet.slot());
             } else {
-               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, I18nMessage.from("CANNOT_RECOVER_FROM_BANISH_YET"));
+               MessageBroadcaster.getInstance()
+                     .sendServerNotice(chr, ServerNoticeType.PINK_TEXT, I18nMessage.from("CANNOT_RECOVER_FROM_BANISH_YET"));
             }
             return;
          }

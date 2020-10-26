@@ -15,8 +15,8 @@ import javax.persistence.EntityManager;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import client.inventory.MapleInventoryType;
 import config.YamlConfig;
+import constants.MapleInventoryType;
 import constants.game.GameConstants;
 import database.DatabaseConnection;
 import database.administrator.PlayerNpcAdministrator;

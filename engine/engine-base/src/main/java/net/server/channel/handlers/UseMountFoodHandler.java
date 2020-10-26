@@ -4,8 +4,8 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.inventory.Item;
 import client.inventory.MapleInventory;
-import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
+import constants.MapleInventoryType;
 import constants.game.ExpTable;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.UseMountFoodPacket;
@@ -39,7 +39,8 @@ public final class UseMountFoodHandler extends AbstractPacketHandler<UseMountFoo
 
                   chr.modifyMount(mapleMount -> mapleMount.updateTiredness(curTiredness - healedTiredness));
                   if (healedFactor > 0.0f) {
-                     chr.modifyMount(mapleMount -> mapleMount.updateExp(mapleMount.exp() + (int) Math.ceil(healedFactor * (2 * mapleMount.level() + 6))));
+                     chr.modifyMount(mapleMount -> mapleMount
+                           .updateExp(mapleMount.exp() + (int) Math.ceil(healedFactor * (2 * mapleMount.level() + 6))));
                      int level = chr.getMount().level();
                      boolean levelUp = chr.getMount().exp() >= ExpTable.getMountExpNeededForLevel(level) && level < 31;
                      if (levelUp) {
@@ -55,7 +56,9 @@ public final class UseMountFoodHandler extends AbstractPacketHandler<UseMountFoo
             }
 
             if (mountLevelUp != null) {
-               MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new UpdateMount(chr.getId(), chr.getMount().level(), chr.getMount().exp(), chr.getMount().tiredness(), mountLevelUp));
+               MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(),
+                     new UpdateMount(chr.getId(), chr.getMount().level(), chr.getMount().exp(), chr.getMount().tiredness(),
+                           mountLevelUp));
             }
          } finally {
             client.releaseClient();

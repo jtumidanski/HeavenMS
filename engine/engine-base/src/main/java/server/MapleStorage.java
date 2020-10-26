@@ -9,27 +9,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.locks.Lock;
-
 import javax.persistence.EntityManager;
 
 import client.MapleClient;
+import client.inventory.Item;
+import client.inventory.ItemFactory;
+import constants.MapleInventoryType;
 import database.DatabaseConnection;
 import database.administrator.StorageAdministrator;
 import database.provider.StorageProvider;
-import client.inventory.Item;
-import client.inventory.ItemFactory;
-import client.inventory.MapleInventoryType;
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
 import provider.MapleData;
 import provider.MapleDataProvider;
 import provider.MapleDataProviderFactory;
 import provider.MapleDataTool;
+import tools.I18nMessage;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
 import tools.ServerNoticeType;
-import tools.I18nMessage;
 import tools.packet.stat.EnableActions;
 import tools.packet.storage.ArrangeStorage;
 import tools.packet.storage.GetStorage;
@@ -189,7 +188,8 @@ public class MapleStorage {
 
    public void sendStorage(MapleClient c, int npcId) {
       if (c.getPlayer().getLevel() < 15) {
-         MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("STORAGE_LEVEL_REQUIREMENT"));
+         MessageBroadcaster.getInstance()
+               .sendServerNotice(c.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("STORAGE_LEVEL_REQUIREMENT"));
          PacketCreator.announce(c, new EnableActions());
          return;
       }

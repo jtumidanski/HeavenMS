@@ -2,8 +2,8 @@ package net.server.channel.handlers;
 
 import client.MapleClient;
 import client.inventory.Item;
-import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
+import constants.MapleInventoryType;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.UseItemPacket;
 import net.server.channel.packet.reader.UseItemReader;
@@ -37,7 +37,8 @@ public final class UseSummonBagHandler extends AbstractPacketHandler<UseItemPack
          int[][] toSpawn = MapleItemInformationProvider.getInstance().getSummonMobs(packet.itemId());
          for (int[] toSpawnChild : toSpawn) {
             if (Randomizer.nextInt(100) < toSpawnChild[1]) {
-               MapleLifeFactory.getMonster(toSpawnChild[0]).ifPresent(monster -> client.getPlayer().getMap().spawnMonsterOnGroundBelow(monster, client.getPlayer().position()));
+               MapleLifeFactory.getMonster(toSpawnChild[0]).ifPresent(
+                     monster -> client.getPlayer().getMap().spawnMonsterOnGroundBelow(monster, client.getPlayer().position()));
             }
          }
       }

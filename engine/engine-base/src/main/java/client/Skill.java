@@ -3,6 +3,7 @@ package client;
 import java.util.ArrayList;
 import java.util.List;
 
+import constants.MapleJob;
 import constants.skills.Evan;
 import server.MapleStatEffect;
 import server.life.Element;
@@ -36,7 +37,8 @@ public class Skill {
       if (job == MapleJob.EVAN4.getId()) {
          return false;
       }
-      if (id == Evan.MAGIC_MASTERY || id == Evan.FLAME_WHEEL || id == Evan.HEROS_WILL || id == Evan.DARK_FOG || id == Evan.SOUL_STONE) {
+      if (id == Evan.MAGIC_MASTERY || id == Evan.FLAME_WHEEL || id == Evan.HEROS_WILL || id == Evan.DARK_FOG
+            || id == Evan.SOUL_STONE) {
          return true;
       }
       return job % 10 == 2;

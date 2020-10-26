@@ -14,9 +14,9 @@ import client.processor.CharacterProcessor;
 import client.processor.MapleFamilyProcessor;
 import client.processor.NewYearCardProcessor;
 import config.YamlConfig;
+import constants.ItemConstants;
 import constants.ServerConstants;
 import constants.game.GameConstants;
-import constants.inventory.ItemConstants;
 import constants.net.OpcodeConstants;
 import database.DatabaseConnection;
 import database.PersistenceManager;
@@ -840,8 +840,6 @@ public class Server {
 
         CashItemFactory.getSpecialCashItems();
         LoggerUtil.printInfo(LoggerOriginator.ENGINE, LogType.PROCESS, "Items loaded in " + ((System.currentTimeMillis() - timeToTake) / 1000.0) + " seconds");
-
-        QuestProcessor.getInstance();
 
         NewYearCardProcessor.getInstance().startPendingNewYearCardRequests();
 

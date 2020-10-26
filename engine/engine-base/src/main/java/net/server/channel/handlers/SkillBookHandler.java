@@ -7,8 +7,8 @@ import client.MapleClient;
 import client.SkillFactory;
 import client.inventory.Item;
 import client.inventory.MapleInventory;
-import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
+import constants.MapleInventoryType;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.SkillBookPacket;
 import net.server.channel.packet.reader.SkillBookReader;
@@ -44,17 +44,20 @@ public final class SkillBookHandler extends AbstractPacketHandler<SkillBookPacke
             if (toUse == null || toUse.id() != packet.itemId()) {
                return;
             }
-            Map<String, Integer> skillData = MapleItemInformationProvider.getInstance().getSkillStats(toUse.id(), player.getJob().getId());
+            Map<String, Integer> skillData =
+                  MapleItemInformationProvider.getInstance().getSkillStats(toUse.id(), player.getJob().getId());
             if (skillData == null) {
                return;
             }
 
             skillId = skillData.get("skillid");
             if (skillId == 0) {
-               MasterBroadcaster.getInstance().sendToAllInMap(player.getMap(), new ShowSkillBookResult(player.getId(), skillId, 0, false, false));
+               MasterBroadcaster.getInstance()
+                     .sendToAllInMap(player.getMap(), new ShowSkillBookResult(player.getId(), skillId, 0, false, false));
             } else {
                SkillFactory.getSkill(skillId).ifPresentOrElse(skill -> {
-                  boolean meetsPrerequisiteLevel = (player.getSkillLevel(skill) >= skillData.get("reqSkillLevel") || skillData.get("reqSkillLevel") == 0);
+                  boolean meetsPrerequisiteLevel =
+                        (player.getSkillLevel(skill) >= skillData.get("reqSkillLevel") || skillData.get("reqSkillLevel") == 0);
                   boolean notMastered = player.getMasterLevel(skill) < skillData.get("masterLevel");
                   boolean bookCanBeUsed = meetsPrerequisiteLevel && notMastered;
                   boolean success = false;
@@ -64,14 +67,17 @@ public final class SkillBookHandler extends AbstractPacketHandler<SkillBookPacke
                      }
                      if (MapleItemInformationProvider.rollSuccessChance(skillData.get("success"))) {
                         success = true;
-                        player.changeSkillLevel(skill, player.getSkillLevel(skill), Math.max(skillData.get("masterLevel"), player.getMasterLevel(skill)), -1);
+                        player.changeSkillLevel(skill, player.getSkillLevel(skill),
+                              Math.max(skillData.get("masterLevel"), player.getMasterLevel(skill)), -1);
                      } else {
                         success = false;
                      }
                   }
                   boolean finalSuccess = success;
-                  MasterBroadcaster.getInstance().sendToAllInMap(player.getMap(), new ShowSkillBookResult(player.getId(), skillId, 0, bookCanBeUsed, finalSuccess));
-               }, () -> MasterBroadcaster.getInstance().sendToAllInMap(player.getMap(), new ShowSkillBookResult(player.getId(), skillId, 0, false, false)));
+                  MasterBroadcaster.getInstance().sendToAllInMap(player.getMap(),
+                        new ShowSkillBookResult(player.getId(), skillId, 0, bookCanBeUsed, finalSuccess));
+               }, () -> MasterBroadcaster.getInstance()
+                     .sendToAllInMap(player.getMap(), new ShowSkillBookResult(player.getId(), skillId, 0, false, false)));
             }
          } finally {
             client.releaseClient();

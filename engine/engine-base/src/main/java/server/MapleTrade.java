@@ -10,9 +10,9 @@ import java.util.stream.Collectors;
 import client.MapleCharacter;
 import client.inventory.Item;
 import client.inventory.MapleInventory;
-import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import config.YamlConfig;
+import constants.MapleInventoryType;
 import net.server.coordinator.world.MapleInviteCoordinator;
 import tools.LogType;
 import tools.LoggerOriginator;
@@ -89,7 +89,8 @@ public class MapleTrade {
          throw new RuntimeException("Trade is locked.");
       }
       if (meso < 0) {
-         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXPLOITS, "[Hack] " + owner.getName() + " Trying to trade < 0 mesos");
+         LoggerUtil
+               .printError(LoggerOriginator.ENGINE, LogType.EXPLOITS, "[Hack] " + owner.getName() + " Trying to trade < 0 mesos");
          return;
       }
       if (owner.getMeso() >= meso) {
@@ -237,8 +238,12 @@ public class MapleTrade {
          MapleTrade tradePartner = trade.getPartnerTrade().get();
          tradePartner.cancel(partnerResult);
          tradePartner.getOwner().setTrade(null);
-         MapleInviteCoordinator.answerInvite(MapleInviteCoordinator.InviteType.TRADE, trade.getOwner().getId(), tradePartner.getOwner().getId(), false);
-         MapleInviteCoordinator.answerInvite(MapleInviteCoordinator.InviteType.TRADE, tradePartner.getOwner().getId(), trade.getOwner().getId(), false);
+         MapleInviteCoordinator
+               .answerInvite(MapleInviteCoordinator.InviteType.TRADE, trade.getOwner().getId(), tradePartner.getOwner().getId(),
+                     false);
+         MapleInviteCoordinator
+               .answerInvite(MapleInviteCoordinator.InviteType.TRADE, tradePartner.getOwner().getId(), trade.getOwner().getId(),
+                     false);
       }
       chr.setTrade(null);
    }

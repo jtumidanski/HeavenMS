@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import client.MapleJob;
 import config.YamlConfig;
+import constants.MapleJob;
 import constants.skills.Aran;
 import provider.MapleData;
 import provider.MapleDataDirectoryEntry;
@@ -613,7 +613,7 @@ public class GameConstants {
    }
 
    public static boolean isMedalQuest(short questId) {
-      return QuestProcessor.getInstance().getQuest(questId).medalId() != -1;
+      return QuestProcessor.getInstance().getQuestMedalId(questId) != -1;
    }
 
    public static boolean hasSPTable(MapleJob job) {

@@ -14,13 +14,13 @@ import java.util.stream.IntStream;
 
 import client.MapleCharacter;
 import client.MapleClient;
+import constants.MapleInventoryType;
 import database.DatabaseConnection;
 import database.administrator.CharacterAdministrator;
 import database.provider.CharacterProvider;
 import client.inventory.Item;
 import client.inventory.ItemFactory;
 import client.inventory.MapleInventory;
-import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import client.inventory.manipulator.MapleKarmaManipulator;
 import client.processor.npc.FredrickProcessor;

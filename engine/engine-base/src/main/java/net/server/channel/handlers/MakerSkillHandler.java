@@ -8,12 +8,12 @@ import java.util.Map;
 import client.MapleClient;
 import client.inventory.Equip;
 import client.inventory.Item;
-import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import client.processor.action.MakerProcessor;
 import config.YamlConfig;
+import constants.ItemConstants;
+import constants.MapleInventoryType;
 import constants.game.GameConstants;
-import constants.inventory.ItemConstants;
 import net.server.AbstractPacketHandler;
 import net.server.PacketReader;
 import net.server.channel.packet.maker.BaseMakerActionPacket;
@@ -22,6 +22,7 @@ import net.server.channel.packet.maker.MakerReagentPacket;
 import net.server.channel.packet.reader.MakerActionReader;
 import server.MakerItemFactory;
 import server.MapleItemInformationProvider;
+import server.processor.QuestProcessor;
 import tools.I18nMessage;
 import tools.LogType;
 import tools.LoggerOriginator;
@@ -62,7 +63,8 @@ public final class MakerSkillHandler extends AbstractPacketHandler<BaseMakerActi
                toCreate = MapleItemInformationProvider.getInstance().getMakerCrystalFromLeftover(toCreate);
                if (toCreate == -1) {
                   String itemName = MapleItemInformationProvider.getInstance().getName(fromLeftover);
-                  MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("MAKER_SKILL_CRYSTAL_CONVERSION_ERROR").with(itemName));
+                  MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP,
+                        I18nMessage.from("MAKER_SKILL_CRYSTAL_CONVERSION_ERROR").with(itemName));
                   PacketCreator.announce(client, new MakerEnableActions());
                   return;
                }
@@ -80,17 +82,20 @@ public final class MakerSkillHandler extends AbstractPacketHandler<BaseMakerActi
                      recipe = MakerItemFactory.generateDisassemblyCrystalEntry(toDisassemble, p.getLeft(), p.getRight());
                   } else {
                      String itemName = MapleItemInformationProvider.getInstance().getName(toCreate);
-                     MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("MAKER_SKILL_CRYSTAL_DISASSEMBLY_ERROR").with(itemName));
+                     MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP,
+                           I18nMessage.from("MAKER_SKILL_CRYSTAL_DISASSEMBLY_ERROR").with(itemName));
                      PacketCreator.announce(client, new MakerEnableActions());
                      return;
                   }
                } else {
-                  MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("MAKER_SKILL_UNKNOWN_DISASSEMBLY_ERROR"));
+                  MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP,
+                        I18nMessage.from("MAKER_SKILL_UNKNOWN_DISASSEMBLY_ERROR"));
                   PacketCreator.announce(client, new MakerEnableActions());
                   return;
                }
             } else {
-               if (ItemConstants.isEquipment(toCreate) && packet instanceof MakerReagentPacket) {   // only equips uses stimulant and reagents
+               if (ItemConstants.isEquipment(toCreate)
+                     && packet instanceof MakerReagentPacket) {   // only equips uses stimulant and reagents
                   if (((MakerReagentPacket) packet).isStimulant()) {  // stimulant
                      stimulantId = MapleItemInformationProvider.getInstance().getMakerStimulant(toCreate);
                      if (!client.getAbstractPlayerInteraction().haveItem(stimulantId)) {
@@ -132,7 +137,8 @@ public final class MakerSkillHandler extends AbstractPacketHandler<BaseMakerActi
 
                   if (!reagentIds.isEmpty()) {
                      if (!removeOddMakerReagents(toCreate, reagentIds)) {
-                        MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("MAKER_SKILL_WEAPON_ITEMS_CAN_ONLY_STRENGTHEN_BY_ATTACK"));
+                        MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP,
+                              I18nMessage.from("MAKER_SKILL_WEAPON_ITEMS_CAN_ONLY_STRENGTHEN_BY_ATTACK"));
                         PacketCreator.announce(client, new MakerEnableActions());
                         return;
                      }
@@ -147,33 +153,42 @@ public final class MakerSkillHandler extends AbstractPacketHandler<BaseMakerActi
             switch (createStatus) {
                // non-available for Maker item id has been tried to forge
                case -1 -> {
-                  LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXPLOITS, "Player " + client.getPlayer().getName() + " tried to craft item id " + toCreate + " using the Maker skill.");
-                  MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("MAKER_SKILL_REQUESTED_ITEM_COULD_NOT_BE_CRAFTED"));
+                  LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXPLOITS,
+                        "Player " + client.getPlayer().getName() + " tried to craft item id " + toCreate
+                              + " using the Maker skill.");
+                  MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP,
+                        I18nMessage.from("MAKER_SKILL_REQUESTED_ITEM_COULD_NOT_BE_CRAFTED"));
                   PacketCreator.announce(client, new MakerEnableActions());
                }
                // no items
                case 1 -> {
-                  MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("MAKER_SKILL_MISSING_REQUIRED_ITEM").with(MapleItemInformationProvider.getInstance().getName(toCreate)));
+                  MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP,
+                        I18nMessage.from("MAKER_SKILL_MISSING_REQUIRED_ITEM")
+                              .with(MapleItemInformationProvider.getInstance().getName(toCreate)));
                   PacketCreator.announce(client, new MakerEnableActions());
                }
                // no meso
                case 2 -> {
-                  MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("MAKER_SKILL_MINIMUM_MESO_ERROR").with(GameConstants.numberWithCommas(recipe.getCost())));
+                  MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP,
+                        I18nMessage.from("MAKER_SKILL_MINIMUM_MESO_ERROR").with(GameConstants.numberWithCommas(recipe.getCost())));
                   PacketCreator.announce(client, new MakerEnableActions());
                }
                // no req level
                case 3 -> {
-                  MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("MAKER_SKILL_MINIMUM_LEVEL_ERROR"));
+                  MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP,
+                        I18nMessage.from("MAKER_SKILL_MINIMUM_LEVEL_ERROR"));
                   PacketCreator.announce(client, new MakerEnableActions());
                }
                // no req skill level
                case 4 -> {
-                  MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("MAKER_SKILL_MINIMUM_MAKER_LEVEL_ERROR"));
+                  MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP,
+                        I18nMessage.from("MAKER_SKILL_MINIMUM_MAKER_LEVEL_ERROR"));
                   PacketCreator.announce(client, new MakerEnableActions());
                }
                // inventory full
                case 5 -> {
-                  MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("INVENTORY_FULL_ERROR"));
+                  MessageBroadcaster.getInstance()
+                        .sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("INVENTORY_FULL_ERROR"));
                   PacketCreator.announce(client, new MakerEnableActions());
                }
                default -> {
@@ -213,17 +228,21 @@ public final class MakerSkillHandler extends AbstractPacketHandler<BaseMakerActi
                      makerSucceeded = addBoostedMakerItem(client, toCreate, stimulantId, reagentIds);
                   }
                   if (type == 3) {
-                     PacketCreator.announce(client, new MakerCrystalResult(recipe.getGainItems().get(0).getLeft(), recipe.getReqItems().get(0).getLeft()));
+                     PacketCreator.announce(client,
+                           new MakerCrystalResult(recipe.getGainItems().get(0).getLeft(), recipe.getReqItems().get(0).getLeft()));
                   } else if (type == 4) {
-                     PacketCreator.announce(client, new MakerResultDestroy(recipe.getReqItems().get(0).getLeft(), recipe.getCost(), recipe.getGainItems()));
+                     PacketCreator.announce(client,
+                           new MakerResultDestroy(recipe.getReqItems().get(0).getLeft(), recipe.getCost(), recipe.getGainItems()));
                   } else {
-                     PacketCreator.announce(client, new MakerResult(makerSucceeded, recipe.getGainItems().get(0).getLeft(), recipe.getGainItems().get(0).getRight(), recipe.getCost(), recipe.getReqItems(), stimulantId, new LinkedList<>(reagentIds.keySet())));
+                     PacketCreator.announce(client, new MakerResult(makerSucceeded, recipe.getGainItems().get(0).getLeft(),
+                           recipe.getGainItems().get(0).getRight(), recipe.getCost(), recipe.getReqItems(), stimulantId,
+                           new LinkedList<>(reagentIds.keySet())));
                   }
                   PacketCreator.announce(client, new ShowMakerEffect(makerSucceeded));
                   boolean finalMakerSucceeded = makerSucceeded;
                   MasterBroadcaster.getInstance().sendToAllInMap(client.getPlayer().getMap(),
                         new ShowForeignMakerEffect(client.getPlayer().getId(), finalMakerSucceeded), false, client.getPlayer());
-                  if (toCreate == 4260003 && type == 3 && client.getPlayer().getQuestStatus(6033) == 1) {
+                  if (toCreate == 4260003 && type == 3 && QuestProcessor.getInstance().isStarted(client.getPlayer(), 6033)) {
                      client.getAbstractPlayerInteraction().setQuestProgress(6033, 1);
                   }
                }

@@ -7,11 +7,8 @@ import javax.script.Invocable;
 import javax.script.ScriptEngine;
 
 import client.MapleClient;
-import client.QuestStatus;
 import constants.game.GameConstants;
 import scripting.AbstractScriptManager;
-import server.processor.QuestProcessor;
-import server.quest.MapleQuest;
 import tools.LogType;
 import tools.LoggerOriginator;
 import tools.LoggerUtil;
@@ -35,8 +32,7 @@ public class QuestScriptManager extends AbstractScriptManager {
       return iv;
    }
 
-   public void start(MapleClient c, short questId, int npc) {
-      MapleQuest quest = QuestProcessor.getInstance().getQuest(questId);
+   public void start(MapleClient c, short questId, int npc, boolean hasScriptRequirement) {
       try {
          QuestActionManager qm = new QuestActionManager(c, questId, npc, true);
          if (qms.containsKey(c)) {
@@ -44,7 +40,7 @@ public class QuestScriptManager extends AbstractScriptManager {
          }
          if (c.canClickNPC()) {
             qms.put(c, qm);
-            if (!quest.hasScriptRequirement(false)) {
+            if (!hasScriptRequirement) {
                qm.dispose();
                return;
             }
@@ -65,7 +61,7 @@ public class QuestScriptManager extends AbstractScriptManager {
          LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.QUEST, ute, String.format("QuestId [%d]", questId));
          dispose(c);
       } catch (final Throwable t) {
-         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.QUEST, t, String.format("QuestId [%d]", getQM(c).getQuest()));
+         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.QUEST, t, String.format("QuestId [%d]", getQM(c).getQuestId()));
          dispose(c);
       }
    }
@@ -77,16 +73,14 @@ public class QuestScriptManager extends AbstractScriptManager {
             c.setClickedNPC();
             ((Invocable) iv).invokeFunction("start", mode, type, selection);
          } catch (final Throwable ute) {
-            LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.QUEST, ute, String.format("QuestId [%d]", getQM(c).getQuest()));
+            LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.QUEST, ute, String.format("QuestId [%d]", getQM(c).getQuestId()));
             dispose(c);
          }
       }
    }
 
-   public void end(MapleClient c, short questId, int npc) {
-      MapleQuest quest = QuestProcessor.getInstance().getQuest(questId);
-      if (!QuestProcessor.getInstance().questIsStatus(c.getPlayer(), quest, QuestStatus.STARTED)
-            || !c.getPlayer().getMap().containsNPC(npc)) {
+   public void end(MapleClient c, short questId, int npc, boolean hasScriptRequirement) {
+      if (!c.getPlayer().getMap().containsNPC(npc)) {
          dispose(c);
          return;
       }
@@ -97,7 +91,7 @@ public class QuestScriptManager extends AbstractScriptManager {
          }
          if (c.canClickNPC()) {
             qms.put(c, qm);
-            if (!quest.hasScriptRequirement(true)) {
+            if (!hasScriptRequirement) {
                qm.dispose();
                return;
             }
@@ -118,7 +112,7 @@ public class QuestScriptManager extends AbstractScriptManager {
          LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.QUEST, ute, String.format("QuestId [%d]", questId));
          dispose(c);
       } catch (final Throwable t) {
-         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.QUEST, t, String.format("QuestId [%d]", getQM(c).getQuest()));
+         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.QUEST, t, String.format("QuestId [%d]", getQM(c).getQuestId()));
          dispose(c);
       }
    }
@@ -130,7 +124,7 @@ public class QuestScriptManager extends AbstractScriptManager {
             c.setClickedNPC();
             ((Invocable) iv).invokeFunction("end", mode, type, selection);
          } catch (final Throwable ute) {
-            LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.QUEST, ute, String.format("QuestId [%d]", getQM(c).getQuest()));
+            LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.QUEST, ute, String.format("QuestId [%d]", getQM(c).getQuestId()));
             dispose(c);
          }
       }
@@ -140,7 +134,7 @@ public class QuestScriptManager extends AbstractScriptManager {
       qms.remove(c);
       scripts.remove(c);
       c.getPlayer().setNpcCoolDown(System.currentTimeMillis());
-      resetContext("quest/" + qm.getQuest(), c);
+      resetContext("quest/" + qm.getQuestId(), c);
       c.getPlayer().flushDelayedUpdateQuests();
    }
 
@@ -168,7 +162,7 @@ public class QuestScriptManager extends AbstractScriptManager {
          LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.QUEST, ute, String.format("QuestId [%d]", questId));
          dispose(c);
       } catch (final Throwable t) {
-         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.QUEST, t, String.format("QuestId [%d]", getQM(c).getQuest()));
+         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.QUEST, t, String.format("QuestId [%d]", getQM(c).getQuestId()));
          dispose(c);
       }
    }

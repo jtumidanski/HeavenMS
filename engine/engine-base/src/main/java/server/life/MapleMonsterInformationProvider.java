@@ -11,7 +11,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import config.YamlConfig;
-import constants.inventory.ItemConstants;
+import constants.ItemConstants;
 import database.DatabaseConnection;
 import database.provider.DropDataProvider;
 import provider.MapleData;
@@ -49,7 +49,8 @@ public class MapleMonsterInformationProvider {
       MapleData data = dataProvider.getData("Mob.img");
 
       return data.getChildren().stream()
-            .map(mapleData -> new Pair<>(Integer.parseInt(mapleData.getName()), MapleDataTool.getString(mapleData.getChildByPath("name"), "NO-NAME")))
+            .map(mapleData -> new Pair<>(Integer.parseInt(mapleData.getName()),
+                  MapleDataTool.getString(mapleData.getChildByPath("name"), "NO-NAME")))
             .filter(pair -> pair.getRight().toLowerCase().contains(search.toLowerCase()))
             .collect(Collectors.toList());
    }
@@ -69,7 +70,8 @@ public class MapleMonsterInformationProvider {
    }
 
    private void retrieveGlobal() {
-      DatabaseConnection.getInstance().withConnection(connection -> globalDrops.addAll(DropDataProvider.getInstance().getGlobalDropData(connection)));
+      DatabaseConnection.getInstance()
+            .withConnection(connection -> globalDrops.addAll(DropDataProvider.getInstance().getGlobalDropData(connection)));
    }
 
    public List<MonsterDropEntry> retrieveEffectiveDrop(final int monsterId) {
@@ -90,7 +92,8 @@ public class MapleMonsterInformationProvider {
 
                int rnd = Randomizer.rand(mde.minimum(), mde.maximum());
                for (int i = 0; i < rnd - 1; i++) {
-                  extra.add(mde);   // this passes copies of the equips' MDE with min/max quantity > 1, but idc on equips they are unused anyways
+                  extra.add(
+                        mde);   // this passes copies of the equips' MDE with min/max quantity > 1, but idc on equips they are unused anyways
                }
             }
          }

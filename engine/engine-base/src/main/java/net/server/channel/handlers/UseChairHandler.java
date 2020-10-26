@@ -1,8 +1,8 @@
 package net.server.channel.handlers;
 
 import client.MapleClient;
-import client.inventory.MapleInventoryType;
-import constants.inventory.ItemConstants;
+import constants.ItemConstants;
+import constants.MapleInventoryType;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.UseChairPacket;
 import net.server.channel.packet.reader.UseChairReader;

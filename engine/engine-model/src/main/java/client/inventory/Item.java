@@ -2,7 +2,8 @@ package client.inventory;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import constants.inventory.ItemConstants;
+import constants.ItemConstants;
+import constants.MapleInventoryType;
 
 public class Item implements Comparable<Item> {
    private final int id;
@@ -37,7 +38,8 @@ public class Item implements Comparable<Item> {
       this(id, position, quantity, pet, petId, (short) 0, 0, "", "", -1);
    }
 
-   public Item(int id, short position, short quantity, MaplePet pet, int petId, short flag, int sn, String giftFrom, String owner, long expiration) {
+   public Item(int id, short position, short quantity, MaplePet pet, int petId, short flag, int sn, String giftFrom, String owner,
+               long expiration) {
       this.id = id;
       this.position = position;
       this.quantity = quantity;

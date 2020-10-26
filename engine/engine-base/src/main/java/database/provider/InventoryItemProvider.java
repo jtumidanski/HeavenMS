@@ -8,10 +8,10 @@ import javax.persistence.TypedQuery;
 
 import accessor.AbstractQueryExecutor;
 import client.database.data.GetInventoryItems;
+import constants.MapleInventoryType;
 import database.transformer.InventoryEquipTransformer;
 import database.transformer.InventoryItemTransformer;
 import client.inventory.Item;
-import client.inventory.MapleInventoryType;
 import tools.Pair;
 
 public class InventoryItemProvider extends AbstractQueryExecutor {
@@ -27,16 +27,21 @@ public class InventoryItemProvider extends AbstractQueryExecutor {
    private InventoryItemProvider() {
    }
 
-   public List<Pair<Item, MapleInventoryType>> getItemsByCharacterAndType(EntityManager entityManager, int characterId, int type, boolean loggedIn) {
+   public List<Pair<Item, MapleInventoryType>> getItemsByCharacterAndType(EntityManager entityManager, int characterId, int type,
+                                                                          boolean loggedIn) {
       TypedQuery<GetInventoryItems> query;
       if (loggedIn) {
          query = entityManager.createQuery(
                "SELECT NEW client.database.data.GetInventoryItems(ii.inventoryType, ii.itemId, ii.position, ii.quantity, " +
-                     "ii.petId, ii.owner, ii.expiration, ii.giftFrom, ii.flag, coalesce(ie.acc, 0), coalesce(ie.avoid, 0), coalesce(ie.dex, 0), coalesce(ie.hands, 0), coalesce(ie.hp, 0), " +
-                     "coalesce(ie.intelligence, 0), coalesce(ie.jump, 0), coalesce(ie.vicious, 0), coalesce(ie.luk, 0), coalesce(ie.matk, 0), coalesce(ie.mdef, 0), coalesce(ie.mp, 0), coalesce(ie.speed, 0), coalesce(ie.str, 0), coalesce(ie.watk, 0), " +
-                     "coalesce(ie.wdef, 0), coalesce(ie.upgradeSlots, 0), coalesce(ie.level, 0), coalesce(ie.itemExp, 0), coalesce(ie.itemLevel, 0), coalesce(ie.ringId, 0), ii.characterId) " +
+                     "ii.petId, ii.owner, ii.expiration, ii.giftFrom, ii.flag, coalesce(ie.acc, 0), coalesce(ie.avoid, 0), coalesce(ie.dex, 0), coalesce(ie.hands, 0), coalesce(ie.hp, 0), "
+                     +
+                     "coalesce(ie.intelligence, 0), coalesce(ie.jump, 0), coalesce(ie.vicious, 0), coalesce(ie.luk, 0), coalesce(ie.matk, 0), coalesce(ie.mdef, 0), coalesce(ie.mp, 0), coalesce(ie.speed, 0), coalesce(ie.str, 0), coalesce(ie.watk, 0), "
+                     +
+                     "coalesce(ie.wdef, 0), coalesce(ie.upgradeSlots, 0), coalesce(ie.level, 0), coalesce(ie.itemExp, 0), coalesce(ie.itemLevel, 0), coalesce(ie.ringId, 0), ii.characterId) "
+                     +
                      "FROM InventoryItem ii LEFT JOIN InventoryEquipment ie ON ii.inventoryItemId = ie.inventoryItemId " +
-                     "WHERE ii.type = :type AND ii.characterId = :characterId AND ii.inventoryType = :inventoryType", GetInventoryItems.class);
+                     "WHERE ii.type = :type AND ii.characterId = :characterId AND ii.inventoryType = :inventoryType",
+               GetInventoryItems.class);
          query.setParameter("type", type);
          query.setParameter("characterId", characterId);
          query.setParameter("inventoryType", (int) MapleInventoryType.EQUIPPED.getType());
@@ -57,25 +62,33 @@ public class InventoryItemProvider extends AbstractQueryExecutor {
       return getResultList(query, new InventoryItemTransformer());
    }
 
-   public List<Pair<Item, MapleInventoryType>> getItemsByAccountAndType(EntityManager entityManager, int accountId, int type, boolean loggedIn) {
+   public List<Pair<Item, MapleInventoryType>> getItemsByAccountAndType(EntityManager entityManager, int accountId, int type,
+                                                                        boolean loggedIn) {
       TypedQuery<GetInventoryItems> query;
       if (loggedIn) {
          query = entityManager.createQuery(
                "SELECT NEW client.database.data.GetInventoryItems(ii.inventoryType, ii.itemId, ii.position, ii.quantity, " +
-                     "ii.petId, ii.owner, ii.expiration, ii.giftFrom, ii.flag, coalesce(ie.acc, 0), coalesce(ie.avoid, 0), coalesce(ie.dex, 0), coalesce(ie.hands, 0), coalesce(ie.hp, 0), " +
-                     "coalesce(ie.intelligence, 0), coalesce(ie.jump, 0), coalesce(ie.vicious, 0), coalesce(ie.luk, 0), coalesce(ie.matk, 0), coalesce(ie.mdef, 0), coalesce(ie.mp, 0), coalesce(ie.speed, 0), coalesce(ie.str, 0), coalesce(ie.watk, 0), " +
-                     "coalesce(ie.wdef, 0), coalesce(ie.upgradeSlots, 0), coalesce(ie.level, 0), coalesce(ie.itemExp, 0), coalesce(ie.itemLevel, 0), coalesce(ie.ringId, 0), ii.characterId) " +
+                     "ii.petId, ii.owner, ii.expiration, ii.giftFrom, ii.flag, coalesce(ie.acc, 0), coalesce(ie.avoid, 0), coalesce(ie.dex, 0), coalesce(ie.hands, 0), coalesce(ie.hp, 0), "
+                     +
+                     "coalesce(ie.intelligence, 0), coalesce(ie.jump, 0), coalesce(ie.vicious, 0), coalesce(ie.luk, 0), coalesce(ie.matk, 0), coalesce(ie.mdef, 0), coalesce(ie.mp, 0), coalesce(ie.speed, 0), coalesce(ie.str, 0), coalesce(ie.watk, 0), "
+                     +
+                     "coalesce(ie.wdef, 0), coalesce(ie.upgradeSlots, 0), coalesce(ie.level, 0), coalesce(ie.itemExp, 0), coalesce(ie.itemLevel, 0), coalesce(ie.ringId, 0), ii.characterId) "
+                     +
                      "FROM InventoryItem ii LEFT JOIN InventoryEquipment ie ON ii.inventoryItemId = ie.inventoryItemId " +
-                     "WHERE ii.type = :type AND ii.accountId = :accountId AND ii.inventoryType = :inventoryType", GetInventoryItems.class);
+                     "WHERE ii.type = :type AND ii.accountId = :accountId AND ii.inventoryType = :inventoryType",
+               GetInventoryItems.class);
          query.setParameter("type", type);
          query.setParameter("accountId", accountId);
          query.setParameter("inventoryType", (int) MapleInventoryType.EQUIPPED.getType());
       } else {
          query = entityManager.createQuery(
                "SELECT NEW client.database.data.GetInventoryItems(ii.inventoryType, ii.itemId, ii.position, ii.quantity, " +
-                     "ii.petId, ii.owner, ii.expiration, ii.giftFrom, ii.flag, coalesce(ie.acc, 0), coalesce(ie.avoid, 0), coalesce(ie.dex, 0), coalesce(ie.hands, 0), coalesce(ie.hp, 0), " +
-                     "coalesce(ie.intelligence, 0), coalesce(ie.jump, 0), coalesce(ie.vicious, 0), coalesce(ie.luk, 0), coalesce(ie.matk, 0), coalesce(ie.mdef, 0), coalesce(ie.mp, 0), coalesce(ie.speed, 0), coalesce(ie.str, 0), coalesce(ie.watk, 0), " +
-                     "coalesce(ie.wdef, 0), coalesce(ie.upgradeSlots, 0), coalesce(ie.level, 0), coalesce(ie.itemExp, 0), coalesce(ie.itemLevel, 0), coalesce(ie.ringId, 0), ii.characterId) " +
+                     "ii.petId, ii.owner, ii.expiration, ii.giftFrom, ii.flag, coalesce(ie.acc, 0), coalesce(ie.avoid, 0), coalesce(ie.dex, 0), coalesce(ie.hands, 0), coalesce(ie.hp, 0), "
+                     +
+                     "coalesce(ie.intelligence, 0), coalesce(ie.jump, 0), coalesce(ie.vicious, 0), coalesce(ie.luk, 0), coalesce(ie.matk, 0), coalesce(ie.mdef, 0), coalesce(ie.mp, 0), coalesce(ie.speed, 0), coalesce(ie.str, 0), coalesce(ie.watk, 0), "
+                     +
+                     "coalesce(ie.wdef, 0), coalesce(ie.upgradeSlots, 0), coalesce(ie.level, 0), coalesce(ie.itemExp, 0), coalesce(ie.itemLevel, 0), coalesce(ie.ringId, 0), ii.characterId) "
+                     +
                      "FROM InventoryItem ii LEFT JOIN InventoryEquipment ie ON ii.inventoryItemId = ie.inventoryItemId " +
                      "WHERE ii.type = :type AND ii.accountId = :accountId", GetInventoryItems.class);
          query.setParameter("type", type);
@@ -94,15 +107,19 @@ public class InventoryItemProvider extends AbstractQueryExecutor {
       return getResultList(query, new InventoryEquipTransformer());
    }
 
-   private TypedQuery<GetInventoryItems> constructGetEquipsByQuery(EntityManager entityManager, boolean account, boolean loggedIn, int id) {
+   private TypedQuery<GetInventoryItems> constructGetEquipsByQuery(EntityManager entityManager, boolean account, boolean loggedIn,
+                                                                   int id) {
       TypedQuery<GetInventoryItems> query;
       if (account) {
          if (loggedIn) {
             query = entityManager.createQuery(
                   "SELECT NEW client.database.data.GetInventoryItems(ii.inventoryType, ii.itemId, ii.position, ii.quantity, " +
-                        "ii.petId, ii.owner, ii.expiration, ii.giftFrom, ii.flag, coalesce(ie.acc, 0), coalesce(ie.avoid, 0), coalesce(ie.dex, 0), coalesce(ie.hands, 0), coalesce(ie.hp, 0), " +
-                        "coalesce(ie.intelligence, 0), coalesce(ie.jump, 0), coalesce(ie.vicious, 0), coalesce(ie.luk, 0), coalesce(ie.matk, 0), coalesce(ie.mdef, 0), coalesce(ie.mp, 0), coalesce(ie.speed, 0), coalesce(ie.str, 0), coalesce(ie.watk, 0), " +
-                        "coalesce(ie.wdef, 0), coalesce(ie.upgradeSlots, 0), coalesce(ie.level, 0), coalesce(ie.itemExp, 0), coalesce(ie.itemLevel, 0), coalesce(ie.ringId, 0), ii.characterId) " +
+                        "ii.petId, ii.owner, ii.expiration, ii.giftFrom, ii.flag, coalesce(ie.acc, 0), coalesce(ie.avoid, 0), coalesce(ie.dex, 0), coalesce(ie.hands, 0), coalesce(ie.hp, 0), "
+                        +
+                        "coalesce(ie.intelligence, 0), coalesce(ie.jump, 0), coalesce(ie.vicious, 0), coalesce(ie.luk, 0), coalesce(ie.matk, 0), coalesce(ie.mdef, 0), coalesce(ie.mp, 0), coalesce(ie.speed, 0), coalesce(ie.str, 0), coalesce(ie.watk, 0), "
+                        +
+                        "coalesce(ie.wdef, 0), coalesce(ie.upgradeSlots, 0), coalesce(ie.level, 0), coalesce(ie.itemExp, 0), coalesce(ie.itemLevel, 0), coalesce(ie.ringId, 0), ii.characterId) "
+                        +
                         "FROM InventoryItem ii " +
                         "LEFT JOIN InventoryEquipment ie ON ii.inventoryItemId = ie.inventoryItemId " +
                         "LEFT JOIN Character c ON c.id = ii.characterId " +
@@ -112,9 +129,12 @@ public class InventoryItemProvider extends AbstractQueryExecutor {
          } else {
             query = entityManager.createQuery(
                   "SELECT NEW client.database.data.GetInventoryItems(ii.inventoryType, ii.itemId, ii.position, ii.quantity, " +
-                        "ii.petId, ii.owner, ii.expiration, ii.giftFrom, ii.flag, coalesce(ie.acc, 0), coalesce(ie.avoid, 0), coalesce(ie.dex, 0), coalesce(ie.hands, 0), coalesce(ie.hp, 0), " +
-                        "coalesce(ie.intelligence, 0), coalesce(ie.jump, 0), coalesce(ie.vicious, 0), coalesce(ie.luk, 0), coalesce(ie.matk, 0), coalesce(ie.mdef, 0), coalesce(ie.mp, 0), coalesce(ie.speed, 0), coalesce(ie.str, 0), coalesce(ie.watk, 0), " +
-                        "coalesce(ie.wdef, 0), coalesce(ie.upgradeSlots, 0), coalesce(ie.level, 0), coalesce(ie.itemExp, 0), coalesce(ie.itemLevel, 0), coalesce(ie.ringId, 0), ii.characterId) " +
+                        "ii.petId, ii.owner, ii.expiration, ii.giftFrom, ii.flag, coalesce(ie.acc, 0), coalesce(ie.avoid, 0), coalesce(ie.dex, 0), coalesce(ie.hands, 0), coalesce(ie.hp, 0), "
+                        +
+                        "coalesce(ie.intelligence, 0), coalesce(ie.jump, 0), coalesce(ie.vicious, 0), coalesce(ie.luk, 0), coalesce(ie.matk, 0), coalesce(ie.mdef, 0), coalesce(ie.mp, 0), coalesce(ie.speed, 0), coalesce(ie.str, 0), coalesce(ie.watk, 0), "
+                        +
+                        "coalesce(ie.wdef, 0), coalesce(ie.upgradeSlots, 0), coalesce(ie.level, 0), coalesce(ie.itemExp, 0), coalesce(ie.itemLevel, 0), coalesce(ie.ringId, 0), ii.characterId) "
+                        +
                         "FROM InventoryItem ii " +
                         "LEFT JOIN InventoryEquipment ie ON ii.inventoryItemId = ie.inventoryItemId " +
                         "LEFT JOIN Character c ON c.id = ii.characterId " +
@@ -125,9 +145,12 @@ public class InventoryItemProvider extends AbstractQueryExecutor {
          if (loggedIn) {
             query = entityManager.createQuery(
                   "SELECT NEW client.database.data.GetInventoryItems(ii.inventoryType, ii.itemId, ii.position, ii.quantity, " +
-                        "ii.petId, ii.owner, ii.expiration, ii.giftFrom, ii.flag, coalesce(ie.acc, 0), coalesce(ie.avoid, 0), coalesce(ie.dex, 0), coalesce(ie.hands, 0), coalesce(ie.hp, 0), " +
-                        "coalesce(ie.intelligence, 0), coalesce(ie.jump, 0), coalesce(ie.vicious, 0), coalesce(ie.luk, 0), coalesce(ie.matk, 0), coalesce(ie.mdef, 0), coalesce(ie.mp, 0), coalesce(ie.speed, 0), coalesce(ie.str, 0), coalesce(ie.watk, 0), " +
-                        "coalesce(ie.wdef, 0), coalesce(ie.upgradeSlots, 0), coalesce(ie.level, 0), coalesce(ie.itemExp, 0), coalesce(ie.itemLevel, 0), coalesce(ie.ringId, 0), ii.characterId) " +
+                        "ii.petId, ii.owner, ii.expiration, ii.giftFrom, ii.flag, coalesce(ie.acc, 0), coalesce(ie.avoid, 0), coalesce(ie.dex, 0), coalesce(ie.hands, 0), coalesce(ie.hp, 0), "
+                        +
+                        "coalesce(ie.intelligence, 0), coalesce(ie.jump, 0), coalesce(ie.vicious, 0), coalesce(ie.luk, 0), coalesce(ie.matk, 0), coalesce(ie.mdef, 0), coalesce(ie.mp, 0), coalesce(ie.speed, 0), coalesce(ie.str, 0), coalesce(ie.watk, 0), "
+                        +
+                        "coalesce(ie.wdef, 0), coalesce(ie.upgradeSlots, 0), coalesce(ie.level, 0), coalesce(ie.itemExp, 0), coalesce(ie.itemLevel, 0), coalesce(ie.ringId, 0), ii.characterId) "
+                        +
                         "FROM InventoryItem ii " +
                         "LEFT JOIN InventoryEquipment ie ON ii.inventoryItemId = ie.inventoryItemId " +
                         "LEFT JOIN Character c ON c.id = ii.characterId " +
@@ -137,9 +160,12 @@ public class InventoryItemProvider extends AbstractQueryExecutor {
          } else {
             query = entityManager.createQuery(
                   "SELECT NEW client.database.data.GetInventoryItems(ii.inventoryType, ii.itemId, ii.position, ii.quantity, " +
-                        "ii.petId, ii.owner, ii.expiration, ii.giftFrom, ii.flag, coalesce(ie.acc, 0), coalesce(ie.avoid, 0), coalesce(ie.dex, 0), coalesce(ie.hands, 0), coalesce(ie.hp, 0), " +
-                        "coalesce(ie.intelligence, 0), coalesce(ie.jump, 0), coalesce(ie.vicious, 0), coalesce(ie.luk, 0), coalesce(ie.matk, 0), coalesce(ie.mdef, 0), coalesce(ie.mp, 0), coalesce(ie.speed, 0), coalesce(ie.str, 0), coalesce(ie.watk, 0), " +
-                        "coalesce(ie.wdef, 0), coalesce(ie.upgradeSlots, 0), coalesce(ie.level, 0), coalesce(ie.itemExp, 0), coalesce(ie.itemLevel, 0), coalesce(ie.ringId, 0), ii.characterId) " +
+                        "ii.petId, ii.owner, ii.expiration, ii.giftFrom, ii.flag, coalesce(ie.acc, 0), coalesce(ie.avoid, 0), coalesce(ie.dex, 0), coalesce(ie.hands, 0), coalesce(ie.hp, 0), "
+                        +
+                        "coalesce(ie.intelligence, 0), coalesce(ie.jump, 0), coalesce(ie.vicious, 0), coalesce(ie.luk, 0), coalesce(ie.matk, 0), coalesce(ie.mdef, 0), coalesce(ie.mp, 0), coalesce(ie.speed, 0), coalesce(ie.str, 0), coalesce(ie.watk, 0), "
+                        +
+                        "coalesce(ie.wdef, 0), coalesce(ie.upgradeSlots, 0), coalesce(ie.level, 0), coalesce(ie.itemExp, 0), coalesce(ie.itemLevel, 0), coalesce(ie.ringId, 0), ii.characterId) "
+                        +
                         "FROM InventoryItem ii " +
                         "LEFT JOIN InventoryEquipment ie ON ii.inventoryItemId = ie.inventoryItemId " +
                         "LEFT JOIN Character c ON c.id = ii.characterId " +
@@ -151,13 +177,15 @@ public class InventoryItemProvider extends AbstractQueryExecutor {
    }
 
    public List<Integer> getPetsForCharacter(EntityManager entityManager, int characterId) {
-      TypedQuery<Integer> query = entityManager.createQuery("SELECT i.petId FROM InventoryItem i WHERE i.characterId = :characterId AND i.petId > -1", Integer.class);
+      TypedQuery<Integer> query = entityManager
+            .createQuery("SELECT i.petId FROM InventoryItem i WHERE i.characterId = :characterId AND i.petId > -1", Integer.class);
       query.setParameter("characterId", characterId);
       return query.getResultList();
    }
 
    public List<Pair<Integer, Integer>> get(EntityManager entityManager, int characterId) {
-      Query query = entityManager.createQuery("SELECT i.inventoryItemId, i.petId FROM InventoryItem i WHERE i.characterId = :characterId");
+      Query query =
+            entityManager.createQuery("SELECT i.inventoryItemId, i.petId FROM InventoryItem i WHERE i.characterId = :characterId");
       query.setParameter("characterId", characterId);
       List<Object[]> results = (List<Object[]>) query.getResultList();
       return results.stream().map(result -> new Pair<>((int) result[0], (int) result[1])).collect(Collectors.toList());

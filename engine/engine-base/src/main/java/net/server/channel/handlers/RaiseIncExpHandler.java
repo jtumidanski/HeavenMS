@@ -4,17 +4,15 @@ import java.util.Map;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import client.QuestStatus;
 import client.inventory.MapleInventory;
-import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
+import constants.MapleInventoryType;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.UseItemUIPacket;
 import net.server.channel.packet.reader.UseItemUIReader;
 import server.MapleItemInformationProvider;
 import server.QuestConsItem;
 import server.processor.QuestProcessor;
-import server.quest.MapleQuest;
 import tools.PacketCreator;
 import tools.packet.stat.EnableActions;
 
@@ -38,8 +36,8 @@ public class RaiseIncExpHandler extends AbstractPacketHandler<UseItemUIPacket> {
             Map<Integer, Integer> consumables = consItem.items();
 
             MapleCharacter chr = client.getPlayer();
-            MapleQuest quest = QuestProcessor.getInstance().getInstanceFromInfoNumber(infoNumber);
-            if (!QuestProcessor.getInstance().questIsStatus(chr, quest, QuestStatus.STARTED)) {
+            short questId = QuestProcessor.getInstance().getInstanceFromInfoNumber(infoNumber);
+            if (!QuestProcessor.getInstance().isStatus(chr, questId, "STARTED")) {
                PacketCreator.announce(client, new EnableActions());
                return;
             }
@@ -60,7 +58,6 @@ public class RaiseIncExpHandler extends AbstractPacketHandler<UseItemUIPacket> {
                inv.unlockInventory();
             }
 
-            int questId = quest.id();
             int nextValue =
                   Math.min(consumables.get(consId) + client.getAbstractPlayerInteraction().getQuestProgressInt(questId, infoNumber),
                         consItem.exp() * consItem.grade());

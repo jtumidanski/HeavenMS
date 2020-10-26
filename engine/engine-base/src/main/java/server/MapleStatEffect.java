@@ -1,27 +1,26 @@
 package server;
 
-import java.awt.Point;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import client.MapleAbnormalStatus;
 import client.MapleBuffStat;
 import client.MapleCharacter;
-import client.MapleAbnormalStatus;
-import client.MapleJob;
 import client.MapleMount;
 import client.SkillFactory;
 import client.inventory.Item;
 import client.inventory.MapleInventory;
-import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import client.status.MonsterStatus;
 import client.status.MonsterStatusEffect;
 import config.YamlConfig;
-import constants.inventory.ItemConstants;
+import constants.ItemConstants;
+import constants.MapleInventoryType;
+import constants.MapleJob;
 import constants.skills.Aran;
 import constants.skills.Beginner;
 import constants.skills.Bishop;
@@ -37,16 +36,16 @@ import constants.skills.DarkKnight;
 import constants.skills.DawnWarrior;
 import constants.skills.DragonKnight;
 import constants.skills.Evan;
+import constants.skills.FPWizard;
 import constants.skills.FirePoisonArchMage;
 import constants.skills.FirePoisonMagician;
-import constants.skills.FPWizard;
 import constants.skills.GM;
 import constants.skills.Hermit;
 import constants.skills.Hero;
 import constants.skills.Hunter;
+import constants.skills.ILWizard;
 import constants.skills.IceLighteningArchMagician;
 import constants.skills.IceLighteningMagician;
-import constants.skills.ILWizard;
 import constants.skills.Legend;
 import constants.skills.Marauder;
 import constants.skills.Marksman;
@@ -85,12 +84,12 @@ import server.maps.SummonMovementType;
 import server.partyquest.MapleCarnivalFactory;
 import server.partyquest.MapleCarnivalFactory.MCSkill;
 import server.processor.StatEffectProcessor;
+import tools.I18nMessage;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
 import tools.ServerNoticeType;
-import tools.I18nMessage;
 import tools.packet.PacketInput;
 import tools.packet.buff.GiveBuff;
 import tools.packet.buff.GiveForeignBuff;
@@ -177,7 +176,9 @@ public class MapleStatEffect {
                      mob.setMp(mob.getMp() - absorbMp);
                      applyTo.addMP(absorbMp);
                      PacketCreator.announce(applyTo, new ShowOwnBuffEffect(sourceId, 1));
-                     MasterBroadcaster.getInstance().sendToAllInMap(applyTo.getMap(), new ShowBuffEffect(applyTo.getId(), sourceId, 1, (byte) 3), false, applyTo);
+                     MasterBroadcaster.getInstance()
+                           .sendToAllInMap(applyTo.getMap(), new ShowBuffEffect(applyTo.getId(), sourceId, 1, (byte) 3), false,
+                                 applyTo);
                   }
                }
                break;
@@ -207,7 +208,8 @@ public class MapleStatEffect {
    }
 
    // primary: the player caster of the buff
-   private boolean applyTo(MapleCharacter applyFrom, MapleCharacter applyTo, boolean primary, Point pos, boolean useMaxRange, int affectedPlayers) {
+   private boolean applyTo(MapleCharacter applyFrom, MapleCharacter applyTo, boolean primary, Point pos, boolean useMaxRange,
+                           int affectedPlayers) {
       if (skill && (sourceId == GM.HIDE || sourceId == SuperGM.HIDE)) {
          applyTo.toggleHide(false);
          return true;
@@ -225,7 +227,8 @@ public class MapleStatEffect {
                PacketCreator.announce(applyTo, new EnableActions());
                return false;
             }
-            MapleInventoryManipulator.removeById(applyTo.getClient(), ItemConstants.getInventoryType(itemCon), itemCon, itemConNo, false, true);
+            MapleInventoryManipulator
+                  .removeById(applyTo.getClient(), ItemConstants.getInventoryType(itemCon), itemCon, itemConNo, false, true);
          }
       } else {
          if (isResurrection()) {
@@ -269,9 +272,12 @@ public class MapleStatEffect {
                   pt = target.getPortal(lastBanishInfo.getRight());
                }
             } else {
-               target = applyTo.getClient().getWorldServer().getChannel(applyTo.getClient().getChannel()).getMapFactory().getMap(moveTo);
+               target = applyTo.getClient().getWorldServer().getChannel(applyTo.getClient().getChannel()).getMapFactory()
+                     .getMap(moveTo);
                int targetId = target.getId() / 10000000;
-               if (targetId != 60 && applyTo.getMapId() / 10000000 != 61 && targetId != applyTo.getMapId() / 10000000 && targetId != 21 && targetId != 20 && targetId != 12 && (applyTo.getMapId() / 10000000 != 10 && applyTo.getMapId() / 10000000 != 12)) {
+               if (targetId != 60 && applyTo.getMapId() / 10000000 != 61 && targetId != applyTo.getMapId() / 10000000
+                     && targetId != 21 && targetId != 20 && targetId != 12 && (applyTo.getMapId() / 10000000 != 10
+                     && applyTo.getMapId() / 10000000 != 12)) {
                   return false;
                }
 
@@ -301,7 +307,9 @@ public class MapleStatEffect {
             if (projectile == null) {
                return false;
             } else {
-               MapleInventoryManipulator.removeFromSlot(applyTo.getClient(), MapleInventoryType.USE, projectile.position(), projectileConsume, false, true);
+               MapleInventoryManipulator
+                     .removeFromSlot(applyTo.getClient(), MapleInventoryType.USE, projectile.position(), projectileConsume, false,
+                           true);
             }
          } finally {
             use.unlockInventory();
@@ -362,17 +370,22 @@ public class MapleStatEffect {
             MapleInventoryManipulator.addFromDrop(applyTo.getClient(), new Item(4006000, (short) 0, (short) 1), false);
 
             if (door.getOwnerId() == -3) {
-               MessageBroadcaster.getInstance().sendServerNotice(applyTo, ServerNoticeType.PINK_TEXT, I18nMessage.from("MYSTIC_DOOR_CLOSENESS").with(door.getDoorStatus().getRight(), door.getDoorStatus().getLeft()));
+               MessageBroadcaster.getInstance().sendServerNotice(applyTo, ServerNoticeType.PINK_TEXT,
+                     I18nMessage.from("MYSTIC_DOOR_CLOSENESS")
+                           .with(door.getDoorStatus().getRight(), door.getDoorStatus().getLeft()));
             } else if (door.getOwnerId() == -2) {
-               MessageBroadcaster.getInstance().sendServerNotice(applyTo, ServerNoticeType.PINK_TEXT, I18nMessage.from("MYSTIC_DOOR_SLOPE"));
+               MessageBroadcaster.getInstance()
+                     .sendServerNotice(applyTo, ServerNoticeType.PINK_TEXT, I18nMessage.from("MYSTIC_DOOR_SLOPE"));
             } else {
-               MessageBroadcaster.getInstance().sendServerNotice(applyTo, ServerNoticeType.PINK_TEXT, I18nMessage.from("NO_PORTALS_AVAILABLE"));
+               MessageBroadcaster.getInstance()
+                     .sendServerNotice(applyTo, ServerNoticeType.PINK_TEXT, I18nMessage.from("NO_PORTALS_AVAILABLE"));
             }
 
             applyTo.cancelBuffStats(MapleBuffStat.SOUL_ARROW);  // cancel door buff
          }
       } else if (isMist()) {
-         Rectangle bounds = calculateBoundingBox(sourceId == NightWalker.POISON_BOMB ? pos : applyFrom.position(), applyFrom.isFacingLeft());
+         Rectangle bounds =
+               calculateBoundingBox(sourceId == NightWalker.POISON_BOMB ? pos : applyFrom.position(), applyFrom.isFacingLeft());
          MapleMist mist = new MapleMist(bounds, applyFrom, this);
          applyFrom.getMap().spawnMist(mist, getDuration(), mist.isPoisonMist(), false, mist.isRecoveryMist());
       } else if (isTimeLeap()) {
@@ -432,8 +445,10 @@ public class MapleStatEffect {
       int affectedc = 1;
 
       if (isPartyBuff() && (applyFrom.getParty().isPresent() || isGmBuff())) {
-         Rectangle bounds = (!useMaxRange) ? calculateBoundingBox(applyFrom.position(), applyFrom.isFacingLeft()) : new Rectangle(Integer.MIN_VALUE / 2, Integer.MIN_VALUE / 2, Integer.MAX_VALUE, Integer.MAX_VALUE);
-         List<MapleMapObject> affecteds = applyFrom.getMap().getMapObjectsInRect(bounds, Collections.singletonList(MapleMapObjectType.PLAYER));
+         Rectangle bounds = (!useMaxRange) ? calculateBoundingBox(applyFrom.position(), applyFrom.isFacingLeft()) :
+               new Rectangle(Integer.MIN_VALUE / 2, Integer.MIN_VALUE / 2, Integer.MAX_VALUE, Integer.MAX_VALUE);
+         List<MapleMapObject> affecteds =
+               applyFrom.getMap().getMapObjectsInRect(bounds, Collections.singletonList(MapleMapObjectType.PLAYER));
          List<MapleCharacter> affectedp = new ArrayList<>(affecteds.size());
          for (MapleMapObject affectedmo : affecteds) {
             MapleCharacter affected = (MapleCharacter) affectedmo;
@@ -454,7 +469,8 @@ public class MapleStatEffect {
          for (MapleCharacter affected : affectedp) {
             applyTo(applyFrom, affected, false, null, useMaxRange, affectedc);
             PacketCreator.announce(affected, new ShowOwnBuffEffect(sourceId, 2));
-            MasterBroadcaster.getInstance().sendToAllInMap(affected.getMap(), new ShowBuffEffect(affected.getId(), sourceId, 2, (byte) 3), false, affected);
+            MasterBroadcaster.getInstance()
+                  .sendToAllInMap(affected.getMap(), new ShowBuffEffect(affected.getId(), sourceId, 2, (byte) 3), false, affected);
          }
       }
 
@@ -463,7 +479,8 @@ public class MapleStatEffect {
 
    private void applyMonsterBuff(MapleCharacter applyFrom) {
       Rectangle bounds = calculateBoundingBox(applyFrom.position(), applyFrom.isFacingLeft());
-      List<MapleMapObject> affected = applyFrom.getMap().getMapObjectsInRect(bounds, Collections.singletonList(MapleMapObjectType.MONSTER));
+      List<MapleMapObject> affected =
+            applyFrom.getMap().getMapObjectsInRect(bounds, Collections.singletonList(MapleMapObjectType.MONSTER));
       SkillFactory.getSkill(sourceId).ifPresent(skill_ -> {
          int i = 0;
          for (MapleMapObject mo : affected) {
@@ -474,7 +491,8 @@ public class MapleStatEffect {
                //do nothing, seal shouldn't work on bosses
             } else {
                if (makeChanceResult()) {
-                  monster.applyStatus(applyFrom, new MonsterStatusEffect(getMonsterStati(), skill_, null, false), isPoison(), getDuration());
+                  monster.applyStatus(applyFrom, new MonsterStatusEffect(getMonsterStati(), skill_, null, false), isPoison(),
+                        getDuration());
                   if (isCrash()) {
                      monster.removeMobStatus(skill_.getId());
                   }
@@ -554,7 +572,8 @@ public class MapleStatEffect {
    }
 
    private void applyBuffEffect(MapleCharacter applyFrom, MapleCharacter applyTo, boolean primary) {
-      if (!isMonsterRiding() && !isCouponBuff() && !isMysticDoor() && !isHyperBody() && !isCombo()) {     // last mystic door already dispelled if it has been used before.
+      if (!isMonsterRiding() && !isCouponBuff() && !isMysticDoor() && !isHyperBody()
+            && !isCombo()) {     // last mystic door already dispelled if it has been used before.
          applyTo.cancelEffect(this, true, -1);
       }
 
@@ -578,7 +597,8 @@ public class MapleStatEffect {
             ridingMountId = 1932003;
          } else if (sourceId == Beginner.YETI_MOUNT2 || sourceId == Noblesse.YETI_MOUNT2 || sourceId == Legend.YETI_MOUNT2) {
             ridingMountId = 1932004;
-         } else if (sourceId == Beginner.WITCH_BROOMSTICK || sourceId == Noblesse.WITCH_BROOMSTICK || sourceId == Legend.WITCH_BROOMSTICK) {
+         } else if (sourceId == Beginner.WITCH_BROOMSTICK || sourceId == Noblesse.WITCH_BROOMSTICK
+               || sourceId == Legend.WITCH_BROOMSTICK) {
             ridingMountId = 1932005;
          } else if (sourceId == Beginner.BALROG_MOUNT || sourceId == Noblesse.BALROG_MOUNT || sourceId == Legend.BALROG_MOUNT) {
             ridingMountId = 1932010;
@@ -600,7 +620,8 @@ public class MapleStatEffect {
       }
       if (primary) {
          localDuration = alchemistModifyVal(applyFrom, localDuration, false);
-         MasterBroadcaster.getInstance().sendToAllInMap(applyTo.getMap(), new ShowBuffEffect(applyTo.getId(), sourceId, 1, (byte) 3), false, applyTo);
+         MasterBroadcaster.getInstance()
+               .sendToAllInMap(applyTo.getMap(), new ShowBuffEffect(applyTo.getId(), sourceId, 1, (byte) 3), false, applyTo);
       }
       if (localstatups.size() > 0) {
          PacketInput buff = null;
@@ -711,7 +732,8 @@ public class MapleStatEffect {
    }
 
    private int makeHealHP(double rate, double stat, double lowerFactor, double upperFactor) {
-      return (int) ((Math.random() * ((int) (stat * upperFactor * rate) - (int) (stat * lowerFactor * rate) + 1)) + (int) (stat * lowerFactor * rate));
+      return (int) ((Math.random() * ((int) (stat * upperFactor * rate) - (int) (stat * lowerFactor * rate) + 1)) + (int) (stat
+            * lowerFactor * rate));
    }
 
    private int calcMPChange(MapleCharacter applyFrom, boolean primary) {
@@ -733,8 +755,10 @@ public class MapleStatEffect {
             boolean isCygnus = applyFrom.getJob().isA(MapleJob.BLAZE_WIZARD_2);
             boolean isEvan = applyFrom.getJob().isA(MapleJob.EVAN7);
             if (isAFpMage || isCygnus || isEvan || applyFrom.getJob().isA(MapleJob.ICE_LIGHTENING_MAGICIAN)) {
-               int skillId = isAFpMage ? FirePoisonMagician.ELEMENT_AMPLIFICATION : (isCygnus ? BlazeWizard.ELEMENT_AMPLIFICATION : (isEvan ? Evan.MAGIC_AMPLIFICATION : IceLighteningMagician.ELEMENT_AMPLIFICATION));
-               mod = SkillFactory.applyIfHasSkill(applyFrom, skillId, (skill, skillLevel) -> skill.getEffect(skillLevel).getX() / 100.0, 0.0);
+               int skillId = isAFpMage ? FirePoisonMagician.ELEMENT_AMPLIFICATION : (isCygnus ? BlazeWizard.ELEMENT_AMPLIFICATION :
+                     (isEvan ? Evan.MAGIC_AMPLIFICATION : IceLighteningMagician.ELEMENT_AMPLIFICATION));
+               mod = SkillFactory
+                     .applyIfHasSkill(applyFrom, skillId, (skill, skillLevel) -> skill.getEffect(skillLevel).getX() / 100.0, 0.0);
             }
             mpChange -= mpCon * mod;
             if (applyFrom.getBuffedValue(MapleBuffStat.INFINITY) != null) {
@@ -788,7 +812,8 @@ public class MapleStatEffect {
          return false;
       }
       // wk charges have lt and rb set but are neither player nor monster buffs
-      return (sourceId < 1211003 || sourceId > 1211008) && sourceId != Paladin.SWORD_HOLY_CHARGE && sourceId != Paladin.BW_HOLY_CHARGE && sourceId != DawnWarrior.SOUL_CHARGE;
+      return (sourceId < 1211003 || sourceId > 1211008) && sourceId != Paladin.SWORD_HOLY_CHARGE
+            && sourceId != Paladin.BW_HOLY_CHARGE && sourceId != DawnWarrior.SOUL_CHARGE;
    }
 
    private boolean isHeal() {
@@ -812,7 +837,8 @@ public class MapleStatEffect {
    }
 
    public boolean isRecovery() {
-      return sourceId == Beginner.RECOVERY || sourceId == Noblesse.RECOVERY || sourceId == Legend.RECOVERY || sourceId == Evan.RECOVERY;
+      return sourceId == Beginner.RECOVERY || sourceId == Noblesse.RECOVERY || sourceId == Legend.RECOVERY
+            || sourceId == Evan.RECOVERY;
    }
 
    public boolean isMapChair() {
@@ -865,10 +891,14 @@ public class MapleStatEffect {
    }
 
    public boolean isMonsterRiding() {
-      return skill && (sourceId % 10000000 == 1004 || sourceId == Corsair.BATTLE_SHIP || sourceId == Beginner.SPACESHIP || sourceId == Noblesse.SPACESHIP
-            || sourceId == Beginner.YETI_MOUNT1 || sourceId == Beginner.YETI_MOUNT2 || sourceId == Beginner.WITCH_BROOMSTICK || sourceId == Beginner.BALROG_MOUNT
-            || sourceId == Noblesse.YETI_MOUNT1 || sourceId == Noblesse.YETI_MOUNT2 || sourceId == Noblesse.WITCH_BROOMSTICK || sourceId == Noblesse.BALROG_MOUNT
-            || sourceId == Legend.YETI_MOUNT1 || sourceId == Legend.YETI_MOUNT2 || sourceId == Legend.WITCH_BROOMSTICK || sourceId == Legend.BALROG_MOUNT);
+      return skill && (sourceId % 10000000 == 1004 || sourceId == Corsair.BATTLE_SHIP || sourceId == Beginner.SPACESHIP
+            || sourceId == Noblesse.SPACESHIP
+            || sourceId == Beginner.YETI_MOUNT1 || sourceId == Beginner.YETI_MOUNT2 || sourceId == Beginner.WITCH_BROOMSTICK
+            || sourceId == Beginner.BALROG_MOUNT
+            || sourceId == Noblesse.YETI_MOUNT1 || sourceId == Noblesse.YETI_MOUNT2 || sourceId == Noblesse.WITCH_BROOMSTICK
+            || sourceId == Noblesse.BALROG_MOUNT
+            || sourceId == Legend.YETI_MOUNT1 || sourceId == Legend.YETI_MOUNT2 || sourceId == Legend.WITCH_BROOMSTICK
+            || sourceId == Legend.BALROG_MOUNT);
    }
 
    public boolean isMagicDoor() {
@@ -876,7 +906,9 @@ public class MapleStatEffect {
    }
 
    public boolean isPoison() {
-      return skill && (sourceId == FirePoisonMagician.POISON_MIST || sourceId == FPWizard.POISON_BREATH || sourceId == FirePoisonMagician.ELEMENT_COMPOSITION || sourceId == NightWalker.POISON_BOMB || sourceId == BlazeWizard.FLAME_GEAR);
+      return skill && (sourceId == FirePoisonMagician.POISON_MIST || sourceId == FPWizard.POISON_BREATH
+            || sourceId == FirePoisonMagician.ELEMENT_COMPOSITION || sourceId == NightWalker.POISON_BOMB
+            || sourceId == BlazeWizard.FLAME_GEAR);
    }
 
    public boolean isMorph() {
@@ -884,11 +916,13 @@ public class MapleStatEffect {
    }
 
    public boolean isMorphWithoutAttack() {
-      return morphId > 0 && morphId < 100; // Every morph item I have found has been under 100, pirate skill transforms start at 1000.
+      return morphId > 0
+            && morphId < 100; // Every morph item I have found has been under 100, pirate skill transforms start at 1000.
    }
 
    private boolean isMist() {
-      return skill && (sourceId == FirePoisonMagician.POISON_MIST || sourceId == Shadower.SMOKE_SCREEN || sourceId == BlazeWizard.FLAME_GEAR || sourceId == NightWalker.POISON_BOMB || sourceId == Evan.RECOVERY_AURA);
+      return skill && (sourceId == FirePoisonMagician.POISON_MIST || sourceId == Shadower.SMOKE_SCREEN
+            || sourceId == BlazeWizard.FLAME_GEAR || sourceId == NightWalker.POISON_BOMB || sourceId == Evan.RECOVERY_AURA);
    }
 
    private boolean isSoulArrow() {
@@ -900,11 +934,13 @@ public class MapleStatEffect {
    }
 
    private boolean isCrash() {
-      return skill && (sourceId == DragonKnight.POWER_CRASH || sourceId == Crusader.ARMOR_CRASH || sourceId == WhiteKnight.MAGIC_CRASH);
+      return skill && (sourceId == DragonKnight.POWER_CRASH || sourceId == Crusader.ARMOR_CRASH
+            || sourceId == WhiteKnight.MAGIC_CRASH);
    }
 
    private boolean isSeal() {
-      return skill && (sourceId == IceLighteningMagician.SEAL || sourceId == FirePoisonMagician.SEAL || sourceId == BlazeWizard.SEAL);
+      return skill && (sourceId == IceLighteningMagician.SEAL || sourceId == FirePoisonMagician.SEAL
+            || sourceId == BlazeWizard.SEAL);
    }
 
    private boolean isDispel() {
@@ -917,19 +953,21 @@ public class MapleStatEffect {
       } else {
          return sourceId == 2022544;
       }
-
    }
 
    private boolean isDash() {
-      return skill && (sourceId == Pirate.DASH || sourceId == ThunderBreaker.DASH || sourceId == Beginner.SPACE_DASH || sourceId == Noblesse.SPACE_DASH);
+      return skill && (sourceId == Pirate.DASH || sourceId == ThunderBreaker.DASH || sourceId == Beginner.SPACE_DASH
+            || sourceId == Noblesse.SPACE_DASH);
    }
 
    private boolean isSkillMorph() {
-      return skill && (sourceId == Buccaneer.SUPER_TRANSFORMATION || sourceId == Marauder.TRANSFORMATION || sourceId == WindArcher.EAGLE_EYE || sourceId == ThunderBreaker.TRANSFORMATION);
+      return skill && (sourceId == Buccaneer.SUPER_TRANSFORMATION || sourceId == Marauder.TRANSFORMATION
+            || sourceId == WindArcher.EAGLE_EYE || sourceId == ThunderBreaker.TRANSFORMATION);
    }
 
    private boolean isInfusion() {
-      return skill && (sourceId == Buccaneer.SPEED_INFUSION || sourceId == Corsair.SPEED_INFUSION || sourceId == ThunderBreaker.SPEED_INFUSION);
+      return skill && (sourceId == Buccaneer.SPEED_INFUSION || sourceId == Corsair.SPEED_INFUSION
+            || sourceId == ThunderBreaker.SPEED_INFUSION);
    }
 
    private boolean isCygnusFA() {

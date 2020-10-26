@@ -12,14 +12,14 @@ import client.database.data.CharacterIdNameAccountId;
 import client.inventory.Equip;
 import client.inventory.Item;
 import client.inventory.MapleInventory;
-import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import client.processor.CashShopProcessor;
 import client.processor.CharacterProcessor;
 import client.processor.MapleRingProcessor;
 import client.processor.NoteProcessor;
 import config.YamlConfig;
-import constants.inventory.ItemConstants;
+import constants.ItemConstants;
+import constants.MapleInventoryType;
 import net.server.AbstractPacketHandler;
 import net.server.Server;
 import net.server.channel.packet.cash.operation.BaseCashOperationPacket;
@@ -83,7 +83,9 @@ public final class CashOperationHandler extends AbstractPacketHandler<BaseCashOp
 
    private boolean canBuy(MapleCharacter chr, CashItem item, int cash) {
       if (item != null && item.isOnSale() && item.getPrice() <= cash) {
-         LoggerUtil.printInfo(LoggerOriginator.ENGINE, LogType.CASHITEM_BOUGHT, chr + " bought " + MapleItemInformationProvider.getInstance().getName(item.getItemId()) + " (SN " + item.getSN() + ") for " + item.getPrice());
+         LoggerUtil.printInfo(LoggerOriginator.ENGINE, LogType.CASHITEM_BOUGHT,
+               chr + " bought " + MapleItemInformationProvider.getInstance().getName(item.getItemId()) + " (SN " + item.getSN()
+                     + ") for " + item.getPrice());
          return true;
       } else {
          return false;
@@ -153,7 +155,8 @@ public final class CashOperationHandler extends AbstractPacketHandler<BaseCashOp
                handleWorldTransfer(client, character, cashShop, ((WorldTransferPacket) packet).itemId(),
                      ((WorldTransferPacket) packet).newWorldId());
             } else {
-               LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.UNHANDLED_EVENT, "Unhandled action: " + action + "\n" + packet.toString());
+               LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.UNHANDLED_EVENT,
+                     "Unhandled action: " + action + "\n" + packet.toString());
             }
          } finally {
             client.releaseClient();
@@ -163,7 +166,8 @@ public final class CashOperationHandler extends AbstractPacketHandler<BaseCashOp
       }
    }
 
-   private void sendGift(MapleClient c, MapleCharacter chr, CashShop cs, int birthday, int sn, String characterName, String message) {
+   private void sendGift(MapleClient c, MapleCharacter chr, CashShop cs, int birthday, int sn, String characterName,
+                         String message) {
       //TODO check for gender
       CashItem cItem = CashItemFactory.getItem(sn);
       CharacterIdNameAccountId recipient = CharacterProcessor.getInstance().getCharacterFromDatabase(characterName);
@@ -185,8 +189,11 @@ public final class CashOperationHandler extends AbstractPacketHandler<BaseCashOp
       CashShopProcessor.getInstance().gift(recipient.id(), chr.getName(), message, cItem.getSN());
       PacketCreator.announce(c, new ShowGiftSucceed(recipient.name(), cItem.getItemId(), cItem.getCount(), cItem.getPrice()));
       cs.gainCash(4, cItem, chr.getWorld());
-      PacketCreator.announce(c, new ShowCash(chr.getCashShop().getCash(1), chr.getCashShop().getCash(2), chr.getCashShop().getCash(4)));
-      NoteProcessor.getInstance().sendNote(recipient.name(), chr.getName(), chr.getName() + " has sent you a gift! Go check out the Cash Shop.", (byte) 0); //fame or not
+      PacketCreator
+            .announce(c, new ShowCash(chr.getCashShop().getCash(1), chr.getCashShop().getCash(2), chr.getCashShop().getCash(4)));
+      NoteProcessor.getInstance()
+            .sendNote(recipient.name(), chr.getName(), chr.getName() + " has sent you a gift! Go check out the Cash Shop.",
+                  (byte) 0); //fame or not
       c.getChannelServer().getPlayerStorage().getCharacterByName(recipient.name()).ifPresent(MapleCharacter::showNote);
    }
 
@@ -231,7 +238,8 @@ public final class CashOperationHandler extends AbstractPacketHandler<BaseCashOp
             PacketCreator.announce(c, new ShowBoughtQuestItem(itemId));
          }
       }
-      PacketCreator.announce(c, new ShowCash(chr.getCashShop().getCash(1), c.getPlayer().getCashShop().getCash(2), chr.getCashShop().getCash(4)));
+      PacketCreator.announce(c,
+            new ShowCash(chr.getCashShop().getCash(1), c.getPlayer().getCashShop().getCash(2), chr.getCashShop().getCash(4)));
    }
 
    private void makePurchase(MapleClient c, MapleCharacter chr, CashShop cs, int action, int useNX, int snCS) {
@@ -247,7 +255,8 @@ public final class CashOperationHandler extends AbstractPacketHandler<BaseCashOp
             c.enableCSActions();
             return;
          } else if (ItemConstants.isRateCoupon(cItem.getItemId()) && !YamlConfig.config.server.USE_SUPPLY_RATE_COUPONS) {
-            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, I18nMessage.from("CASH_SHOP_RATE_COUPON_UNAVAILABLE"));
+            MessageBroadcaster.getInstance()
+                  .sendServerNotice(chr, ServerNoticeType.POP_UP, I18nMessage.from("CASH_SHOP_RATE_COUPON_UNAVAILABLE"));
             c.enableCSActions();
             return;
          } else if (ItemConstants.isMapleLife(cItem.getItemId()) && chr.getLevel() < 30) {
@@ -266,7 +275,8 @@ public final class CashOperationHandler extends AbstractPacketHandler<BaseCashOp
          PacketCreator.announce(c, new ShowBoughtCashPackageSuccess(cashPackage, c.getAccID()));
       }
       cs.gainCash(useNX, cItem, chr.getWorld());
-      PacketCreator.announce(c, new ShowCash(chr.getCashShop().getCash(1), chr.getCashShop().getCash(2), chr.getCashShop().getCash(4)));
+      PacketCreator
+            .announce(c, new ShowCash(chr.getCashShop().getCash(1), chr.getCashShop().getCash(2), chr.getCashShop().getCash(4)));
    }
 
    private void putIntoCashInventory(MapleClient c, MapleCharacter chr, CashShop cs, int cashId, byte invType) {
@@ -281,11 +291,13 @@ public final class CashOperationHandler extends AbstractPacketHandler<BaseCashOp
          c.enableCSActions();
          return;
       } else if (c.getPlayer().getPetIndex(item.petId()) > -1) {
-         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, I18nMessage.from("CASH_SHOP_INVENTORY_EQUIPPED_PET_ERROR"));
+         MessageBroadcaster.getInstance()
+               .sendServerNotice(chr, ServerNoticeType.POP_UP, I18nMessage.from("CASH_SHOP_INVENTORY_EQUIPPED_PET_ERROR"));
          c.enableCSActions();
          return;
       } else if (ItemConstants.isWeddingRing(item.id()) || ItemConstants.isWeddingToken(item.id())) {
-         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, I18nMessage.from("CASH_SHOP_INVENTORY_RELATIONSHIP_ITEM_ERROR"));
+         MessageBroadcaster.getInstance()
+               .sendServerNotice(chr, ServerNoticeType.POP_UP, I18nMessage.from("CASH_SHOP_INVENTORY_RELATIONSHIP_ITEM_ERROR"));
          c.enableCSActions();
          return;
       }
@@ -325,9 +337,11 @@ public final class CashOperationHandler extends AbstractPacketHandler<BaseCashOp
       if (c.gainCharacterSlot()) {
          PacketCreator.announce(c, new ShowBoughtCharacterSlots(c.getCharacterSlots()));
          cs.gainCash(cash, cItem, chr.getWorld());
-         PacketCreator.announce(c, new ShowCash(chr.getCashShop().getCash(1), chr.getCashShop().getCash(2), chr.getCashShop().getCash(4)));
+         PacketCreator
+               .announce(c, new ShowCash(chr.getCashShop().getCash(1), chr.getCashShop().getCash(2), chr.getCashShop().getCash(4)));
       } else {
-         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, I18nMessage.from("CASH_SHOP_CHARACTER_SLOT_MAX"));
+         MessageBroadcaster.getInstance()
+               .sendServerNotice(chr, ServerNoticeType.POP_UP, I18nMessage.from("CASH_SHOP_CHARACTER_SLOT_MAX"));
          c.enableCSActions();
       }
    }
@@ -338,12 +352,14 @@ public final class CashOperationHandler extends AbstractPacketHandler<BaseCashOp
          return;
       }
       if (chr.getStorage().gainSlots(4)) {
-         LoggerUtil.printInfo(LoggerOriginator.ENGINE, LogType.STORAGE, c.getPlayer().getName() + " bought 4 slots to their account storage.");
+         LoggerUtil.printInfo(LoggerOriginator.ENGINE, LogType.STORAGE,
+               c.getPlayer().getName() + " bought 4 slots to their account storage.");
          chr.setUsedStorage();
 
          PacketCreator.announce(c, new ShowBoughtStorageSlots(chr.getStorage().getSlots()));
          cs.gainCash(cash, -4000);
-         PacketCreator.announce(c, new ShowCash(chr.getCashShop().getCash(1), chr.getCashShop().getCash(2), chr.getCashShop().getCash(4)));
+         PacketCreator
+               .announce(c, new ShowCash(chr.getCashShop().getCash(1), chr.getCashShop().getCash(2), chr.getCashShop().getCash(4)));
       }
    }
 
@@ -355,12 +371,14 @@ public final class CashOperationHandler extends AbstractPacketHandler<BaseCashOp
          return;
       }
       if (chr.getStorage().gainSlots(8)) {
-         LoggerUtil.printInfo(LoggerOriginator.ENGINE, LogType.STORAGE, c.getPlayer().getName() + " bought 8 slots to their account storage.");
+         LoggerUtil.printInfo(LoggerOriginator.ENGINE, LogType.STORAGE,
+               c.getPlayer().getName() + " bought 8 slots to their account storage.");
          chr.setUsedStorage();
 
          PacketCreator.announce(c, new ShowBoughtStorageSlots(chr.getStorage().getSlots()));
          cs.gainCash(cash, cItem, chr.getWorld());
-         PacketCreator.announce(c, new ShowCash(chr.getCashShop().getCash(1), chr.getCashShop().getCash(2), chr.getCashShop().getCash(4)));
+         PacketCreator
+               .announce(c, new ShowCash(chr.getCashShop().getCash(1), chr.getCashShop().getCash(2), chr.getCashShop().getCash(4)));
       }
    }
 
@@ -372,7 +390,8 @@ public final class CashOperationHandler extends AbstractPacketHandler<BaseCashOp
       if (chr.gainSlots(type, 4, false)) {
          PacketCreator.announce(c, new ShowBoughtInventorySlots(type, chr.getSlots(type)));
          cs.gainCash(cash, -4000);
-         PacketCreator.announce(c, new ShowCash(chr.getCashShop().getCash(1), chr.getCashShop().getCash(2), chr.getCashShop().getCash(4)));
+         PacketCreator
+               .announce(c, new ShowCash(chr.getCashShop().getCash(1), chr.getCashShop().getCash(2), chr.getCashShop().getCash(4)));
       }
    }
 
@@ -386,7 +405,8 @@ public final class CashOperationHandler extends AbstractPacketHandler<BaseCashOp
       if (chr.gainSlots(type, 8, false)) {
          PacketCreator.announce(c, new ShowBoughtInventorySlots(type, chr.getSlots(type)));
          cs.gainCash(cash, cItem, chr.getWorld());
-         PacketCreator.announce(c, new ShowCash(chr.getCashShop().getCash(1), chr.getCashShop().getCash(2), chr.getCashShop().getCash(4)));
+         PacketCreator
+               .announce(c, new ShowCash(chr.getCashShop().getCash(1), chr.getCashShop().getCash(2), chr.getCashShop().getCash(4)));
       }
    }
 
@@ -400,13 +420,15 @@ public final class CashOperationHandler extends AbstractPacketHandler<BaseCashOp
       if (cItem.getSN() == 50600001 && YamlConfig.config.server.ALLOW_CASHSHOP_WORLD_TRANSFER) {
 
          int worldTransferError = chr.checkWorldTransferEligibility();
-         if (worldTransferError != 0 || newWorldId >= Server.getInstance().getWorldsSize() || Server.getInstance().getWorldsSize() <= 1) {
+         if (worldTransferError != 0 || newWorldId >= Server.getInstance().getWorldsSize()
+               || Server.getInstance().getWorldsSize() <= 1) {
             PacketCreator.announce(c, new ShowCashShopMessage(CashShopMessage.UNKNOWN_ERROR));
             return;
          } else if (newWorldId == c.getWorld()) {
             PacketCreator.announce(c, new ShowCashShopMessage(CashShopMessage.CANNOT_TRANSFER_TO_SAME_WORLD));
             return;
-         } else if (c.getAvailableCharacterWorldSlots(newWorldId) < 1 || Server.getInstance().getAccountWorldCharacterCount(c.getAccID(), newWorldId) >= 3) {
+         } else if (c.getAvailableCharacterWorldSlots(newWorldId) < 1
+               || Server.getInstance().getAccountWorldCharacterCount(c.getAccID(), newWorldId) >= 3) {
             PacketCreator.announce(c, new ShowCashShopMessage(CashShopMessage.CANNOT_TRANSFER_NO_EMPTY_SLOTS));
             return;
          } else if (chr.registerWorldTransfer(newWorldId)) {
@@ -429,11 +451,14 @@ public final class CashOperationHandler extends AbstractPacketHandler<BaseCashOp
          return;
       }
       if (cItem.getSN() == 50600000 && YamlConfig.config.server.ALLOW_CASHSHOP_NAME_CHANGE) {
-         if (!CharacterProcessor.getInstance().canCreateChar(newName) || chr.getLevel() < 10) { //(longest ban duration isn't tracked currently)
+         if (!CharacterProcessor.getInstance().canCreateChar(newName)
+               || chr.getLevel() < 10) { //(longest ban duration isn't tracked currently)
             PacketCreator.announce(c, new ShowCashShopMessage(CashShopMessage.UNKNOWN_ERROR));
             c.enableCSActions();
             return;
-         } else if (c.getTempBanCalendar() != null && c.getTempBanCalendar().getTimeInMillis() + (30 * 24 * 60 * 60 * 1000) > Calendar.getInstance().getTimeInMillis()) {
+         } else if (c.getTempBanCalendar() != null
+               && c.getTempBanCalendar().getTimeInMillis() + (30 * 24 * 60 * 60 * 1000) > Calendar.getInstance()
+               .getTimeInMillis()) {
             PacketCreator.announce(c, new ShowCashShopMessage(CashShopMessage.UNKNOWN_ERROR));
             c.enableCSActions();
             return;
@@ -450,7 +475,8 @@ public final class CashOperationHandler extends AbstractPacketHandler<BaseCashOp
       c.enableCSActions();
    }
 
-   private void friendshipRingOperation(MapleClient c, MapleCharacter chr, CashShop cs, int birthday, int payment, int sn, String sentTo, String text) {
+   private void friendshipRingOperation(MapleClient c, MapleCharacter chr, CashShop cs, int birthday, int payment, int sn,
+                                        String sentTo, String text) {
       if (checkBirthday(c, birthday)) {
          CashItem itemRing = CashItemFactory.getItem(sn);
          c.getChannelServer().getPlayerStorage().getCharacterByName(sentTo).ifPresentOrElse(partner -> {
@@ -472,10 +498,12 @@ public final class CashOperationHandler extends AbstractPacketHandler<BaseCashOp
          PacketCreator.announce(c, new ShowCashShopMessage(CashShopMessage.CHECK_BIRTHDAY_CODE));
       }
 
-      PacketCreator.announce(c, new ShowCash(chr.getCashShop().getCash(1), chr.getCashShop().getCash(2), chr.getCashShop().getCash(4)));
+      PacketCreator
+            .announce(c, new ShowCash(chr.getCashShop().getCash(1), chr.getCashShop().getCash(2), chr.getCashShop().getCash(4)));
    }
 
-   private void crushRingOperation(MapleClient c, MapleCharacter chr, CashShop cs, int birthday, int toCharge, int sn, String recipientName, String text) {
+   private void crushRingOperation(MapleClient c, MapleCharacter chr, CashShop cs, int birthday, int toCharge, int sn,
+                                   String recipientName, String text) {
       if (checkBirthday(c, birthday)) {
          CashItem itemRing = CashItemFactory.getItem(sn);
          c.getChannelServer().getPlayerStorage().getCharacterByName(recipientName).ifPresentOrElse(partner -> {
@@ -491,10 +519,12 @@ public final class CashOperationHandler extends AbstractPacketHandler<BaseCashOp
                NoteProcessor.getInstance().sendNote(partner.getName(), chr.getName(), text, (byte) 1);
                partner.showNote();
             }
-         }, () -> MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, I18nMessage.from("CASH_SHOP_RING_PARTNER_ERROR")));
+         }, () -> MessageBroadcaster.getInstance()
+               .sendServerNotice(chr, ServerNoticeType.POP_UP, I18nMessage.from("CASH_SHOP_RING_PARTNER_ERROR")));
       } else {
          PacketCreator.announce(c, new ShowCashShopMessage(CashShopMessage.CHECK_BIRTHDAY_CODE));
       }
-      PacketCreator.announce(c, new ShowCash(chr.getCashShop().getCash(1), chr.getCashShop().getCash(2), chr.getCashShop().getCash(4)));
+      PacketCreator
+            .announce(c, new ShowCash(chr.getCashShop().getCash(1), chr.getCashShop().getCash(2), chr.getCashShop().getCash(4)));
    }
 }

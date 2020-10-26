@@ -2,7 +2,7 @@ package client.inventory.manipulator;
 
 import client.inventory.Item;
 import client.processor.ItemProcessor;
-import constants.inventory.ItemConstants;
+import constants.ItemConstants;
 
 public class MapleKarmaManipulator {
    private static short getKarmaFlag(Item item) {

@@ -10,9 +10,9 @@ import client.Skill;
 import client.SkillFactory;
 import client.autoban.AutoBanFactory;
 import client.inventory.Item;
-import client.inventory.MapleInventoryType;
 import client.inventory.MapleWeaponType;
 import client.status.MonsterStatusEffect;
+import constants.MapleInventoryType;
 import constants.skills.Outlaw;
 import net.server.channel.packet.SummonDamagePacket;
 import net.server.channel.packet.reader.SummonDamageReader;
@@ -78,13 +78,18 @@ public final class SummonDamageHandler extends AbstractDealDamageHandler<SummonD
          if (target != null) {
             if (damage > maxDmg) {
                AutoBanFactory.DAMAGE_HACK.alert(client.getPlayer(), "Possible packet editing summon damage exploit.");
-               LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXPLOITS, client.getPlayer().getName() + " used a summon of skillId " + summon.getSkill() + " to attack " + MapleMonsterInformationProvider.getInstance().getMobNameFromId(target.id()) + " with damage " + damage + " (max: " + maxDmg + ")");
+               LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXPLOITS,
+                     client.getPlayer().getName() + " used a summon of skillId " + summon.getSkill() + " to attack "
+                           + MapleMonsterInformationProvider.getInstance().getMobNameFromId(target.id()) + " with damage " + damage
+                           + " (max: " + maxDmg + ")");
                damage = maxDmg;
             }
 
             if (damage > 0 && summonEffect.getMonsterStati().size() > 0) {
                if (summonEffect.makeChanceResult()) {
-                  target.applyStatus(player, new MonsterStatusEffect(summonEffect.getMonsterStati(), summonSkill.get(), null, false), summonEffect.isPoison(), 4000);
+                  target.applyStatus(player,
+                        new MonsterStatusEffect(summonEffect.getMonsterStati(), summonSkill.get(), null, false),
+                        summonEffect.isPoison(), 4000);
                }
             }
             player.getMap().damageMonster(player, target, damage);
@@ -108,7 +113,8 @@ public final class SummonDamageHandler extends AbstractDealDamageHandler<SummonD
 
          int maxBaseDmg;
          if (weapon_item != null) {
-            maxBaseDmg = player.calculateMaxBaseDamage(weaponAttack, MapleItemInformationProvider.getInstance().getWeaponType(weapon_item.id()));
+            maxBaseDmg = player.calculateMaxBaseDamage(weaponAttack,
+                  MapleItemInformationProvider.getInstance().getWeaponType(weapon_item.id()));
          } else {
             maxBaseDmg = player.calculateMaxBaseDamage(weaponAttack, MapleWeaponType.SWORD1H);
          }

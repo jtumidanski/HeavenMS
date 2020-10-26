@@ -12,21 +12,21 @@ import java.util.function.Function;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import client.MapleQuestStatus;
 import client.Ring;
 import client.Skill;
 import client.SkillEntry;
 import client.inventory.Equip;
 import client.inventory.Item;
 import client.inventory.MapleInventory;
-import client.inventory.MapleInventoryType;
 import client.inventory.MaplePet;
 import client.newyear.NewYearCardRecord;
 import client.processor.CharacterProcessor;
+import constants.ItemConstants;
+import constants.MapleInventoryType;
 import constants.game.ExpTable;
 import constants.game.GameConstants;
-import constants.inventory.ItemConstants;
 import net.server.PlayerCoolDownValueHolder;
+import rest.quest.attributes.CharacterQuestAttributes;
 import server.MapleItemInformationProvider;
 import server.maps.MapleMiniGame;
 import server.processor.QuestProcessor;
@@ -467,31 +467,30 @@ public abstract class AbstractPacketFactory implements PacketFactory {
    }
 
    protected void addQuestInfo(final MaplePacketLittleEndianWriter writer, MapleCharacter character) {
-      List<MapleQuestStatus> started = character.getStartedQuests();
+      List<CharacterQuestAttributes> started = QuestProcessor.getInstance().getStartedQuests(character);
       int startedSize = 0;
-      for (MapleQuestStatus qs : started) {
-         if (QuestProcessor.getInstance().getInfoNumber(qs) > 0) {
+      for (CharacterQuestAttributes qs : started) {
+         if (QuestProcessor.getInstance().getInfoNumber(qs.getId(), qs.getStatus()) > 0) {
             startedSize++;
          }
          startedSize++;
       }
       writer.writeShort(startedSize);
-      for (MapleQuestStatus qs : started) {
-         writer.writeShort(qs.questId());
-         writer.writeMapleAsciiString(qs.getProgressData());
+      for (CharacterQuestAttributes qs : started) {
+         writer.writeShort(qs.getId());
+         writer.writeMapleAsciiString(QuestProcessor.getInstance().getProgress(character, qs.getId()));
 
-         short infoNumber = QuestProcessor.getInstance().getInfoNumber(qs);
+         short infoNumber = QuestProcessor.getInstance().getInfoNumber(qs.getId(), qs.getStatus());
          if (infoNumber > 0) {
-            MapleQuestStatus iqs = QuestProcessor.getInstance().getQuestStatus(character, infoNumber);
             writer.writeShort(infoNumber);
-            writer.writeMapleAsciiString(iqs.getProgressData());
+            writer.writeMapleAsciiString(QuestProcessor.getInstance().getProgress(character, infoNumber));
          }
       }
-      List<MapleQuestStatus> completed = character.getCompletedQuests();
+      List<CharacterQuestAttributes> completed = QuestProcessor.getInstance().getCompletedQuests(character);
       writer.writeShort(completed.size());
-      for (MapleQuestStatus qs : completed) {
-         writer.writeShort(qs.questId());
-         writer.writeLong(getTime(qs.completionTime()));
+      for (CharacterQuestAttributes qs : completed) {
+         writer.writeShort(qs.getId());
+         writer.writeLong(getTime(qs.getCompletionTime()));
       }
    }
 

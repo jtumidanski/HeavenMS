@@ -1,6 +1,6 @@
 package tools.packet.factory;
 
-import constants.inventory.ItemConstants;
+import constants.ItemConstants;
 import server.MapleItemInformationProvider;
 import server.MapleShopItem;
 import tools.data.output.MaplePacketLittleEndianWriter;

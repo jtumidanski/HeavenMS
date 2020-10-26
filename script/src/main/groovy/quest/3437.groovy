@@ -1,8 +1,9 @@
 package quest
-import tools.I18nMessage
+import tools.I18nMessage
 
-import client.MapleJob
-import client.inventory.MapleInventoryType
+
+import constants.MapleJob
+import constants.MapleInventoryType
 import scripting.quest.QuestActionManager
 
 class Quest3437 {
@@ -25,10 +26,12 @@ class Quest3437 {
       status++
 
       if (status == 0) {
-         qm.sendNext(I18nMessage.from("3437_WHAT_THE"))
+         qm.sendNext(I18nMessage.from("3437_WHAT_THE"))
+
       } else if (status == 1) {
          if (qm.getPlayer().getInventory(MapleInventoryType.EQUIP).getNumFreeSlot() < 1) {
-            qm.sendOk(I18nMessage.from("3437_EQUIP_SLOT_NEEDED"))
+            qm.sendOk(I18nMessage.from("3437_EQUIP_SLOT_NEEDED"))
+
             qm.dispose()
             return
          }
@@ -56,7 +59,8 @@ class Quest3437 {
          qm.gainItem(item, (short) 1)
          qm.gainItem(4000122, (short) -120)
          qm.gainExp(6100)
-         qm.sendOk(I18nMessage.from("3437_THANK_YOU"))
+         qm.sendOk(I18nMessage.from("3437_THANK_YOU"))
+
       } else if (status == 3) {
          qm.dispose()
       }

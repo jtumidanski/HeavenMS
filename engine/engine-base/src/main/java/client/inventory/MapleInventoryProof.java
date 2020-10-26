@@ -3,6 +3,7 @@ package client.inventory;
 import java.util.Optional;
 
 import client.MapleCharacter;
+import constants.MapleInventoryType;
 
 public class MapleInventoryProof extends MapleInventory {
 

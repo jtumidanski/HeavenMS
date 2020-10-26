@@ -3,12 +3,12 @@ package net.server.channel.handlers;
 import java.util.Arrays;
 import java.util.Optional;
 
+import client.KeyBinding;
 import client.MapleCharacter;
 import client.MapleClient;
-import client.KeyBinding;
 import client.Skill;
 import client.SkillFactory;
-import client.inventory.MapleInventoryType;
+import constants.MapleInventoryType;
 import constants.game.GameConstants;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.keymap.AutoHPKeymapChangePacket;
@@ -28,15 +28,20 @@ public final class KeymapChangeHandler extends AbstractPacketHandler<BaseKeymapC
    public void handlePacket(BaseKeymapChangePacket packet, MapleClient client) {
       if (packet.available()) {
          if (packet instanceof RegularKeymapChangePacket) {
-            Arrays.stream(((RegularKeymapChangePacket) packet).changes()).forEach(change -> changeKeyBinding(change, client.getPlayer()));
+            Arrays.stream(((RegularKeymapChangePacket) packet).changes())
+                  .forEach(change -> changeKeyBinding(change, client.getPlayer()));
          } else if (packet instanceof AutoHPKeymapChangePacket) {
-            if (((AutoHPKeymapChangePacket) packet).itemId() != 0 && client.getPlayer().getInventory(MapleInventoryType.USE).findById(((AutoHPKeymapChangePacket) packet).itemId()) == null) {
+            if (((AutoHPKeymapChangePacket) packet).itemId() != 0
+                  && client.getPlayer().getInventory(MapleInventoryType.USE).findById(((AutoHPKeymapChangePacket) packet).itemId())
+                  == null) {
                client.disconnect(false, false); // Don't let them send a packet with a use item they dont have.
                return;
             }
             client.getPlayer().changeKeyBinding(91, new KeyBinding(7, ((AutoHPKeymapChangePacket) packet).itemId()));
          } else if (packet instanceof AutoMPKeymapChangePacket) {
-            if (((AutoMPKeymapChangePacket) packet).itemId() != 0 && client.getPlayer().getInventory(MapleInventoryType.USE).findById(((AutoMPKeymapChangePacket) packet).itemId()) == null) {
+            if (((AutoMPKeymapChangePacket) packet).itemId() != 0
+                  && client.getPlayer().getInventory(MapleInventoryType.USE).findById(((AutoMPKeymapChangePacket) packet).itemId())
+                  == null) {
                client.disconnect(false, false); // Don't let them send a packet with a use item they dont have.
                return;
             }

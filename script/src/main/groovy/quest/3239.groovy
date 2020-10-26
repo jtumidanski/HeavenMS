@@ -1,7 +1,8 @@
 package quest
-import tools.I18nMessage
+import tools.I18nMessage
 
-import client.inventory.MapleInventoryType
+
+import constants.MapleInventoryType
 import scripting.quest.QuestActionManager
 
 class Quest3239 {
@@ -30,13 +31,16 @@ class Quest3239 {
          if (status == 0) {
             if (qm.haveItem(4031092, 10)) {
                if (qm.getPlayer().getInventory(MapleInventoryType.USE).getNumFreeSlot() >= 1) {
-                  qm.sendOk(I18nMessage.from("3239_WELL_DONE"))
+                  qm.sendOk(I18nMessage.from("3239_WELL_DONE"))
+
                } else {
-                  qm.sendOk(I18nMessage.from("3239_USE_SPACE_NEEDED"))
+                  qm.sendOk(I18nMessage.from("3239_USE_SPACE_NEEDED"))
+
                   qm.dispose()
                }
             } else {
-               qm.sendOk(I18nMessage.from("3239_RETURN_ME"))
+               qm.sendOk(I18nMessage.from("3239_RETURN_ME"))
+
                qm.dispose()
             }
          } else if (status == 1) {

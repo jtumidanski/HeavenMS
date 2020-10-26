@@ -1,9 +1,10 @@
 package npc
-import tools.I18nMessage
+import tools.I18nMessage
 
-import client.MapleJob
+
+import constants.MapleJob
 import client.MonsterBook
-import client.inventory.MapleInventoryType
+import constants.MapleInventoryType
 import config.YamlConfig
 import constants.game.GameConstants
 import scripting.npc.NPCConversationManager
@@ -67,7 +68,8 @@ class ScrollGenerator {
          }
 
          if (status == 0) {
-            cm.sendNext(I18nMessage.from("scroll_generator_BROADCAST"))
+            cm.sendNext(I18nMessage.from("scroll_generator_BROADCAST"))
+
          } else if (status == 1) {
             String sendStr
 
@@ -99,7 +101,8 @@ class ScrollGenerator {
          } else if (status == 2) {
             if (selection == (sgItems.size() + 2)) {
                if (sgItemBuckets < 1.0) {
-                  cm.sendPrev(I18nMessage.from("scroll_generator_NOT_ENOUGH_SUPPLIES"))
+                  cm.sendPrev(I18nMessage.from("scroll_generator_NOT_ENOUGH_SUPPLIES"))
+
                } else {
                   generateRandomScroll()
                   cm.dispose()
@@ -117,9 +120,11 @@ class ScrollGenerator {
 
                curItemSel = selection
                if (curItemQty > 0) {
-                  cm.sendGetText(I18nMessage.from("scroll_generator_HOW_MANY").with(tickSel, curItemQty))
+                  cm.sendGetText(I18nMessage.from("scroll_generator_HOW_MANY").with(tickSel, curItemQty))
+
                } else {
-                  cm.sendPrev(I18nMessage.from("scroll_generator_GOT_NONE").with(tickSel))
+                  cm.sendPrev(I18nMessage.from("scroll_generator_GOT_NONE").with(tickSel))
+
                }
             }
          } else if (status == 3) {
@@ -132,7 +137,8 @@ class ScrollGenerator {
                }
 
                if (placedQty > curItemQty) {
-                  cm.sendPrev(I18nMessage.from("scroll_generator_CANNOT_INSERT").with(sgItems[curItemSel], curItemQty))
+                  cm.sendPrev(I18nMessage.from("scroll_generator_CANNOT_INSERT").with(sgItems[curItemSel], curItemQty))
+
                } else {
                   if (curItemSel < sgItems.size()) {
                      sgApplyItem(curItemSel, placedQty)
@@ -140,10 +146,12 @@ class ScrollGenerator {
                      sgApplyMeso(placedQty)
                   }
 
-                  cm.sendPrev(I18nMessage.from("scroll_generator_SUCCESS"))
+                  cm.sendPrev(I18nMessage.from("scroll_generator_SUCCESS"))
+
                }
             } catch (Exception ignored) {
-               cm.sendPrev(I18nMessage.from("scroll_generator_MUST_BE_POSITIVE"))
+               cm.sendPrev(I18nMessage.from("scroll_generator_MUST_BE_POSITIVE"))
+
             }
 
             status = 2
@@ -405,15 +413,19 @@ class ScrollGenerator {
          int itemId = getRandomScroll(calculateScrollTiers())
          if (itemId != -1) {
             if (performExchange(itemId, 1)) {
-               cm.sendNext(I18nMessage.from("scroll_generator_ACCEPTED").with(itemId))
+               cm.sendNext(I18nMessage.from("scroll_generator_ACCEPTED").with(itemId))
+
             } else {
-               cm.sendOk(I18nMessage.from("scroll_generator_SOME_ITEMS_MISSING"))
+               cm.sendOk(I18nMessage.from("scroll_generator_SOME_ITEMS_MISSING"))
+
             }
          } else {
-            cm.sendOk(I18nMessage.from("scroll_generator_SORRY"))
+            cm.sendOk(I18nMessage.from("scroll_generator_SORRY"))
+
          }
       } else {
-         cm.sendOk(I18nMessage.from("scroll_generator_NEED_USE_SLOT_FREE"))
+         cm.sendOk(I18nMessage.from("scroll_generator_NEED_USE_SLOT_FREE"))
+
       }
    }
 }

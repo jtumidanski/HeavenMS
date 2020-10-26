@@ -2,7 +2,7 @@ package net.server.channel.handlers;
 
 import client.MapleClient;
 import client.inventory.Item;
-import constants.inventory.ItemConstants;
+import constants.ItemConstants;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.ScriptedItemPacket;
 import net.server.channel.packet.reader.ScriptedItemReader;

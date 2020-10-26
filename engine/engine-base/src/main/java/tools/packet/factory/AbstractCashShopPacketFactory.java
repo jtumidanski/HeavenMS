@@ -2,7 +2,7 @@ package tools.packet.factory;
 
 import client.inventory.Equip;
 import client.inventory.Item;
-import client.inventory.MapleInventoryType;
+import constants.MapleInventoryType;
 import tools.StringUtil;
 import tools.data.output.MaplePacketLittleEndianWriter;
 

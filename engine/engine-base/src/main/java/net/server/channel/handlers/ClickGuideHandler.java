@@ -1,7 +1,7 @@
 package net.server.channel.handlers;
 
 import client.MapleClient;
-import client.MapleJob;
+import constants.MapleJob;
 import net.server.AbstractPacketHandler;
 import net.server.packet.NoOpPacket;
 import net.server.packet.reader.NoOpReader;
@@ -21,5 +21,4 @@ public class ClickGuideHandler extends AbstractPacketHandler<NoOpPacket> {
          NPCScriptManager.getInstance().start(client, 1202000, null);
       }
    }
-
 }

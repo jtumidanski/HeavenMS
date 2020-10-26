@@ -21,7 +21,8 @@ import java.util.stream.Collectors;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.inventory.manipulator.MapleInventoryManipulator;
-import constants.inventory.ItemConstants;
+import constants.ItemConstants;
+import constants.MapleInventoryType;
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
 import server.MapleItemInformationProvider;
@@ -89,7 +90,8 @@ public class MapleInventory implements Iterable<Item> {
       return checkSpots(chr, items, zeroedList, useProofInv);
    }
 
-   public static boolean checkSpots(MapleCharacter chr, List<Pair<Item, MapleInventoryType>> items, List<Integer> typesSlotsUsed, boolean useProofInv) {
+   public static boolean checkSpots(MapleCharacter chr, List<Pair<Item, MapleInventoryType>> items, List<Integer> typesSlotsUsed,
+                                    boolean useProofInv) {
       // assumption: no "UNDEFINED" or "EQUIPPED" items shall be tested here, all counts are >= 0.
 
       if (!checkItemRestricted(items)) {
@@ -160,7 +162,8 @@ public class MapleInventory implements Iterable<Item> {
       return checkSpotsAndOwnership(chr, items, false);
    }
 
-   public static boolean checkSpotsAndOwnership(MapleCharacter chr, List<Pair<Item, MapleInventoryType>> items, boolean useProofInv) {
+   public static boolean checkSpotsAndOwnership(MapleCharacter chr, List<Pair<Item, MapleInventoryType>> items,
+                                                boolean useProofInv) {
       List<Integer> zeroedList = new ArrayList<>(5);
       for (byte i = 0; i < 5; i++) {
          zeroedList.add(0);
@@ -169,7 +172,8 @@ public class MapleInventory implements Iterable<Item> {
       return checkSpotsAndOwnership(chr, items, zeroedList, useProofInv);
    }
 
-   public static boolean checkSpotsAndOwnership(MapleCharacter chr, List<Pair<Item, MapleInventoryType>> items, List<Integer> typesSlotsUsed, boolean useProofInv) {
+   public static boolean checkSpotsAndOwnership(MapleCharacter chr, List<Pair<Item, MapleInventoryType>> items,
+                                                List<Integer> typesSlotsUsed, boolean useProofInv) {
       //assumption: no "UNDEFINED" or "EQUIPPED" items shall be tested here, all counts are >= 0 and item list to be checked is a legal one.
 
       if (!checkItemRestricted(items)) {
@@ -208,7 +212,8 @@ public class MapleInventory implements Iterable<Item> {
          for (Integer itValue : it.getValue()) {
             int usedSlots = typesSlotsUsed.get(itemType);
 
-            int result = MapleInventoryManipulator.checkSpaceProgressively(c, itemId, itValue, rcvOwners.get(it.getKey()), usedSlots, useProofInv);
+            int result = MapleInventoryManipulator
+                  .checkSpaceProgressively(c, itemId, itValue, rcvOwners.get(it.getKey()), usedSlots, useProofInv);
             boolean hasSpace = ((result % 2) != 0);
 
             if (!hasSpace) {
@@ -222,7 +227,8 @@ public class MapleInventory implements Iterable<Item> {
    }
 
    public boolean isExtendableInventory() { // not sure about cash, basing this on the previous one.
-      return !(type.equals(MapleInventoryType.UNDEFINED) || type.equals(MapleInventoryType.EQUIPPED) || type.equals(MapleInventoryType.CASH));
+      return !(type.equals(MapleInventoryType.UNDEFINED) || type.equals(MapleInventoryType.EQUIPPED) || type
+            .equals(MapleInventoryType.CASH));
    }
 
    public boolean isEquipInventory() {

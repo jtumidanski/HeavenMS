@@ -2,7 +2,7 @@ package net.server.channel.handlers;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import constants.inventory.ItemConstants;
+import constants.ItemConstants;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.FaceExpressionPacket;
 import net.server.channel.packet.reader.FaceExpressionReader;
@@ -19,7 +19,8 @@ public final class FaceExpressionHandler extends AbstractPacketHandler<FaceExpre
 
       if (packet.emote() > 7) {
          int itemId = 5159992 + packet.emote();
-         if (!ItemConstants.isFaceExpression(itemId) || chr.getInventory(ItemConstants.getInventoryType(itemId)).findById(itemId) == null) {
+         if (!ItemConstants.isFaceExpression(itemId)
+               || chr.getInventory(ItemConstants.getInventoryType(itemId)).findById(itemId) == null) {
             return;
          }
       } else if (packet.emote() < 1) {

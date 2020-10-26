@@ -1,7 +1,8 @@
 package quest
-import tools.I18nMessage
+import tools.I18nMessage
 
-import client.inventory.MapleInventoryType
+
+import constants.MapleInventoryType
 import scripting.quest.QuestActionManager
 
 class Quest3452 {
@@ -18,7 +19,8 @@ class Quest3452 {
          qm.dispose()
       } else {
          if (status == 0) {
-            qm.sendNext(I18nMessage.from("3452_TAKE_THESE"))
+            qm.sendNext(I18nMessage.from("3452_TAKE_THESE"))
+
          } else if (status == 1) {
             if (qm.getPlayer().getInventory(MapleInventoryType.USE).getNumFreeSlot() >= 1) {
                qm.gainItem(4000099, (short) -1)
@@ -27,7 +29,8 @@ class Quest3452 {
                qm.forceCompleteQuest()
                qm.dispose()
             } else {
-               qm.sendNext(I18nMessage.from("3452_INVENTORY_FULL"))
+               qm.sendNext(I18nMessage.from("3452_INVENTORY_FULL"))
+
             }
          } else if (status == 2) {
             qm.dispose()

@@ -11,7 +11,7 @@ import client.MapleClient;
 import client.inventory.Equip;
 import client.inventory.Item;
 import config.YamlConfig;
-import constants.inventory.ItemConstants;
+import constants.ItemConstants;
 
 class PairedQuickSort {
    private final ArrayList<Integer> intersect;
@@ -49,8 +49,12 @@ class PairedQuickSort {
 
       x = A.get((i + j) / 2);
       do {
-         while (x.id() > A.get(i).id()) i++;
-         while (x.id() < A.get(j).id()) j--;
+         while (x.id() > A.get(i).id()) {
+            i++;
+         }
+         while (x.id() < A.get(j).id()) {
+            j--;
+         }
 
          if (i <= j) {
             w = A.get(i);
@@ -71,8 +75,12 @@ class PairedQuickSort {
 
       x = A.get((i + j) / 2);
       do {
-         while (ii.getName(x.id()).compareTo(ii.getName(A.get(i).id())) > 0) i++;
-         while (ii.getName(x.id()).compareTo(ii.getName(A.get(j).id())) < 0) j--;
+         while (ii.getName(x.id()).compareTo(ii.getName(A.get(i).id())) > 0) {
+            i++;
+         }
+         while (ii.getName(x.id()).compareTo(ii.getName(A.get(j).id())) < 0) {
+            j--;
+         }
 
          if (i <= j) {
             w = A.get(i);
@@ -93,8 +101,12 @@ class PairedQuickSort {
 
       x = A.get((i + j) / 2);
       do {
-         while (x.quantity() > A.get(i).quantity()) i++;
-         while (x.quantity() < A.get(j).quantity()) j--;
+         while (x.quantity() > A.get(i).quantity()) {
+            i++;
+         }
+         while (x.quantity() < A.get(j).quantity()) {
+            j--;
+         }
 
          if (i <= j) {
             w = A.get(i);
@@ -119,8 +131,12 @@ class PairedQuickSort {
          eqpI = (Equip) A.get(i);
          eqpJ = (Equip) A.get(j);
 
-         while (x.level() > eqpI.level()) i++;
-         while (x.level() < eqpJ.level()) j--;
+         while (x.level() > eqpI.level()) {
+            i++;
+         }
+         while (x.level() < eqpJ.level()) {
+            j--;
+         }
 
          if (i <= j) {
             w = (Equip) A.get(i);
@@ -140,7 +156,6 @@ class PairedQuickSort {
          case 1 -> PartitionByQuantity(Esq, Dir, A);
          default -> PartitionByItemId(Esq, Dir, A);
       }
-
 
       if (Esq < j) {
          MapleQuickSort(Esq, j, A, sort);
@@ -204,7 +219,8 @@ public class MapleStorageInventory {
          source = Item.newBuilder(source).setPosition(dSlot).build();
          inventory.put(dSlot, source);
          inventory.remove(sSlot);
-      } else if (target.id() == source.id() && !ItemConstants.isRechargeable(source.id()) && !MapleItemInformationProvider.getInstance().isPickupRestricted(source.id()) && isSameOwner(source, target)) {
+      } else if (target.id() == source.id() && !ItemConstants.isRechargeable(source.id()) && !MapleItemInformationProvider
+            .getInstance().isPickupRestricted(source.id()) && isSameOwner(source, target)) {
          if (isEquipOrCash(source)) {
             swap(target, source);
          } else if (source.quantity() + target.quantity() > slotMax) {

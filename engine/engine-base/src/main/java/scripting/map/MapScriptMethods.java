@@ -1,10 +1,8 @@
 package scripting.map;
 
 import client.MapleClient;
-import client.MapleQuestStatus;
 import scripting.AbstractPlayerInteraction;
 import server.processor.QuestProcessor;
-import server.quest.MapleQuest;
 import tools.PacketCreator;
 import tools.packet.foreigneffect.ShowTitleEarned;
 import tools.packet.quest.info.ShowQuestComplete;
@@ -86,28 +84,22 @@ public class MapScriptMethods extends AbstractPlayerInteraction {
    }
 
    public void explorerQuest(short questId, String questName) {
-      MapleQuest quest = QuestProcessor.getInstance().getQuest(questId);
       if (!isQuestStarted(questId)) {
-         boolean success = QuestProcessor.getInstance().forceStart(getPlayer(), quest, 9000066);
-         if (!success) {
-            return;
-         }
+         QuestProcessor.getInstance().forceStart(getPlayer(), questId, 9000066);
       }
-      MapleQuestStatus questStatus = QuestProcessor.getInstance().getQuestStatus(getPlayer(), questId);
-      if (!questStatus.hasMedalMap(getPlayer().getMapId())) {
+      if (!QuestProcessor.getInstance().hasMedalMap(getPlayer(), questId, getPlayer().getMapId())) {
          return;
       }
-      questStatus = questStatus.addMedalMap(getPlayer().getMapId());
-      QuestProcessor.getInstance().updateQuestStatus(getPlayer(), questStatus);
+      QuestProcessor.getInstance().addMedalMap(getPlayer(), questId, getPlayer().getMapId());
 
-      String status = Integer.toString(questStatus.getMedalProgress());
-      String infoEx = quest.getInfoEx(questStatus.status(), 0);
+      String status = Integer.toString(QuestProcessor.getInstance().getMedalProgress(getPlayer(), questId));
+      String infoEx = QuestProcessor.getInstance().getInfoEx(getPlayer(), questId, 0);
       StringBuilder smp = new StringBuilder();
       StringBuilder etm = new StringBuilder();
       if (status.equals(infoEx)) {
          etm.append("Earned the ").append(questName).append(" title!");
          smp.append("You have earned the <").append(questName).append(">").append(rewardString);
-         PacketCreator.announce(getPlayer(), new ShowQuestComplete(quest.id()));
+         PacketCreator.announce(getPlayer(), new ShowQuestComplete(questId));
       } else {
          etm.append("Trying for the ").append(questName).append(" title.");
          smp.append("You made progress on the ").append(questName).append(" title. ").append(status).append("/").append(infoEx);
@@ -118,26 +110,22 @@ public class MapScriptMethods extends AbstractPlayerInteraction {
    }
 
    public void touchTheSky() { //29004
-      MapleQuest quest = QuestProcessor.getInstance().getQuest(29004);
-      if (!isQuestStarted(29004)) {
-         boolean success = QuestProcessor.getInstance().forceStart(getPlayer(), quest, 9000066);
-         if (!success) {
-            return;
-         }
+      short questId = 29004;
+      if (!isQuestStarted(questId)) {
+         QuestProcessor.getInstance().forceStart(getPlayer(), questId, 9000066);
       }
-      MapleQuestStatus questStatus = QuestProcessor.getInstance().getQuestStatus(getPlayer(), quest);
-      if (!questStatus.hasMedalMap(getPlayer().getMapId())) {
+      if (!QuestProcessor.getInstance().hasMedalMap(getPlayer(), questId, getPlayer().getMapId())) {
          return;
       }
-      questStatus = questStatus.addMedalMap(getPlayer().getMapId());
-      QuestProcessor.getInstance().updateQuestStatus(getPlayer(), questStatus);
+      QuestProcessor.getInstance().addMedalMap(getPlayer(), questId, getPlayer().getMapId());
 
-      String status = Integer.toString(questStatus.getMedalProgress());
+      String status = Integer.toString(QuestProcessor.getInstance().getMedalProgress(getPlayer(), questId));
+      String infoEx = QuestProcessor.getInstance().getInfoEx(getPlayer(), questId, 0);
       PacketCreator.announce(getPlayer(), new ShowTitleEarned(status + "/5 Completed"));
       PacketCreator.announce(getPlayer(), new ShowTitleEarned("The One Who's Touched the Sky title in progress."));
-      if (Integer.toString(questStatus.getMedalProgress()).equals(quest.getInfoEx(questStatus.status(), 0))) {
+      if (status.equals(infoEx)) {
          showInfoText("The One Who's Touched the Sky" + rewardString);
-         PacketCreator.announce(getPlayer(), new ShowQuestComplete(quest.id()));
+         PacketCreator.announce(getPlayer(), new ShowQuestComplete(questId));
       } else {
          showInfoText("The One Who's Touched the Sky title in progress. " + status + "/5 Completed");
       }

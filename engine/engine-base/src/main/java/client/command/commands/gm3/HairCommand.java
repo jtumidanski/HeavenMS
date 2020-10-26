@@ -6,10 +6,10 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.MapleStat;
 import client.command.Command;
-import constants.inventory.ItemConstants;
+import constants.ItemConstants;
 import server.MapleItemInformationProvider;
-import tools.MessageBroadcaster;
 import tools.I18nMessage;
+import tools.MessageBroadcaster;
 
 public class HairCommand extends Command {
    {
@@ -28,7 +28,8 @@ public class HairCommand extends Command {
          if (params.length == 1) {
             int itemId = Integer.parseInt(params[0]);
             if (!ItemConstants.isHair(itemId) || MapleItemInformationProvider.getInstance().getName(itemId) == null) {
-               MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("HAIR_COMMAND_HAIR_DOES_NOT_EXIST").with(params[0]));
+               MessageBroadcaster.getInstance()
+                     .yellowMessage(player, I18nMessage.from("HAIR_COMMAND_HAIR_DOES_NOT_EXIST").with(params[0]));
                return;
             }
 
@@ -38,7 +39,8 @@ public class HairCommand extends Command {
          } else {
             int itemId = Integer.parseInt(params[1]);
             if (!ItemConstants.isHair(itemId) || MapleItemInformationProvider.getInstance().getName(itemId) == null) {
-               MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("HAIR_COMMAND_HAIR_DOES_NOT_EXIST").with(params[1]));
+               MessageBroadcaster.getInstance()
+                     .yellowMessage(player, I18nMessage.from("HAIR_COMMAND_HAIR_DOES_NOT_EXIST").with(params[1]));
                return;
             }
 
@@ -48,7 +50,8 @@ public class HairCommand extends Command {
                victim.get().updateSingleStat(MapleStat.HAIR, itemId);
                victim.get().equipChanged();
             } else {
-               MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("HAIR_COMMAND_PLAYER_NOT_FOUND").with(params[0]));
+               MessageBroadcaster.getInstance()
+                     .yellowMessage(player, I18nMessage.from("HAIR_COMMAND_PLAYER_NOT_FOUND").with(params[0]));
             }
          }
       } catch (Exception ignored) {

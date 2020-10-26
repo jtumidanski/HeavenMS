@@ -4,14 +4,14 @@ import java.util.Optional;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import client.MapleJob;
 import client.MapleSkinColor;
 import client.Skill;
 import client.SkillFactory;
 import client.inventory.Item;
-import client.inventory.MapleInventoryType;
 import client.processor.CharacterProcessor;
 import config.YamlConfig;
+import constants.MapleInventoryType;
+import constants.MapleJob;
 import constants.skills.Magician;
 import constants.skills.Warrior;
 import net.server.Server;
@@ -37,19 +37,22 @@ public class CharacterFactory {
    private CharacterFactory() {
    }
 
-   public int createBeginner(MapleClient c, String name, int face, int hair, int skin, int top, int bottom, int shoes, int weapon, int gender) {
+   public int createBeginner(MapleClient c, String name, int face, int hair, int skin, int top, int bottom, int shoes, int weapon,
+                             int gender) {
       CharacterFactoryRecipe recipe = new CharacterFactoryRecipe(MapleJob.BEGINNER, 1, 10000, top, bottom, shoes, weapon);
       giveItem(recipe, 4161001, 1, MapleInventoryType.ETC);
       return createNewCharacter(c, name, face, hair, skin, gender, recipe);
    }
 
-   public int createLegend(MapleClient c, String name, int face, int hair, int skin, int top, int bottom, int shoes, int weapon, int gender) {
+   public int createLegend(MapleClient c, String name, int face, int hair, int skin, int top, int bottom, int shoes, int weapon,
+                           int gender) {
       CharacterFactoryRecipe recipe = new CharacterFactoryRecipe(MapleJob.LEGEND, 1, 914000000, top, bottom, shoes, weapon);
       giveItem(recipe, 4161048, 1, MapleInventoryType.ETC);
       return createNewCharacter(c, name, face, hair, skin, gender, recipe);
    }
 
-   public int createNoblesse(MapleClient c, String name, int face, int hair, int skin, int top, int bottom, int shoes, int weapon, int gender) {
+   public int createNoblesse(MapleClient c, String name, int face, int hair, int skin, int top, int bottom, int shoes, int weapon,
+                             int gender) {
       CharacterFactoryRecipe recipe = new CharacterFactoryRecipe(MapleJob.NOBLESSE, 1, 130030000, top, bottom, shoes, weapon);
       giveItem(recipe, 4161047, 1, MapleInventoryType.ETC);
       return createNewCharacter(c, name, face, hair, skin, gender, recipe);
@@ -59,13 +62,14 @@ public class CharacterFactory {
       int[] equips = {1040067, 1041054, 1060056, 1061050, 1072081};
       int[] weapons = {1452005, 1462000};
       int[] startingHpMp = {797, 404};
-      CharacterFactoryRecipe recipe = new CharacterFactoryRecipe(MapleJob.BOWMAN, 30, 100000000, equips[gender], equips[2 + gender], equips[4], weapons[0])
-            .setDex(25)
-            .setRemainingAp(133)
-            .setRemainingSp(61)
-            .setMaxHp(startingHpMp[0])
-            .setMaxMp(startingHpMp[1])
-            .setMeso(100000);
+      CharacterFactoryRecipe recipe =
+            new CharacterFactoryRecipe(MapleJob.BOWMAN, 30, 100000000, equips[gender], equips[2 + gender], equips[4], weapons[0])
+                  .setDex(25)
+                  .setRemainingAp(133)
+                  .setRemainingSp(61)
+                  .setMaxHp(startingHpMp[0])
+                  .setMaxMp(startingHpMp[1])
+                  .setMeso(100000);
       for (int i = 1; i < weapons.length; i++) {
          giveEquipment(recipe, weapons[i]);
       }
@@ -81,13 +85,14 @@ public class CharacterFactory {
       int[] startingHpMp = {405, 729};
       int[] mpGain = {0, 40, 80, 118, 156, 194, 230, 266, 302, 336, 370};
 
-      CharacterFactoryRecipe recipe = new CharacterFactoryRecipe(MapleJob.MAGICIAN, 30, 101000000, equips[gender], equips[2 + gender], equips[4], weapons[0])
-            .setIntelligence(20)
-            .setRemainingAp(138)
-            .setRemainingSp(67)
-            .setMaxMp(startingHpMp[0])
-            .setMaxMp(startingHpMp[1] + mpGain[improveSp])
-            .setMeso(100000);
+      CharacterFactoryRecipe recipe =
+            new CharacterFactoryRecipe(MapleJob.MAGICIAN, 30, 101000000, equips[gender], equips[2 + gender], equips[4], weapons[0])
+                  .setIntelligence(20)
+                  .setRemainingAp(138)
+                  .setRemainingSp(67)
+                  .setMaxMp(startingHpMp[0])
+                  .setMaxMp(startingHpMp[1] + mpGain[improveSp])
+                  .setMeso(100000);
 
       if (gender == 0) {
          giveEquipment(recipe, 1050003);
@@ -126,13 +131,14 @@ public class CharacterFactory {
       int[] equips = {0, 0, 0, 0, 1072294};
       int[] weapons = {1482004, 1492004};
       int[] startingHpMp = {846, 503};
-      CharacterFactoryRecipe recipe = new CharacterFactoryRecipe(MapleJob.PIRATE, 30, 120000000, equips[gender], equips[2 + gender], equips[4], weapons[0])
-            .setDex(20)
-            .setRemainingAp(138)
-            .setRemainingSp(61)
-            .setMaxHp(startingHpMp[0])
-            .setMaxMp(startingHpMp[1])
-            .setMeso(100000);
+      CharacterFactoryRecipe recipe =
+            new CharacterFactoryRecipe(MapleJob.PIRATE, 30, 120000000, equips[gender], equips[2 + gender], equips[4], weapons[0])
+                  .setDex(20)
+                  .setRemainingAp(138)
+                  .setRemainingSp(61)
+                  .setMaxHp(startingHpMp[0])
+                  .setMaxMp(startingHpMp[1])
+                  .setMeso(100000);
 
       giveEquipment(recipe, 1052107);
 
@@ -152,13 +158,14 @@ public class CharacterFactory {
       int[] equips = {1040057, 1041047, 1060043, 1061043, 1072032};
       int[] weapons = {1472008, 1332012};
       int[] startingHpMp = {794, 407};
-      CharacterFactoryRecipe recipe = new CharacterFactoryRecipe(MapleJob.THIEF, 30, 103000000, equips[gender], equips[2 + gender], equips[4], weapons[0])
-            .setDex(25)
-            .setRemainingAp(133)
-            .setRemainingSp(61)
-            .setMaxHp(startingHpMp[0])
-            .setMaxMp(startingHpMp[1])
-            .setMeso(100000);
+      CharacterFactoryRecipe recipe =
+            new CharacterFactoryRecipe(MapleJob.THIEF, 30, 103000000, equips[gender], equips[2 + gender], equips[4], weapons[0])
+                  .setDex(25)
+                  .setRemainingAp(133)
+                  .setRemainingSp(61)
+                  .setMaxHp(startingHpMp[0])
+                  .setMaxMp(startingHpMp[1])
+                  .setMeso(100000);
 
       for (int i = 1; i < weapons.length; i++) {
          giveEquipment(recipe, weapons[i]);
@@ -177,13 +184,14 @@ public class CharacterFactory {
       int[] weapons = {1302008, 1442001, 1422001, 1312005};
       int[] startingHpMp = {905, 208};
       int[] hpGain = {0, 72, 144, 212, 280, 348, 412, 476, 540, 600, 660};
-      CharacterFactoryRecipe recipe = new CharacterFactoryRecipe(MapleJob.WARRIOR, 30, 102000000, equips[gender], equips[2 + gender], equips[4], weapons[0])
-            .setStr(35)
-            .setRemainingAp(123)
-            .setRemainingSp(61)
-            .setMaxMp(startingHpMp[0] + hpGain[improveSp])
-            .setMaxMp(startingHpMp[1])
-            .setMeso(100000);
+      CharacterFactoryRecipe recipe =
+            new CharacterFactoryRecipe(MapleJob.WARRIOR, 30, 102000000, equips[gender], equips[2 + gender], equips[4], weapons[0])
+                  .setStr(35)
+                  .setRemainingAp(123)
+                  .setRemainingSp(61)
+                  .setMaxMp(startingHpMp[0] + hpGain[improveSp])
+                  .setMaxMp(startingHpMp[1])
+                  .setMeso(100000);
 
       if (gender == 1) {
          giveEquipment(recipe, 1051010);
@@ -223,8 +231,10 @@ public class CharacterFactory {
       recipe.addStartingEquipment(nEquip);
    }
 
-   protected synchronized int createNewCharacter(MapleClient c, String name, int face, int hair, int skin, int gender, CharacterFactoryRecipe recipe) {
-      if (YamlConfig.config.server.COLLECTIVE_CHARSLOT ? c.getAvailableCharacterSlots() <= 0 : c.getAvailableCharacterWorldSlots() <= 0) {
+   protected synchronized int createNewCharacter(MapleClient c, String name, int face, int hair, int skin, int gender,
+                                                 CharacterFactoryRecipe recipe) {
+      if (YamlConfig.config.server.COLLECTIVE_CHARSLOT ? c.getAvailableCharacterSlots() <= 0 :
+            c.getAvailableCharacterWorldSlots() <= 0) {
          return -3;
       }
 
@@ -249,8 +259,10 @@ public class CharacterFactory {
       PacketCreator.announce(c, new AddNewCharacter(newCharacter));
 
       Server.getInstance().createCharacterEntry(newCharacter);
-      Server.getInstance().broadcastGMMessage(c.getWorld(), PacketCreator.create(new YellowTip("[New Char]: " + c.getAccountName() + " has created a new character with IGN " + name)));
-      LoggerUtil.printInfo(LoggerOriginator.ENGINE, LogType.CREATED_CHAR, c.getAccountName() + " created character with IGN " + name);
+      Server.getInstance().broadcastGMMessage(c.getWorld(), PacketCreator
+            .create(new YellowTip("[New Char]: " + c.getAccountName() + " has created a new character with IGN " + name)));
+      LoggerUtil
+            .printInfo(LoggerOriginator.ENGINE, LogType.CREATED_CHAR, c.getAccountName() + " created character with IGN " + name);
       return 0;
    }
 }

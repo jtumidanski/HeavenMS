@@ -4,13 +4,13 @@ import java.io.File;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import client.MapleJob;
 import client.SkillFactory;
 import client.command.Command;
+import constants.MapleJob;
 import provider.MapleData;
 import provider.MapleDataProviderFactory;
-import tools.MessageBroadcaster;
 import tools.I18nMessage;
+import tools.MessageBroadcaster;
 
 public class ResetSkillCommand extends Command {
    {
@@ -20,9 +20,11 @@ public class ResetSkillCommand extends Command {
    @Override
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
-      for (MapleData skill_ : MapleDataProviderFactory.getDataProvider(new File(System.getProperty("wzpath") + "/" + "String.wz")).getData("Skill.img").getChildren()) {
+      for (MapleData skill_ : MapleDataProviderFactory.getDataProvider(new File(System.getProperty("wzpath") + "/" + "String.wz"))
+            .getData("Skill.img").getChildren()) {
          try {
-            SkillFactory.getSkill(Integer.parseInt(skill_.getName())).ifPresent(skill -> player.changeSkillLevel(skill, (byte) 0, skill.getMaxLevel(), -1));
+            SkillFactory.getSkill(Integer.parseInt(skill_.getName()))
+                  .ifPresent(skill -> player.changeSkillLevel(skill, (byte) 0, skill.getMaxLevel(), -1));
          } catch (NumberFormatException nfe) {
             nfe.printStackTrace();
             break;

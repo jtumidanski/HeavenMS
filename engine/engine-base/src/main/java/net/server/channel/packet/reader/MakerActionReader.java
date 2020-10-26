@@ -1,6 +1,6 @@
 package net.server.channel.packet.reader;
 
-import constants.inventory.ItemConstants;
+import constants.ItemConstants;
 import net.server.PacketReader;
 import net.server.channel.packet.maker.BaseMakerActionPacket;
 import net.server.channel.packet.maker.MakerDisassemblingPacket;

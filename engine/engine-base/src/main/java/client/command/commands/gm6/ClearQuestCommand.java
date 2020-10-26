@@ -3,7 +3,8 @@ package client.command.commands.gm6;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
-import server.processor.QuestProcessor;
+import rest.RestService;
+import rest.UriBuilder;
 import tools.I18nMessage;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
@@ -21,7 +22,7 @@ public class ClearQuestCommand extends Command {
                .sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("CLEAR_QUEST_COMMAND_LENGTH"));
          return;
       }
-      QuestProcessor.getInstance().clearCache(Integer.parseInt(params[0]));
+      UriBuilder.service(RestService.QUEST).path("quests").path(params[0]).getRestClient().delete();
       MessageBroadcaster.getInstance()
             .sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("CLEAR_QUEST_COMMAND_SUCCESS").with(params[0]));
    }

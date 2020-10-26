@@ -1,7 +1,7 @@
 package quest
 
-import client.MapleJob
-import client.inventory.MapleInventoryType
+import constants.MapleJob
+import constants.MapleInventoryType
 import scripting.quest.QuestActionManager
 import tools.I18nMessage
 import tools.MessageBroadcaster
@@ -27,7 +27,8 @@ class Quest3414 {
       status++
 
       if (status == 0) {
-         qm.sendNext(I18nMessage.from("3414_WHOA"))
+         qm.sendNext(I18nMessage.from("3414_WHOA"))
+
       } else if (status == 1) {
          if (qm.getPlayer().getInventory(MapleInventoryType.USE).getNumFreeSlot() < 1) {
             MessageBroadcaster.getInstance().sendServerNotice(qm.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("INVENTORY_FULL_ERROR"))

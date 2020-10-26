@@ -6,8 +6,8 @@ import java.util.Calendar;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
+import constants.MapleInventoryType;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.ChangeMapPacket;
 import net.server.channel.packet.reader.ChangeMapReader;

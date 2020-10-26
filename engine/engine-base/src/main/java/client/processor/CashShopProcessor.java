@@ -1,26 +1,28 @@
 package client.processor;
 
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 
+import builder.InputObjectBuilder;
+import builder.ResultObjectBuilder;
 import client.MapleCharacter;
 import client.inventory.Equip;
 import client.inventory.Item;
 import client.inventory.ItemFactory;
-import client.inventory.MapleInventoryType;
 import config.YamlConfig;
-import constants.inventory.ItemConstants;
+import constants.ItemConstants;
+import constants.MapleInventoryType;
 import database.DatabaseConnection;
 import database.administrator.AccountAdministrator;
 import database.provider.AccountProvider;
+import rest.DataBody;
 import rest.RestService;
 import rest.UriBuilder;
-import rest.cashshop.GiftsResponse;
-import rest.cashshop.WishListItem;
-import rest.cashshop.WishListResponse;
+import rest.attributes.NoopAttributes;
+import rest.cashshop.attributes.GiftAttributes;
+import rest.cashshop.attributes.builders.GiftAttributesBuilder;
 import server.CashShop;
 import tools.LogType;
 import tools.LoggerOriginator;
@@ -84,16 +86,22 @@ public class CashShopProcessor {
 
    protected List<Integer> getWishList(int characterId) {
       List<Integer> results = new ArrayList<>();
-      UriBuilder.service(RestService.CASH_SHOP).path("characters").path(characterId).path("wish-list").path("items").getRestClient(WishListResponse.class)
-            .success((responseCode, result) -> results.addAll(result.items().parallelStream().map(WishListItem::id).collect(Collectors.toList())))
-            .failure(responseCode -> LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.CASH_SHOP_ORCHESTRATOR, "Failed to get wish list for character " + characterId))
+      UriBuilder.service(RestService.CASH_SHOP).path("characters").path(characterId).path("wish-list").path("items")
+            .getRestClient(NoopAttributes.class)
+            .success((responseCode, result) -> results
+                  .addAll(result.getDataAsList().parallelStream().map(body -> Integer.parseInt(body.getId()))
+                        .collect(Collectors.toList())))
+            .failure(responseCode -> LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.CASH_SHOP_ORCHESTRATOR,
+                  "Failed to get wish list for character " + characterId))
             .get();
 
       return results;
    }
 
    public void save(EntityManager entityManager, CashShop cashShop) {
-      AccountAdministrator.getInstance().saveNxInformation(entityManager, cashShop.getAccountId(), cashShop.getNxCredit(), cashShop.getMaplePoint(), cashShop.getNxPrepaid());
+      AccountAdministrator.getInstance()
+            .saveNxInformation(entityManager, cashShop.getAccountId(), cashShop.getNxCredit(), cashShop.getMaplePoint(),
+                  cashShop.getNxPrepaid());
 
       List<Pair<Item, MapleInventoryType>> itemsWithType = cashShop.getInventory().stream()
             .map(item -> new Pair<>(item, item.inventoryType()))
@@ -134,8 +142,9 @@ public class CashShopProcessor {
     */
    protected void addWishListItem(int characterId, int id) {
       UriBuilder.service(RestService.CASH_SHOP).path("characters").path(characterId).path("wish-list").path("items").getRestClient()
-            .failure(responseCode -> LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.CASH_SHOP_ORCHESTRATOR, "Failed to add wish list item " + id + " for character " + characterId))
-            .create(new WishListItem(id));
+            .failure(responseCode -> LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.CASH_SHOP_ORCHESTRATOR,
+                  "Failed to add wish list item " + id + " for character " + characterId))
+            .create(new InputObjectBuilder().setData(new ResultObjectBuilder(NoopAttributes.class, id).build()));
    }
 
    /**
@@ -145,10 +154,10 @@ public class CashShopProcessor {
     */
    public void deleteWishListForCharacter(int characterId) {
       UriBuilder.service(RestService.CASH_SHOP).path("characters").path(characterId).path("wish-list").path("items").getRestClient()
-            .failure(responseCode -> LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.CASH_SHOP_ORCHESTRATOR, "Failed to delete wish list for character " + characterId))
+            .failure(responseCode -> LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.CASH_SHOP_ORCHESTRATOR,
+                  "Failed to delete wish list for character " + characterId))
             .delete();
    }
-
 
    public void gift(int recipient, String from, String message, int sn) {
       gift(recipient, from, message, sn, -1);
@@ -156,8 +165,16 @@ public class CashShopProcessor {
 
    public void gift(int recipient, String from, String message, int sn, int ringId) {
       UriBuilder.service(RestService.CASH_SHOP).path("characters").path(recipient).path("gifts").getRestClient()
-            .failure(responseCode -> LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.CASH_SHOP_ORCHESTRATOR, "Failed to create gift for character " + recipient))
-            .create(new rest.cashshop.Gift(from, message, sn, ringId));
+            .failure(responseCode -> LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.CASH_SHOP_ORCHESTRATOR,
+                  "Failed to create gift for character " + recipient))
+            .create(new InputObjectBuilder()
+                  .setData(new ResultObjectBuilder(GiftAttributes.class, 0)
+                        .setAttribute(new GiftAttributesBuilder()
+                              .setFrom(from)
+                              .setMessage(message)
+                              .setSn(sn)
+                              .setRingId(ringId))
+                        .build()));
    }
 
    public void showGifts(MapleCharacter character, CashShop cashShop) {
@@ -168,30 +185,35 @@ public class CashShopProcessor {
    protected List<Gift> loadGifts(int characterId, CashShop cashShop) {
       List<Gift> gifts = new ArrayList<>();
 
-      UriBuilder.service(RestService.CASH_SHOP).path("characters").path(characterId).path("gifts").getRestClient(GiftsResponse.class)
-            .success((responseCode, result) -> gifts.addAll(result.gifts().stream().map(gift -> loadGift(cashShop, gift)).collect(Collectors.toList())))
-            .failure(responseCode -> LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.CASH_SHOP_ORCHESTRATOR, "Failed to get gifts for character " + characterId))
+      UriBuilder.service(RestService.CASH_SHOP)
+            .path("characters").path(characterId).path("gifts")
+            .getRestClient(GiftAttributes.class)
+            .success((responseCode, result) -> gifts
+                  .addAll(result.getDataAsList().stream().map(gift -> loadGift(cashShop, gift)).collect(Collectors.toList())))
+            .failure(responseCode -> LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.CASH_SHOP_ORCHESTRATOR,
+                  "Failed to get gifts for character " + characterId))
             .get();
       UriBuilder.service(RestService.CASH_SHOP).path("characters").path(characterId).path("gifts").getRestClient()
-            .failure(responseCode -> LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.CASH_SHOP_ORCHESTRATOR, "Failed to delete gifts for character " + characterId))
+            .failure(responseCode -> LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.CASH_SHOP_ORCHESTRATOR,
+                  "Failed to delete gifts for character " + characterId))
             .delete();
       return gifts;
    }
 
-   protected Gift loadGift(CashShop cashShop, rest.cashshop.Gift gift) {
+   protected Gift loadGift(CashShop cashShop, DataBody<GiftAttributes> gift) {
       Gift result;
 
       cashShop.addNote();
-      CashShop.CashItem cItem = CashShop.CashItemFactory.getItem(gift.sn());
-      Item item = Item.newBuilder(cItem.toItem()).setGiftFrom(gift.from()).build();
+      CashShop.CashItem cItem = CashShop.CashItemFactory.getItem(gift.getAttributes().getSn());
+      Item item = Item.newBuilder(cItem.toItem()).setGiftFrom(gift.getAttributes().getFrom()).build();
       if (item.inventoryType().equals(MapleInventoryType.EQUIP)) {
-         item = Equip.newBuilder((Equip) item).setRingId(gift.ringId()).build();
+         item = Equip.newBuilder((Equip) item).setRingId(gift.getAttributes().getRingId()).build();
       }
-      result = new Gift(item, gift.message());
+      result = new Gift(item, gift.getAttributes().getMessage());
 
       if (CashShop.CashItemFactory.isPackage(cItem.getItemId())) { //Packages never contains a ring
          for (Item packageItem : CashShop.CashItemFactory.getPackage(cItem.getItemId())) {
-            Item updatedItem = Item.newBuilder(packageItem).setGiftFrom(gift.from()).build();
+            Item updatedItem = Item.newBuilder(packageItem).setGiftFrom(gift.getAttributes().getFrom()).build();
             cashShop.addToInventory(updatedItem);
          }
       } else {

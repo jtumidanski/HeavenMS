@@ -7,13 +7,13 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import client.MapleCharacter;
-import client.MapleJob;
 import client.SkillFactory;
 import client.inventory.Equip;
 import client.inventory.Item;
 import client.inventory.MapleInventory;
-import client.inventory.MapleInventoryType;
 import config.YamlConfig;
+import constants.MapleInventoryType;
+import constants.MapleJob;
 import constants.game.GameConstants;
 import server.MapleItemInformationProvider;
 import tools.Pair;
@@ -89,7 +89,8 @@ public class CharacterFactoryRecipe {
       runningTypePosition = new HashMap<>();
    }
 
-   public CharacterFactoryRecipe(MapleJob job, Integer level, Integer map, Integer top, Integer bottom, Integer shoes, Integer weapon) {
+   public CharacterFactoryRecipe(MapleJob job, Integer level, Integer map, Integer top, Integer bottom, Integer shoes,
+                                 Integer weapon) {
       this();
       this.job = job;
       this.level = level;

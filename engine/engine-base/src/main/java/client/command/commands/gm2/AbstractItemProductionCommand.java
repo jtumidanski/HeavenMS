@@ -5,10 +5,10 @@ import client.MapleClient;
 import client.command.Command;
 import client.processor.PetProcessor;
 import config.YamlConfig;
-import constants.inventory.ItemConstants;
+import constants.ItemConstants;
 import server.MapleItemInformationProvider;
-import tools.MessageBroadcaster;
 import tools.I18nMessage;
+import tools.MessageBroadcaster;
 
 public abstract class AbstractItemProductionCommand extends Command {
    protected abstract String getSyntax();
@@ -30,7 +30,8 @@ public abstract class AbstractItemProductionCommand extends Command {
       MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
 
       if (ii.getName(itemId) == null) {
-         MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("ITEM_PRODUCTION_COMMAND_ITEM_NOT_FOUND").with(params[0]));
+         MessageBroadcaster.getInstance()
+               .yellowMessage(player, I18nMessage.from("ITEM_PRODUCTION_COMMAND_ITEM_NOT_FOUND").with(params[0]));
          return;
       }
 

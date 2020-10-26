@@ -1,7 +1,8 @@
 package npc
-import tools.I18nMessage
+import tools.I18nMessage
 
-import client.inventory.MapleInventoryType
+
+import constants.MapleInventoryType
 import scripting.npc.NPCConversationManager
 import tools.PacketCreator
 import tools.packet.rps.OpenRPSNPC
@@ -39,7 +40,8 @@ class NPC9000019 {
 
          if (status == 0) {
             if (cm.getPlayer().getInventory(MapleInventoryType.ETC).getNumFreeSlot() < 1) {
-               cm.sendNext(I18nMessage.from("9000019_NEED_ETC_SPACE"))
+               cm.sendNext(I18nMessage.from("9000019_NEED_ETC_SPACE"))
+
                cm.dispose()
                return
             }

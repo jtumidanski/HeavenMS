@@ -9,10 +9,10 @@ import java.util.stream.IntStream;
 import client.MapleBuffStat;
 import client.MapleCharacter;
 import client.MapleClient;
-import client.MapleJob;
 import client.Skill;
 import client.SkillFactory;
 import config.YamlConfig;
+import constants.MapleJob;
 import constants.game.GameConstants;
 import constants.skills.Beginner;
 import constants.skills.Crusader;
@@ -29,16 +29,16 @@ import constants.skills.ThunderBreaker;
 import constants.skills.WhiteKnight;
 import constants.skills.WindArcher;
 import net.server.channel.packet.AttackPacket;
-import net.server.channel.packet.reader.DamageReader;
 import net.server.channel.packet.PacketReaderFactory;
+import net.server.channel.packet.reader.DamageReader;
 import server.MapleStatEffect;
+import tools.I18nMessage;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
 import tools.ServerNoticeType;
 import tools.data.input.SeekableLittleEndianAccessor;
-import tools.I18nMessage;
 import tools.packet.GetEnergy;
 import tools.packet.attack.CloseRangeAttack;
 import tools.packet.buff.GiveBuff;
@@ -68,7 +68,8 @@ public final class CloseRangeDamageHandler extends AbstractDealDamageHandler<Att
          }
       }
 
-      if (chr.getDojoEnergy() < 10000 && (attack.skill() == Beginner.BAMBOO_RAIN || attack.skill() == Noblesse.BAMBOO_RAIN || attack.skill() == Legend.BAMBOO_THRUST)) {
+      if (chr.getDojoEnergy() < 10000 && (attack.skill() == Beginner.BAMBOO_RAIN || attack.skill() == Noblesse.BAMBOO_RAIN
+            || attack.skill() == Legend.BAMBOO_THRUST)) {
          // PE hacking or maybe just lagging
          return;
       }
@@ -78,7 +79,8 @@ public final class CloseRangeDamageHandler extends AbstractDealDamageHandler<Att
       }
 
       MasterBroadcaster.getInstance().sendToAllInMapRange(chr.getMap(),
-            new CloseRangeAttack(chr.getId(), attack.skill(), attack.skillLevel(), attack.stance(), attack.numAttackedAndDamage(), attack.allDamage(), attack.speed(), attack.direction(), attack.display()),
+            new CloseRangeAttack(chr.getId(), attack.skill(), attack.skillLevel(), attack.stance(), attack.numAttackedAndDamage(),
+                  attack.allDamage(), attack.speed(), attack.direction(), attack.display()),
             false, chr, true);
       int numFinisherOrbs = 0;
       Integer comboBuff = chr.getBuffedValue(MapleBuffStat.COMBO);
@@ -93,7 +95,8 @@ public final class CloseRangeDamageHandler extends AbstractDealDamageHandler<Att
             int comboId = chr.isCygnus() ? DawnWarrior.COMBO : Crusader.COMBO;
             int advancedComboId = chr.isCygnus() ? DawnWarrior.ADVANCED_COMBO : Hero.ADVANCED_COMBO;
 
-            Optional<MapleStatEffect> comboEffect = Optional.ofNullable(SkillFactory.applyIfHasSkill(chr, advancedComboId, Skill::getEffect, null));
+            Optional<MapleStatEffect> comboEffect =
+                  Optional.ofNullable(SkillFactory.applyIfHasSkill(chr, advancedComboId, Skill::getEffect, null));
             if (comboEffect.isEmpty()) {
                int comboLv = SkillFactory.getSkill(comboId).map(chr::getSkillLevel).orElse((byte) 0);
                if (comboLv <= 0 || chr.isGM()) {
@@ -121,7 +124,9 @@ public final class CloseRangeDamageHandler extends AbstractDealDamageHandler<Att
                   final int comboLevel = chr.getSkillLevel(comboId) > 0
                         ? chr.getSkillLevel(comboId)
                         : SkillFactory.getSkill(comboId).map(Skill::getMaxLevel).orElse(0);
-                  int duration = SkillFactory.getSkill(comboId).map(skill -> skill.getEffect(comboLevel)).map(MapleStatEffect::getDuration).orElse(0);
+                  int duration =
+                        SkillFactory.getSkill(comboId).map(skill -> skill.getEffect(comboLevel)).map(MapleStatEffect::getDuration)
+                              .orElse(0);
 
                   List<Pair<MapleBuffStat, Integer>> stat = Collections.singletonList(new Pair<>(MapleBuffStat.COMBO, newOrbCount));
                   chr.setBuffedValue(MapleBuffStat.COMBO, newOrbCount);
@@ -131,9 +136,11 @@ public final class CloseRangeDamageHandler extends AbstractDealDamageHandler<Att
                }
             }
          } else if (chr.getJob().isA(MapleJob.MARAUDER)) {
-            SkillFactory.executeIfHasSkill(chr, Marauder.ENERGY_CHARGE, (skill, skillLevel) -> chargeNEnergy(chr, attack.numAttacked()));
+            SkillFactory
+                  .executeIfHasSkill(chr, Marauder.ENERGY_CHARGE, (skill, skillLevel) -> chargeNEnergy(chr, attack.numAttacked()));
          } else if (chr.getJob().isA(MapleJob.THUNDER_BREAKER_2)) {
-            SkillFactory.executeIfHasSkill(chr, ThunderBreaker.ENERGY_CHARGE, (skill, skillLevel) -> chargeNEnergy(chr, attack.numAttacked()));
+            SkillFactory.executeIfHasSkill(chr, ThunderBreaker.ENERGY_CHARGE,
+                  (skill, skillLevel) -> chargeNEnergy(chr, attack.numAttacked()));
          }
       }
       if (attack.numAttacked() > 0 && attack.skill() == DragonKnight.SACRIFICE) {
@@ -170,7 +177,8 @@ public final class CloseRangeDamageHandler extends AbstractDealDamageHandler<Att
 
          chr.setDojoEnergy(0);
          PacketCreator.announce(c, new GetEnergy("energy", chr.getDojoEnergy()));
-         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, I18nMessage.from("ENERGY_RESET_DUE_TO_SECRET_SKILL"));
+         MessageBroadcaster.getInstance()
+               .sendServerNotice(chr, ServerNoticeType.PINK_TEXT, I18nMessage.from("ENERGY_RESET_DUE_TO_SECRET_SKILL"));
       } else if (attack.skill() > 0) {
          SkillFactory.executeForSkill(chr, attack.skill(), ((skill, skillLevel) -> applyCoolDownIfPresent(skill, chr)));
       }

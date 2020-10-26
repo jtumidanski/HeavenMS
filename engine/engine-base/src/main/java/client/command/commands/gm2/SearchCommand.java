@@ -1,6 +1,7 @@
 package client.command.commands.gm2;
 
 import java.io.File;
+import java.util.List;
 
 import client.MapleCharacter;
 import client.MapleClient;
@@ -9,9 +10,10 @@ import provider.MapleData;
 import provider.MapleDataProvider;
 import provider.MapleDataProviderFactory;
 import provider.MapleDataTool;
+import rest.DataBody;
+import rest.quest.attributes.QuestAttributes;
 import server.MapleItemInformationProvider;
 import server.processor.QuestProcessor;
-import server.quest.MapleQuest;
 import tools.I18nMessage;
 import tools.MessageBroadcaster;
 import tools.Pair;
@@ -89,14 +91,15 @@ public class SearchCommand extends Command {
                   }
                }
             } else {
-               for (MapleQuest mq : QuestProcessor.getInstance().getMatchedQuests(search)) {
-                  sb.append("#b").append(mq.id()).append("#k - #r");
+               List<DataBody<QuestAttributes>> quests = QuestProcessor.getInstance().getMatchedQuests(search);
+               for (DataBody<QuestAttributes> mq : quests) {
+                  sb.append("#b").append(mq.getId()).append("#k - #r");
 
-                  String parentName = mq.parent();
+                  String parentName = mq.getAttributes().getParentName();
                   if (!parentName.isEmpty()) {
                      sb.append(parentName).append(" - ");
                   }
-                  sb.append(mq.name()).append("\r\n");
+                  sb.append(mq.getAttributes().getName()).append("\r\n");
                }
             }
          }

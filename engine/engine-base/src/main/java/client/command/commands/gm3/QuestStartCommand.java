@@ -4,7 +4,6 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
 import server.processor.QuestProcessor;
-import server.quest.MapleQuest;
 import tools.I18nMessage;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
@@ -25,10 +24,10 @@ public class QuestStartCommand extends Command {
 
       int questId = Integer.parseInt(params[0]);
 
-      if (player.getQuestStatus(questId) == 0) {
-         MapleQuest quest = QuestProcessor.getInstance().getQuest(questId);
-         if (quest != null && quest.getNpcRequirement(false) != -1) {
-            c.getAbstractPlayerInteraction().forceStartQuest(questId, quest.getNpcRequirement(false));
+      if (QuestProcessor.getInstance().isNotStarted(player, questId)) {
+         int npcRequirement = QuestProcessor.getInstance().getNpcRequirement(questId, false);
+         if (npcRequirement != -1) {
+            c.getAbstractPlayerInteraction().forceStartQuest(questId, npcRequirement);
          } else {
             c.getAbstractPlayerInteraction().forceStartQuest(questId);
          }

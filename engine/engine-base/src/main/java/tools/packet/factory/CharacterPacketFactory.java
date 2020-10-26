@@ -5,14 +5,15 @@ import java.util.stream.Collectors;
 
 import client.MapleCharacter;
 import client.MapleMount;
-import client.MapleQuestStatus;
 import client.MonsterBook;
 import client.inventory.Item;
-import client.inventory.MapleInventoryType;
 import client.inventory.MaplePet;
+import constants.MapleInventoryType;
 import net.server.Server;
 import net.server.guild.MapleAlliance;
+import rest.quest.attributes.CharacterQuestAttributes;
 import server.MapleItemInformationProvider;
+import server.processor.QuestProcessor;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.character.CharacterKnockBack;
 import tools.packet.character.CharacterLook;
@@ -119,9 +120,10 @@ public class CharacterPacketFactory extends AbstractPacketFactory {
          writer.writeInt(0);
       }
 
-      List<Short> medalQuests = chr.getCompletedQuests().stream()
-            .filter(questStatus -> questStatus.questId() >= 29000) // && q.getQuest().getId() <= 29923
-            .map(MapleQuestStatus::questId)
+      List<Short> medalQuests = QuestProcessor.getInstance().getCompletedQuests(chr).stream()
+            .filter(questStatus -> questStatus.getId() >= 29000) // && q.getQuest().getId() <= 29923
+            .map(CharacterQuestAttributes::getId)
+            .map(Integer::shortValue)
             .sorted()
             .collect(Collectors.toList());
 

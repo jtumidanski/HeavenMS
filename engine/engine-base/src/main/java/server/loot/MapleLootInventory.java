@@ -5,7 +5,7 @@ import java.util.Map;
 
 import client.MapleCharacter;
 import client.inventory.Item;
-import client.inventory.MapleInventoryType;
+import constants.MapleInventoryType;
 
 public class MapleLootInventory {
    Map<Integer, Integer> items = new HashMap<>(50);
@@ -29,5 +29,4 @@ public class MapleLootInventory {
       Integer itemQty = items.get(itemId);
       return itemQty == null ? 0 : itemQty >= quantity ? 2 : itemQty > 0 ? 1 : 0;
    }
-
 }

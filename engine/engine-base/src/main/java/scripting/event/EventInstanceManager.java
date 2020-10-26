@@ -16,7 +16,7 @@ import javax.script.ScriptException;
 import client.MapleCharacter;
 import client.SkillFactory;
 import config.YamlConfig;
-import constants.inventory.ItemConstants;
+import constants.ItemConstants;
 import net.server.audit.LockCollector;
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.MonitoredReadLock;

@@ -17,7 +17,6 @@ import client.MapleAbnormalStatus;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.MapleFamily;
-import client.MapleJob;
 import client.MapleMount;
 import client.MapleSkinColor;
 import client.Ring;
@@ -31,13 +30,14 @@ import client.inventory.Equip;
 import client.inventory.Item;
 import client.inventory.ItemFactory;
 import client.inventory.MapleInventory;
-import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleCashIdGenerator;
 import client.keybind.MapleQuickSlotBinding;
 import client.processor.npc.FredrickProcessor;
 import config.YamlConfig;
+import constants.ItemConstants;
+import constants.MapleInventoryType;
+import constants.MapleJob;
 import constants.game.GameConstants;
-import constants.inventory.ItemConstants;
 import database.DatabaseConnection;
 import database.administrator.AreaInfoAdministrator;
 import database.administrator.BbsThreadAdministrator;
@@ -49,14 +49,11 @@ import database.administrator.FamilyCharacterAdministrator;
 import database.administrator.InventoryEquipmentAdministrator;
 import database.administrator.InventoryItemAdministrator;
 import database.administrator.KeyMapAdministrator;
-import database.administrator.MedalMapAdministrator;
 import database.administrator.MonsterBookAdministrator;
 import database.administrator.MtsCartAdministrator;
 import database.administrator.MtsItemAdministrator;
 import database.administrator.PetAdministrator;
 import database.administrator.PlayerDiseaseAdministrator;
-import database.administrator.QuestProgressAdministrator;
-import database.administrator.QuestStatusAdministrator;
 import database.administrator.QuickSlotKeyMapAdministrator;
 import database.administrator.RingAdministrator;
 import database.administrator.SavedLocationAdministrator;
@@ -87,6 +84,8 @@ import net.server.guild.MapleGuildCharacter;
 import net.server.processor.MapleGuildProcessor;
 import net.server.world.MaplePartyCharacter;
 import net.server.world.World;
+import rest.RestService;
+import rest.UriBuilder;
 import server.events.RescueGaga;
 import server.life.MobSkill;
 import server.life.MobSkillFactory;
@@ -94,7 +93,6 @@ import server.maps.MapleMapManager;
 import server.maps.MaplePortal;
 import server.maps.SavedLocation;
 import server.maps.SavedLocationType;
-import server.processor.QuestProcessor;
 import tools.LongTool;
 import tools.Pair;
 
@@ -206,7 +204,9 @@ public class CharacterProcessor {
          FamilyCharacterAdministrator.getInstance().deleteForCharacter(entityManager, cid);
          FameLogAdministrator.getInstance().deleteForCharacter(entityManager, cid);
          cleanupInventoryEquipment(entityManager, cid);
-         QuestProcessor.getInstance().deleteQuestProgressWhereCharacterId(entityManager, cid);
+
+         UriBuilder.service(RestService.QUEST).path("characters").path(cid).path("quests").getRestClient().delete();
+
          FredrickProcessor.removeFredrickLog(cid);
          MtsItemAdministrator.getInstance().deleteForCharacter(entityManager, cid);
          MtsCartAdministrator.getInstance().deleteForCharacter(entityManager, cid);
@@ -433,7 +433,6 @@ public class CharacterProcessor {
                      .setLinkedCharacterInformation(otherCharacterData.name(), otherCharacterData.level()));
 
          if (channelServer) {
-            QuestProcessor.getInstance().loadQuests(connection, characterData, mapleCharacter);
             CharacterProcessor.getInstance().loadSkills(connection, characterData, mapleCharacter);
             CharacterProcessor.getInstance().loadCoolDowns(connection, characterData, mapleCharacter);
             CharacterProcessor.getInstance().loadPlayerDiseases(connection, characterData, mapleCharacter);

@@ -4,8 +4,8 @@ import java.util.Calendar;
 
 import client.MapleCharacter;
 import config.YamlConfig;
+import constants.ItemConstants;
 import constants.game.GameConstants;
-import constants.inventory.ItemConstants;
 import server.MapleItemInformationProvider;
 import tools.I18nMessage;
 import tools.MasterBroadcaster;
@@ -36,12 +36,16 @@ public class Fishing {
    }
 
    private static boolean hitFishingTime(MapleCharacter chr, int baitLevel, double yearLikelihood, double timeLikelihood) {
-      double baitLikelihood = 0.0002 * chr.getWorldServer().getFishingRate() * baitLevel;   // can improve 10.0 at "max level 50000" on rate 1x
+      double baitLikelihood =
+            0.0002 * chr.getWorldServer().getFishingRate() * baitLevel;   // can improve 10.0 at "max level 50000" on rate 1x
 
       if (YamlConfig.config.server.USE_DEBUG) {
-         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, I18nMessage.from("DEBUG_FISHING_TITLE"));
-         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, I18nMessage.from("DEBUG_FISHING_BODY").with(yearLikelihood, timeLikelihood, baitLikelihood));
-         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, I18nMessage.from("DEBUG_FISHING_FOOTER").with((0.23 * yearLikelihood), (0.77 * timeLikelihood), baitLikelihood));
+         MessageBroadcaster.getInstance()
+               .sendServerNotice(chr, ServerNoticeType.PINK_TEXT, I18nMessage.from("DEBUG_FISHING_TITLE"));
+         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT,
+               I18nMessage.from("DEBUG_FISHING_BODY").with(yearLikelihood, timeLikelihood, baitLikelihood));
+         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT,
+               I18nMessage.from("DEBUG_FISHING_FOOTER").with((0.23 * yearLikelihood), (0.77 * timeLikelihood), baitLikelihood));
       }
 
       return (0.23 * yearLikelihood) + (0.77 * timeLikelihood) + (baitLikelihood) > 57.777;
@@ -53,12 +57,14 @@ public class Fishing {
       }
 
       if (!GameConstants.isFishingArea(chr.getMapId())) {
-         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.NOTICE, I18nMessage.from("FISHING_ERROR_WRONG_MAP"));
+         MessageBroadcaster.getInstance()
+               .sendServerNotice(chr, ServerNoticeType.NOTICE, I18nMessage.from("FISHING_ERROR_WRONG_MAP"));
          return;
       }
 
       if (chr.getLevel() < 30) {
-         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, I18nMessage.from("FISHING_ERROR_LEVEL_REQUIREMENT"));
+         MessageBroadcaster.getInstance()
+               .sendServerNotice(chr, ServerNoticeType.PINK_TEXT, I18nMessage.from("FISHING_ERROR_LEVEL_REQUIREMENT"));
          return;
       }
 
@@ -90,13 +96,16 @@ public class Fishing {
                if (chr.canHold(itemId)) {
                   chr.getAbstractPlayerInteraction().gainItem(itemId, true);
                } else {
-                  chr.showHint("Couldn't catch a(n) #r" + MapleItemInformationProvider.getInstance().getName(itemId) + "#k due to #e#b" + ItemConstants.getInventoryType(itemId) + "#k#n inventory limit.");
+                  chr.showHint(
+                        "Couldn't catch a(n) #r" + MapleItemInformationProvider.getInstance().getName(itemId) + "#k due to #e#b"
+                              + ItemConstants.getInventoryType(itemId) + "#k#n inventory limit.");
                   rewardStr += ".. but has goofed up due to full inventory.";
                }
                break;
          }
 
-         MessageBroadcaster.getInstance().sendMapServerNotice(chr.getMap(), ServerNoticeType.LIGHT_BLUE, I18nMessage.from("FISHING_FOUND").with(chr.getName(), rewardStr));
+         MessageBroadcaster.getInstance().sendMapServerNotice(chr.getMap(), ServerNoticeType.LIGHT_BLUE,
+               I18nMessage.from("FISHING_FOUND").with(chr.getName(), rewardStr));
       }
 
       PacketCreator.announce(chr, new ShowInfo(fishingEffect));
@@ -105,9 +114,12 @@ public class Fishing {
 
    public static int getRandomItem() {
       int rand = (int) (100.0 * Math.random());
-      int[] commons = {1002851, 2002020, 2002020, 2000006, 2000018, 2002018, 2002024, 2002027, 2002027, 2000018, 2000018, 2000018, 2000018, 2002030, 2002018, 2000016}; // filler' up
-      int[] uncommons = {1000025, 1002662, 1002812, 1002850, 1002881, 1002880, 1012072, 4020009, 2043220, 2043022, 2040543, 2044420, 2040943, 2043713, 2044220, 2044120, 2040429, 2043220, 2040943}; // filler' up too
-      int[] rares = {1002859, 1002553, 1002762, 1002763, 1002764, 1002765, 1002766, 1002663, 1002788, 1002949, 2049100, 2340000, 2040822, 2040822, 2040822, 2040822}; // filler' up last
+      int[] commons =
+            {1002851, 2002020, 2002020, 2000006, 2000018, 2002018, 2002024, 2002027, 2002027, 2000018, 2000018, 2000018, 2000018, 2002030, 2002018, 2000016}; // filler' up
+      int[] uncommons =
+            {1000025, 1002662, 1002812, 1002850, 1002881, 1002880, 1012072, 4020009, 2043220, 2043022, 2040543, 2044420, 2040943, 2043713, 2044220, 2044120, 2040429, 2043220, 2040943}; // filler' up too
+      int[] rares =
+            {1002859, 1002553, 1002762, 1002763, 1002764, 1002765, 1002766, 1002663, 1002788, 1002949, 2049100, 2340000, 2040822, 2040822, 2040822, 2040822}; // filler' up last
 
       if (rand >= 25) {
          return commons[(int) (commons.length * Math.random())];

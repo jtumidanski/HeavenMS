@@ -5,9 +5,9 @@ import client.MapleClient;
 import client.command.Command;
 import client.inventory.Equip;
 import client.inventory.MapleInventory;
-import client.inventory.MapleInventoryType;
 import client.processor.ItemProcessor;
-import constants.inventory.ItemConstants;
+import constants.ItemConstants;
+import constants.MapleInventoryType;
 import tools.I18nMessage;
 import tools.MessageBroadcaster;
 

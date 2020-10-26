@@ -4,9 +4,9 @@ import java.util.List;
 
 import client.MapleClient;
 import client.inventory.Item;
-import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
-import constants.inventory.ItemConstants;
+import constants.ItemConstants;
+import constants.MapleInventoryType;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.ItemRewardPacket;
 import net.server.channel.packet.reader.ItemRewardReader;

@@ -12,23 +12,22 @@ import java.util.stream.Collectors;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import client.MapleJob;
-import client.MapleQuestStatus;
-import client.QuestStatus;
 import client.SkillEntry;
 import client.SkillFactory;
 import client.inventory.Equip;
 import client.inventory.Item;
+import client.inventory.ItemQuantity;
 import client.inventory.MapleInventory;
 import client.inventory.MapleInventoryProof;
-import client.inventory.MapleInventoryType;
 import client.inventory.MaplePet;
 import client.inventory.ModifyInventory;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import client.processor.PetProcessor;
 import config.YamlConfig;
+import constants.ItemConstants;
+import constants.MapleInventoryType;
+import constants.MapleJob;
 import constants.game.GameConstants;
-import constants.inventory.ItemConstants;
 import net.server.Server;
 import net.server.guild.MapleGuild;
 import net.server.world.MapleParty;
@@ -284,27 +283,28 @@ public class AbstractPlayerInteraction {
       return MapleInventory.checkSpots(c.getPlayer(), addedItems, false);
    }
 
-   private List<Pair<Item, MapleInventoryType>> prepareProofInventoryItems(List<Pair<Integer, Integer>> items) {
+   private List<Pair<Item, MapleInventoryType>> prepareProofInventoryItems(List<ItemQuantity> items) {
       List<Pair<Item, MapleInventoryType>> addedItems = new LinkedList<>();
-      for (Pair<Integer, Integer> p : items) {
-         Item it = new Item(p.getLeft(), (short) 0, p.getRight().shortValue());
+      for (ItemQuantity p : items) {
+         Item it = new Item(p.itemId(), (short) 0, (short) p.quantity());
          addedItems.add(new Pair<>(it, MapleInventoryType.CAN_HOLD));
       }
 
       return addedItems;
    }
 
-   private List<List<Pair<Integer, Integer>>> prepareInventoryItemList(List<Integer> itemIds, List<Integer> quantity) {
+   private List<List<ItemQuantity>> prepareInventoryItemList(List<Integer> itemIds, List<Integer> quantity) {
       int size = Math.min(itemIds.size(), quantity.size());
 
-      List<List<Pair<Integer, Integer>>> invList = new ArrayList<>(6);
+      List<List<ItemQuantity>> invList = new ArrayList<>(6);
       for (int i = MapleInventoryType.UNDEFINED.getType(); i < MapleInventoryType.CASH.getType(); i++) {
          invList.add(new LinkedList<>());
       }
 
       for (int i = 0; i < size; i++) {
          int itemId = itemIds.get(i);
-         invList.get(ItemConstants.getInventoryType(itemId).getType()).add(new Pair<>(itemId, quantity.get(i)));
+         byte inventoryType = ItemConstants.getInventoryType(itemId).getType();
+         invList.get(inventoryType).add(new ItemQuantity(itemId, quantity.get(i)));
       }
 
       return invList;
@@ -312,23 +312,23 @@ public class AbstractPlayerInteraction {
 
    public boolean canHoldAllAfterRemoving(List<Integer> toAddItemIds, List<Integer> toAddQuantity, List<Integer> toRemoveItemIds,
                                           List<Integer> toRemoveQuantity) {
-      List<List<Pair<Integer, Integer>>> toAddItemList = prepareInventoryItemList(toAddItemIds, toAddQuantity);
-      List<List<Pair<Integer, Integer>>> toRemoveItemList = prepareInventoryItemList(toRemoveItemIds, toRemoveQuantity);
+      List<List<ItemQuantity>> toAddItemList = prepareInventoryItemList(toAddItemIds, toAddQuantity);
+      List<List<ItemQuantity>> toRemoveItemList = prepareInventoryItemList(toRemoveItemIds, toRemoveQuantity);
 
       MapleInventoryProof prfInv = (MapleInventoryProof) this.getInventory(MapleInventoryType.CAN_HOLD);
       prfInv.lockInventory();
       try {
          for (int i = MapleInventoryType.EQUIP.getType(); i < MapleInventoryType.CASH.getType(); i++) {
-            List<Pair<Integer, Integer>> toAdd = toAddItemList.get(i);
+            List<ItemQuantity> toAdd = toAddItemList.get(i);
 
             if (!toAdd.isEmpty()) {
-               List<Pair<Integer, Integer>> toRemove = toRemoveItemList.get(i);
+               List<ItemQuantity> toRemove = toRemoveItemList.get(i);
 
                MapleInventory inv = this.getInventory(i);
                prfInv.cloneContents(inv);
 
-               for (Pair<Integer, Integer> p : toRemove) {
-                  MapleInventoryManipulator.removeById(c, MapleInventoryType.CAN_HOLD, p.getLeft(), p.getRight(), false, false);
+               for (ItemQuantity p : toRemove) {
+                  MapleInventoryManipulator.removeById(c, MapleInventoryType.CAN_HOLD, p.itemId(), p.quantity(), false, false);
                }
 
                List<Pair<Item, MapleInventoryType>> addItems = prepareProofInventoryItems(toAdd);
@@ -347,16 +347,6 @@ public class AbstractPlayerInteraction {
       return true;
    }
 
-   //---- \/ \/ \/ \/ \/ \/ \/  NOT TESTED  \/ \/ \/ \/ \/ \/ \/ \/ \/ ----
-
-   public final MapleQuestStatus getQuestRecord(final int id) {
-      return QuestProcessor.getInstance().getQuestStatus(c.getPlayer(), id);
-   }
-
-   public final void addQuest(MapleQuestStatus questStatus) {
-      QuestProcessor.getInstance().updateQuestStatus(c.getPlayer(), questStatus);
-   }
-
    //---- /\ /\ /\ /\ /\ /\ /\  NOT TESTED  /\ /\ /\ /\ /\ /\ /\ /\ /\ ----
 
    public void openNpc(int npcId) {
@@ -373,21 +363,8 @@ public class AbstractPlayerInteraction {
       NPCScriptManager.getInstance().start(c, npcId, script, null);
    }
 
-   public int getQuestStatus(int id) {
-      return QuestProcessor.getInstance().getQuestStatus(c.getPlayer(), id).status().getId();
-   }
-
-   private QuestStatus getQuestStat(int id) {
-      return QuestProcessor.getInstance().getQuestStatus(c.getPlayer(), id).status();
-   }
-
    public boolean isQuestCompleted(int quest) {
-      try {
-         return getQuestStat(quest) == QuestStatus.COMPLETED;
-      } catch (NullPointerException e) {
-         e.printStackTrace();
-         return false;
-      }
+      return QuestProcessor.getInstance().isComplete(c.getPlayer(), quest);
    }
 
    public boolean isQuestActive(int quest) {
@@ -395,12 +372,7 @@ public class AbstractPlayerInteraction {
    }
 
    public boolean isQuestStarted(int quest) {
-      try {
-         return getQuestStat(quest) == QuestStatus.STARTED;
-      } catch (NullPointerException e) {
-         e.printStackTrace();
-         return false;
-      }
+      return QuestProcessor.getInstance().isStarted(c.getPlayer(), quest);
    }
 
    public void setQuestProgress(int id, String progress) {
@@ -424,18 +396,7 @@ public class AbstractPlayerInteraction {
    }
 
    public String getQuestProgress(int id, int infoNumber) {
-      MapleQuestStatus qs = QuestProcessor.getInstance().getQuestStatus(getPlayer(), id);
-
-      if (QuestProcessor.getInstance().getInfoNumber(qs) == infoNumber && infoNumber > 0) {
-         qs = QuestProcessor.getInstance().getQuestStatus(getPlayer(), infoNumber);
-         infoNumber = 0;
-      }
-
-      if (qs != null) {
-         return qs.getProgress(infoNumber);
-      } else {
-         return "";
-      }
+      return QuestProcessor.getInstance().getProgress(c.getPlayer(), id, infoNumber);
    }
 
    public int getQuestProgressInt(int id) {
@@ -455,19 +416,11 @@ public class AbstractPlayerInteraction {
    }
 
    public void resetAllQuestProgress(int id) {
-      MapleQuestStatus qs = QuestProcessor.getInstance().getQuestStatus(getPlayer(), id);
-      if (qs != null) {
-         qs = qs.resetAllProgress();
-         QuestProcessor.getInstance().updateQuestStatus(getPlayer(), qs);
-      }
+      QuestProcessor.getInstance().resetProgress(getPlayer(), id);
    }
 
    public void resetQuestProgress(int id, int infoNumber) {
-      MapleQuestStatus qs = QuestProcessor.getInstance().getQuestStatus(getPlayer(), id);
-      if (qs != null) {
-         qs = qs.resetProgress(infoNumber);
-         QuestProcessor.getInstance().updateQuestStatus(getPlayer(), qs);
-      }
+      QuestProcessor.getInstance().resetSpecificProgress(getPlayer(), id, infoNumber);
    }
 
    public boolean forceStartQuest(int id) {
@@ -512,7 +465,8 @@ public class AbstractPlayerInteraction {
 
    public boolean startQuest(int id, int npcId) {
       try {
-         return QuestProcessor.getInstance().forceStart(getPlayer(), id, npcId);
+         QuestProcessor.getInstance().forceStart(getPlayer(), id, npcId);
+         return true;
       } catch (NullPointerException ex) {
          ex.printStackTrace();
          return false;

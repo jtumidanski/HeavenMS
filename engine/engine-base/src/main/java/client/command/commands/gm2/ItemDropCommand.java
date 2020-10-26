@@ -4,10 +4,10 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.inventory.Item;
 import client.inventory.ItemBuilder;
-import client.inventory.MapleInventoryType;
 import client.inventory.MaplePet;
 import client.processor.PetProcessor;
-import constants.inventory.ItemConstants;
+import constants.ItemConstants;
+import constants.MapleInventoryType;
 import server.MapleItemInformationProvider;
 
 public class ItemDropCommand extends AbstractItemProductionCommand {
@@ -33,7 +33,8 @@ public class ItemDropCommand extends AbstractItemProductionCommand {
             .setOwner("")
             .build();
       toDrop = setFlag(player, toDrop);
-      client.getPlayer().getMap().spawnItemDrop(client.getPlayer(), client.getPlayer(), toDrop, client.getPlayer().position(), true, true);
+      client.getPlayer().getMap()
+            .spawnItemDrop(client.getPlayer(), client.getPlayer(), toDrop, client.getPlayer().position(), true, true);
    }
 
    private Item setFlag(MapleCharacter player, Item toDrop) {

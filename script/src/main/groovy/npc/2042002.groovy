@@ -1,8 +1,9 @@
 package npc
-import tools.I18nMessage
+import tools.I18nMessage
+
 
 import client.inventory.Item
-import client.inventory.MapleInventoryType
+import constants.MapleInventoryType
 import config.YamlConfig
 import net.server.world.MaplePartyCharacter
 import scripting.npc.NPCConversationManager
@@ -45,7 +46,8 @@ class NPC2042002 {
             status = 0
             action((byte) 1, (byte) 0, 4)
          } else {
-            cm.sendOk(I18nMessage.from("2042002_CARNIVAL_UNAVAILABLE"))
+            cm.sendOk(I18nMessage.from("2042002_CARNIVAL_UNAVAILABLE"))
+
             cm.dispose()
          }
 
@@ -70,7 +72,8 @@ class NPC2042002 {
 
          if (cm.getPlayer().getMapId() == 980000010) {
             if (status == 0) {
-               cm.sendNext(I18nMessage.from("2042002_HOPE_YOU_HAD_FUN"))
+               cm.sendNext(I18nMessage.from("2042002_HOPE_YOU_HAD_FUN"))
+
             } else if (status > 0) {
                cm.warp(980000000, 0)
                cm.dispose()
@@ -185,10 +188,12 @@ class NPC2042002 {
             if (status == 0) {
                if (cm.getParty() == null) {
                   status = 10
-                  cm.sendOk(I18nMessage.from("2042002_MUST_BE_IN_A_PARTY"))
+                  cm.sendOk(I18nMessage.from("2042002_MUST_BE_IN_A_PARTY"))
+
                } else if (!cm.isLeader()) {
                   status = 10
-                  cm.sendOk(I18nMessage.from("2042002_LEADER_MUST_START"))
+                  cm.sendOk(I18nMessage.from("2042002_LEADER_MUST_START"))
+
                } else {
                   MaplePartyCharacter[] party = cm.getParty().orElseThrow().getMembers()
                   int inMap = cm.partyMembersInMap()
@@ -206,16 +211,20 @@ class NPC2042002 {
 
                   if (party >= 1) {
                      status = 10
-                     cm.sendOk(I18nMessage.from("2042002_NOT_ENOUGH_PEOPLE").with(cpqMinAmt, cpqMaxAmt))
+                     cm.sendOk(I18nMessage.from("2042002_NOT_ENOUGH_PEOPLE").with(cpqMinAmt, cpqMaxAmt))
+
                   } else if (lvlOk != inMap) {
                      status = 10
-                     cm.sendOk(I18nMessage.from("2042002_LEVEL_RANGE").with(cpqMinLvl, cpqMaxLvl))
+                     cm.sendOk(I18nMessage.from("2042002_LEVEL_RANGE").with(cpqMinLvl, cpqMaxLvl))
+
                   } else if (isOutMap > 0) {
                      status = 10
-                     cm.sendOk(I18nMessage.from("2042002_PARTY_MEMBERS_NOT_IN_MAP"))
+                     cm.sendOk(I18nMessage.from("2042002_PARTY_MEMBERS_NOT_IN_MAP"))
+
                   } else {
                      if (!cm.sendCPQMapLists()) {
-                        cm.sendOk(I18nMessage.from("2042002_ALL_FIELDS_IN_USE"))
+                        cm.sendOk(I18nMessage.from("2042002_ALL_FIELDS_IN_USE"))
+
                         cm.dispose()
                      }
                   }
@@ -226,15 +235,18 @@ class NPC2042002 {
                      cm.challengeParty(selection)
                      cm.dispose()
                   } else {
-                     cm.sendOk(I18nMessage.from("2042002_ROOM_IS_FULL"))
+                     cm.sendOk(I18nMessage.from("2042002_ROOM_IS_FULL"))
+
                      cm.dispose()
                   }
                } else {
                   MaplePartyCharacter[] party = cm.getParty().orElseThrow().getMembers()
                   if ((selection >= 0 && selection <= 3) && party.size() < 1) {
-                     cm.sendOk(I18nMessage.from("2042002_NEED_AT_LEAST_2_PLAYERS"))
+                     cm.sendOk(I18nMessage.from("2042002_NEED_AT_LEAST_2_PLAYERS"))
+
                   } else if ((selection >= 4 && selection <= 5) && party.size() < 1) {
-                     cm.sendOk(I18nMessage.from("2042002_NEED_AT_LEAST_3_PLAYERS"))
+                     cm.sendOk(I18nMessage.from("2042002_NEED_AT_LEAST_3_PLAYERS"))
+
                   } else {
                      cm.cpqLobby(selection)
                   }
@@ -257,17 +269,21 @@ class NPC2042002 {
                      cm.warp(980000000, 0)
                      cm.dispose()
                   } else if (cm.getLevel() < 30) {
-                     cm.sendOk(I18nMessage.from("2042002_MUST_BE_AT_LEAST_LEVEL_30"))
+                     cm.sendOk(I18nMessage.from("2042002_MUST_BE_AT_LEAST_LEVEL_30"))
+
                      cm.dispose()
                   } else {
-                     cm.sendOk(I18nMessage.from("2042002_SORRY_LEVEL_RANGE"))
+                     cm.sendOk(I18nMessage.from("2042002_SORRY_LEVEL_RANGE"))
+
                      cm.dispose()
                   }
                } else if (selection == 1) {
                   status = 60
-                  cm.sendSimple(I18nMessage.from("2042002_WHAT_WOULD_YOU_LIKE_TO_DO"))
+                  cm.sendSimple(I18nMessage.from("2042002_WHAT_WOULD_YOU_LIKE_TO_DO"))
+
                } else if (selection == 2) {
-                  cm.sendSimple(I18nMessage.from("2042002_REMEMBER").with(n1, n2))
+                  cm.sendSimple(I18nMessage.from("2042002_REMEMBER").with(n1, n2))
+
                } else if (selection == 3) {
                   cm.getChar().saveLocation("MONSTER_CARNIVAL")
                   cm.warp(980030000, 0)
@@ -299,7 +315,8 @@ class NPC2042002 {
                      cm.gainItem(4001129, (short) -n1)
                      cm.dispose()
                   } else {
-                     cm.sendOk(I18nMessage.from("2042002_MISSING_SOMETHING_OR_EQUIP_FULL"))
+                     cm.sendOk(I18nMessage.from("2042002_MISSING_SOMETHING_OR_EQUIP_FULL"))
+
                      cm.dispose()
                   }
                } else if (select == 1) {
@@ -308,28 +325,35 @@ class NPC2042002 {
                      cm.gainItem(4001129, (short) -n2)
                      cm.dispose()
                   } else {
-                     cm.sendOk(I18nMessage.from("2042002_MISSING_SOMETHING_OR_USE_FULL"))
+                     cm.sendOk(I18nMessage.from("2042002_MISSING_SOMETHING_OR_USE_FULL"))
+
                      cm.dispose()
                   }
                } else if (select == 2) {//S2 Warrior 26 S3 Magician 6 S4 Bowman 6 S5 Thief 8
                   status = 10
-                  cm.sendSimple(I18nMessage.from("2042002_MAKE_SURE").with(n3, n3, n4, n4, n5, n5, n3, n3, n4, n4, n5, n5))
+                  cm.sendSimple(I18nMessage.from("2042002_MAKE_SURE").with(n3, n3, n4, n4, n5, n5, n3, n3, n4, n4, n5, n5))
+
                } else if (select == 3) {
                   status = 20
-                  cm.sendSimple(I18nMessage.from("2042002_SELECT_THE_WEAPON_TO_TRADE").with(n3, n3, n4, n4, n5, n5))
+                  cm.sendSimple(I18nMessage.from("2042002_SELECT_THE_WEAPON_TO_TRADE").with(n3, n3, n4, n4, n5, n5))
+
                } else if (select == 4) {
                   status = 30
-                  cm.sendSimple(I18nMessage.from("2042002_SELECT_THE_WEAPON_TO_TRADE_2").with(n3, n4, n5, n3, n4, n5))
+                  cm.sendSimple(I18nMessage.from("2042002_SELECT_THE_WEAPON_TO_TRADE_2").with(n3, n4, n5, n3, n4, n5))
+
                } else if (select == 5) {
                   status = 40
-                  cm.sendSimple(I18nMessage.from("2042002_SELECT_THE_WEAPON_TO_TRADE_3").with(n3, n4, n5, n3, n4, n4, n5, n5))
+                  cm.sendSimple(I18nMessage.from("2042002_SELECT_THE_WEAPON_TO_TRADE_3").with(n3, n4, n5, n3, n4, n4, n5, n5))
+
                } else if (select == 6) {
                   status = 50 //pirate rewards
-                  cm.sendSimple(I18nMessage.from("2042002_SELECT_THE_WEAPON_TO_TRADE_4").with(n3, n4, n5, n3, n4, n5))
+                  cm.sendSimple(I18nMessage.from("2042002_SELECT_THE_WEAPON_TO_TRADE_4").with(n3, n4, n5, n3, n4, n5))
+
                }
             } else if (status == 11) {
                if (selection == 12) {
-                  cm.sendSimple(I18nMessage.from("2042002_SELECT_THE_WEAPON_TO_TRADE_5").with(n3, n3, n4, n4, n5, n5, n3, n3, n4, n4, n5, n5))
+                  cm.sendSimple(I18nMessage.from("2042002_SELECT_THE_WEAPON_TO_TRADE_5").with(n3, n3, n4, n4, n5, n5, n3, n3, n4, n4, n5, n5))
+
                } else {
                   int[] item = [1302004, 1402006, 1302009, 1402007, 1302010, 1402003, 1312006, 1412004, 1312007, 1412005, 1312008, 1412003]
                   int[] cost = [n3, n3, n4, n4, n5, n5, n3, n3, n4, n4, n5]
@@ -338,14 +362,16 @@ class NPC2042002 {
                      cm.gainItem(4001129, (short) -cost[selection])
                      cm.dispose()
                   } else {
-                     cm.sendOk(I18nMessage.from("2042002_NOT_ENOUGH_OR_INVENTORY_IS_FULL"))
+                     cm.sendOk(I18nMessage.from("2042002_NOT_ENOUGH_OR_INVENTORY_IS_FULL"))
+
                      cm.dispose()
                   }
                }
             } else if (status == 12) {
                if (selection == 12) {
                   status = 10
-                  cm.sendSimple(I18nMessage.from("2042002_MAKE_SURE_2").with(n3, n3, n4, n4, n5, n5, n3, n3, n4, n4, n5, n5))
+                  cm.sendSimple(I18nMessage.from("2042002_MAKE_SURE_2").with(n3, n3, n4, n4, n5, n5, n3, n3, n4, n4, n5, n5))
+
                } else {
                   int[] item = [1322015, 1422008, 1322016, 1422007, 1322017, 1422005, 1432003, 1442003, 1432005, 1442009, 1442005, 1432004]
                   int[] cost = [n3, n3, n4, n4, n5, n5, n3, n3, n4, n4, n5, n5]
@@ -354,7 +380,8 @@ class NPC2042002 {
                      cm.gainItem(4001129, (short) -cost[selection])
                      cm.dispose()
                   } else {
-                     cm.sendOk(I18nMessage.from("2042002_NOT_ENOUGH_OR_INVENTORY_IS_FULL"))
+                     cm.sendOk(I18nMessage.from("2042002_NOT_ENOUGH_OR_INVENTORY_IS_FULL"))
+
                      cm.dispose()
                   }
                }
@@ -366,7 +393,8 @@ class NPC2042002 {
                   cm.gainItem(4001129, (short) -cost[selection])
                   cm.dispose()
                } else {
-                  cm.sendOk(I18nMessage.from("2042002_NOT_ENOUGH_OR_INVENTORY_IS_FULL"))
+                  cm.sendOk(I18nMessage.from("2042002_NOT_ENOUGH_OR_INVENTORY_IS_FULL"))
+
                   cm.dispose()
                }
             } else if (status == 31) {
@@ -377,7 +405,8 @@ class NPC2042002 {
                   cm.gainItem(4001129, (short) -cost[selection])
                   cm.dispose()
                } else {
-                  cm.sendOk(I18nMessage.from("2042002_NOT_ENOUGH_OR_INVENTORY_IS_FULL"))
+                  cm.sendOk(I18nMessage.from("2042002_NOT_ENOUGH_OR_INVENTORY_IS_FULL"))
+
                   cm.dispose()
                }
             } else if (status == 41) {
@@ -388,7 +417,8 @@ class NPC2042002 {
                   cm.gainItem(4001129, (short) -cost[selection])
                   cm.dispose()
                } else {
-                  cm.sendOk(I18nMessage.from("2042002_NOT_ENOUGH_OR_INVENTORY_IS_FULL"))
+                  cm.sendOk(I18nMessage.from("2042002_NOT_ENOUGH_OR_INVENTORY_IS_FULL"))
+
                   cm.dispose()
                }
             } else if (status == 51) {
@@ -399,54 +429,70 @@ class NPC2042002 {
                   cm.gainItem(4001129, (short) -cost[selection])
                   cm.dispose()
                } else {
-                  cm.sendOk(I18nMessage.from("2042002_NOT_ENOUGH_OR_INVENTORY_IS_FULL"))
+                  cm.sendOk(I18nMessage.from("2042002_NOT_ENOUGH_OR_INVENTORY_IS_FULL"))
+
                   cm.dispose()
                }
             } else if (status == 61) {
                select = selection
                if (selection == 0) {
-                  cm.sendNext(I18nMessage.from("2042002_HELLO"))
+                  cm.sendNext(I18nMessage.from("2042002_HELLO"))
+
                } else if (selection == 1) {
-                  cm.sendNext(I18nMessage.from("2042002_MONSTER_CARNIVAL_INFO"))
+                  cm.sendNext(I18nMessage.from("2042002_MONSTER_CARNIVAL_INFO"))
+
                } else if (selection == 2) {
-                  cm.sendNext(I18nMessage.from("2042002_EASY_RIGHT"))
+                  cm.sendNext(I18nMessage.from("2042002_EASY_RIGHT"))
+
                } else {
                   cm.dispose()
                }
             } else if (status == 62) {
                if (select == 0) {
-                  cm.sendNext(I18nMessage.from("2042002_WHAT_IS_IT"))
+                  cm.sendNext(I18nMessage.from("2042002_WHAT_IS_IT"))
+
                } else if (select == 1) {
-                  cm.sendNext(I18nMessage.from("2042002_HOW_TO"))
+                  cm.sendNext(I18nMessage.from("2042002_HOW_TO"))
+
                } else if (select == 2) {
-                  cm.sendNext(I18nMessage.from("2042002_COMMANDS"))
+                  cm.sendNext(I18nMessage.from("2042002_COMMANDS"))
+
                }
             } else if (status == 63) {
                if (select == 0) {
-                  cm.sendNext(I18nMessage.from("2042002_I_KNOW_IT_IS_TOO_DANGEROUS"))
+                  cm.sendNext(I18nMessage.from("2042002_I_KNOW_IT_IS_TOO_DANGEROUS"))
+
                } else if (select == 1) {
-                  cm.sendNext(I18nMessage.from("2042002_3_WAYS_TO_DISTRACT"))
+                  cm.sendNext(I18nMessage.from("2042002_3_WAYS_TO_DISTRACT"))
+
                } else if (select == 2) {
-                  cm.sendNext(I18nMessage.from("2042002_SUMMONING"))
+                  cm.sendNext(I18nMessage.from("2042002_SUMMONING"))
+
                }
             } else if (status == 64) {
                if (select == 0) {
-                  cm.sendNext(I18nMessage.from("2042002_OF_COURSE"))
+                  cm.sendNext(I18nMessage.from("2042002_OF_COURSE"))
+
                   cm.dispose()
                } else if (select == 1) {
-                  cm.sendNext(I18nMessage.from("2042002_PLEASE_REMEMBER"))
+                  cm.sendNext(I18nMessage.from("2042002_PLEASE_REMEMBER"))
+
                } else if (select == 2) {
-                  cm.sendNext(I18nMessage.from("2042002_ABILITY"))
+                  cm.sendNext(I18nMessage.from("2042002_ABILITY"))
+
                }
             } else if (status == 65) {
                if (select == 1) {
-                  cm.sendNext(I18nMessage.from("2042002_DO_NOT_LOSE_EXP_WHEN_DEAD"))
+                  cm.sendNext(I18nMessage.from("2042002_DO_NOT_LOSE_EXP_WHEN_DEAD"))
+
                   cm.dispose()
                } else if (select == 2) {
-                  cm.sendNext(I18nMessage.from("2042002_PROTECTOR"))
+                  cm.sendNext(I18nMessage.from("2042002_PROTECTOR"))
+
                }
             } else if (status == 66) {
-               cm.sendNext(I18nMessage.from("2042002_CANNOT_USE_ITEMS"))
+               cm.sendNext(I18nMessage.from("2042002_CANNOT_USE_ITEMS"))
+
                cm.dispose()
             } else if (status == 77) {
                boolean allDone
@@ -462,9 +508,11 @@ class NPC2042002 {
                }
 
                if (allDone) {
-                  cm.sendOk(I18nMessage.from("2042002_DONE"))
+                  cm.sendOk(I18nMessage.from("2042002_DONE"))
+
                } else {
-                  cm.sendOk(I18nMessage.from("2042002_DONE_BUT_LACK_ETC_SPACE"))
+                  cm.sendOk(I18nMessage.from("2042002_DONE_BUT_LACK_ETC_SPACE"))
+
                }
                cm.dispose()
             }

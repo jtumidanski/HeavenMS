@@ -14,9 +14,9 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.inventory.Item;
 import client.inventory.MapleInventory;
-import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import client.inventory.manipulator.MapleKarmaManipulator;
+import constants.MapleInventoryType;
 import net.opcodes.SendOpcode;
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
@@ -241,7 +241,8 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
                item = item.setQuantity((short) (shopItem.item().quantity() * shopItem.bundles()));
 
                if (!MapleInventory.checkSpot(chr, item)) {
-                  MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, I18nMessage.from("HIRED_MERCHANT_TAKE_ITEM_BACK"));
+                  MessageBroadcaster.getInstance()
+                        .sendServerNotice(chr, ServerNoticeType.POP_UP, I18nMessage.from("HIRED_MERCHANT_TAKE_ITEM_BACK"));
                   PacketCreator.announce(chr, new EnableActions());
                   return;
                }
@@ -278,7 +279,8 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
 
                if (c.getPlayer().getMeso() >= price) {
                   if (!owner.canHoldMeso(price)) {
-                     MessageBroadcaster.getInstance().sendServerNotice(owner, ServerNoticeType.POP_UP, I18nMessage.from("HIRED_MERCHANT_PURCHASE_ERROR_MAX_MESO"));
+                     MessageBroadcaster.getInstance().sendServerNotice(owner, ServerNoticeType.POP_UP,
+                           I18nMessage.from("HIRED_MERCHANT_PURCHASE_ERROR_MAX_MESO"));
                      PacketCreator.announce(c, new EnableActions());
                      return false;
                   }
@@ -288,7 +290,8 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
                      price -= MapleTradeUtil.getFee(price);
                      owner.gainMeso(price, true);
 
-                     MaplePlayerShopSoldItem soldItem = new MaplePlayerShopSoldItem(c.getPlayer().getName(), pItem.item().id(), quantity, price);
+                     MaplePlayerShopSoldItem soldItem =
+                           new MaplePlayerShopSoldItem(c.getPlayer().getName(), pItem.item().id(), quantity, price);
                      PacketCreator.announce(owner, new PlayerShopOwnerUpdate(soldItem, item));
 
                      synchronized (sold) {
@@ -302,16 +305,19 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
                            owner.setPlayerShop(null);
                            this.setOpen(false);
                            this.closeShop();
-                           MessageBroadcaster.getInstance().sendServerNotice(owner, ServerNoticeType.POP_UP, I18nMessage.from("HIRED_MERCHANT_SHOP_SOLD_OUT"));
+                           MessageBroadcaster.getInstance().sendServerNotice(owner, ServerNoticeType.POP_UP,
+                                 I18nMessage.from("HIRED_MERCHANT_SHOP_SOLD_OUT"));
                         }
                      }
                   } else {
-                     MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("HIRED_MERCHANT_PURCHASE_ITEM"));
+                     MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.POP_UP,
+                           I18nMessage.from("HIRED_MERCHANT_PURCHASE_ITEM"));
                      PacketCreator.announce(c, new EnableActions());
                      return false;
                   }
                } else {
-                  MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("HIRED_MERCHANT_PURCHASE_ITEM_ERROR_NO_MESO"));
+                  MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.POP_UP,
+                        I18nMessage.from("HIRED_MERCHANT_PURCHASE_ITEM_ERROR_NO_MESO"));
                   PacketCreator.announce(c, new EnableActions());
                   return false;
                }
@@ -329,7 +335,8 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
    public void broadcastRestoreToVisitors() {
       visitorLock.lock();
       try {
-         MasterBroadcaster.getInstance().sendToShoppers(this, (character, index) -> PacketCreator.create(new PlayerShopRemoveVisitor(index + 1)));
+         MasterBroadcaster.getInstance()
+               .sendToShoppers(this, (character, index) -> PacketCreator.create(new PlayerShopRemoveVisitor(index + 1)));
          MasterBroadcaster.getInstance().sendToShoppers(this, new GetPlayerShop(this, false));
          recoverChatLog();
       } finally {
@@ -356,7 +363,9 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
          visitorLock.unlock();
       }
 
-      for (MapleCharacter mc : visitorList) forceRemoveVisitor(mc);
+      for (MapleCharacter mc : visitorList) {
+         forceRemoveVisitor(mc);
+      }
       if (owner != null) {
          forceRemoveVisitor(owner);
       }
@@ -499,7 +508,8 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
       visitorLock.lock();
       try {
          if (!open.get()) {
-            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, I18nMessage.from("HIRED_MERCHANT_NOT_OPEN_YET"));
+            MessageBroadcaster.getInstance()
+                  .sendServerNotice(chr, ServerNoticeType.POP_UP, I18nMessage.from("HIRED_MERCHANT_NOT_OPEN_YET"));
             return false;
          }
 

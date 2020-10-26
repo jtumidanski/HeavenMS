@@ -4,8 +4,8 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
 import client.inventory.Item;
-import client.inventory.MapleInventoryType;
-import constants.inventory.ItemConstants;
+import constants.ItemConstants;
+import constants.MapleInventoryType;
 import server.MapleItemInformationProvider;
 import tools.I18nMessage;
 import tools.MessageBroadcaster;
@@ -28,6 +28,7 @@ public class RechargeCommand extends Command {
             c.getPlayer().forceUpdateItem(Item.newBuilder(toRecharge).setQuantity(ii.getSlotMax(c, toRecharge.id())).build());
          }
       }
-      MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("RECHARGE_COMMAND_SUCCESS"));
+      MessageBroadcaster.getInstance()
+            .sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("RECHARGE_COMMAND_SUCCESS"));
    }
 }

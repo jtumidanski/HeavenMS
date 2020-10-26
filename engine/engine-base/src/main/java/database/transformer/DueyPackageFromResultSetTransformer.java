@@ -5,7 +5,7 @@ import java.util.Optional;
 
 import client.inventory.Item;
 import client.inventory.ItemFactory;
-import client.inventory.MapleInventoryType;
+import constants.MapleInventoryType;
 import server.DueyPackage;
 import tools.Pair;
 import transformer.SqlTransformer;

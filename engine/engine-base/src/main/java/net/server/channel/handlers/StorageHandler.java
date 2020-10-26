@@ -5,11 +5,11 @@ import client.MapleClient;
 import client.autoban.AutoBanFactory;
 import client.inventory.Item;
 import client.inventory.MapleInventory;
-import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import client.inventory.manipulator.MapleKarmaManipulator;
 import config.YamlConfig;
-import constants.inventory.ItemConstants;
+import constants.ItemConstants;
+import constants.MapleInventoryType;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.reader.StorageReader;
 import net.server.channel.packet.storage.ArrangeItemsPacket;
@@ -40,7 +40,8 @@ public final class StorageHandler extends AbstractPacketHandler<BaseStoragePacke
    public boolean successfulProcess(MapleClient client) {
       MapleCharacter chr = client.getPlayer();
       if (chr.getLevel() < 15) {
-         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, I18nMessage.from("STORAGE_LEVEL_REQUIREMENT"));
+         MessageBroadcaster.getInstance()
+               .sendServerNotice(chr, ServerNoticeType.POP_UP, I18nMessage.from("STORAGE_LEVEL_REQUIREMENT"));
          PacketCreator.announce(client, new EnableActions());
          return false;
       }
@@ -58,7 +59,8 @@ public final class StorageHandler extends AbstractPacketHandler<BaseStoragePacke
             if (packet instanceof TakeoutPacket) {
                takeOut(client, ii, chr, storage, ((TakeoutPacket) packet).theType(), ((TakeoutPacket) packet).slot());
             } else if (packet instanceof StorePacket) {
-               store(client, ii, chr, storage, ((StorePacket) packet).slot(), ((StorePacket) packet).itemId(), ((StorePacket) packet).quantity());
+               store(client, ii, chr, storage, ((StorePacket) packet).slot(), ((StorePacket) packet).itemId(),
+                     ((StorePacket) packet).quantity());
             } else if (packet instanceof ArrangeItemsPacket) {
                arrangeItems(client, storage);
             } else if (packet instanceof MesoPacket) {
@@ -96,7 +98,8 @@ public final class StorageHandler extends AbstractPacketHandler<BaseStoragePacke
          storage.setMeso(storageMesos - meso);
          chr.gainMeso(meso, false, true, false);
          chr.setUsedStorage();
-         LoggerUtil.printInfo(LoggerOriginator.ENGINE, LogType.STORAGE, c.getPlayer().getName() + (meso > 0 ? " took out " : " stored ") + Math.abs(meso) + " mesos");
+         LoggerUtil.printInfo(LoggerOriginator.ENGINE, LogType.STORAGE,
+               c.getPlayer().getName() + (meso > 0 ? " took out " : " stored ") + Math.abs(meso) + " mesos");
          storage.sendMeso(c);
       } else {
          PacketCreator.announce(c, new EnableActions());
@@ -110,12 +113,14 @@ public final class StorageHandler extends AbstractPacketHandler<BaseStoragePacke
       PacketCreator.announce(c, new EnableActions());
    }
 
-   private void store(MapleClient c, MapleItemInformationProvider ii, MapleCharacter chr, MapleStorage storage, short slot, int itemId, short quantity) {
+   private void store(MapleClient c, MapleItemInformationProvider ii, MapleCharacter chr, MapleStorage storage, short slot,
+                      int itemId, short quantity) {
       MapleInventoryType invType = ItemConstants.getInventoryType(itemId);
       MapleInventory inv = chr.getInventory(invType);
       if (slot < 1 || slot > inv.getSlotLimit()) { //player inv starts at one
          AutoBanFactory.PACKET_EDIT.alert(c.getPlayer(), c.getPlayer().getName() + " tried to packet edit with storage.");
-         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXPLOITS, c.getPlayer().getName() + " tried to store item at slot " + slot);
+         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXPLOITS,
+               c.getPlayer().getName() + " tried to store item at slot " + slot);
          c.disconnect(true, false);
          return;
       }
@@ -165,15 +170,18 @@ public final class StorageHandler extends AbstractPacketHandler<BaseStoragePacke
          storage.store(item);    // inside a critical section, "!(storage.isFull())" is still in effect...
          chr.setUsedStorage();
          String itemName = ii.getName(item.id());
-         LoggerUtil.printInfo(LoggerOriginator.ENGINE, LogType.STORAGE, c.getPlayer().getName() + " stored " + item.quantity() + " " + itemName + " (" + item.id() + ")");
+         LoggerUtil.printInfo(LoggerOriginator.ENGINE, LogType.STORAGE,
+               c.getPlayer().getName() + " stored " + item.quantity() + " " + itemName + " (" + item.id() + ")");
          storage.sendStored(c, ItemConstants.getInventoryType(itemId));
       }
    }
 
-   private void takeOut(MapleClient c, MapleItemInformationProvider ii, MapleCharacter chr, MapleStorage storage, byte type, byte slot) {
+   private void takeOut(MapleClient c, MapleItemInformationProvider ii, MapleCharacter chr, MapleStorage storage, byte type,
+                        byte slot) {
       if (slot < 0 || slot > storage.getSlots()) { // removal starts at zero
          AutoBanFactory.PACKET_EDIT.alert(c.getPlayer(), c.getPlayer().getName() + " tried to packet edit with storage.");
-         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXPLOITS, c.getPlayer().getName() + " tried to work with storage slot " + slot);
+         LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.EXPLOITS,
+               c.getPlayer().getName() + " tried to work with storage slot " + slot);
          c.disconnect(true, false);
          return;
       }
@@ -201,7 +209,8 @@ public final class StorageHandler extends AbstractPacketHandler<BaseStoragePacke
                MapleInventoryManipulator.addFromDrop(c, item, false);
 
                String itemName = ii.getName(item.id());
-               LoggerUtil.printInfo(LoggerOriginator.ENGINE, LogType.STORAGE, c.getPlayer().getName() + " took out " + item.quantity() + " " + itemName + " (" + item.id() + ")");
+               LoggerUtil.printInfo(LoggerOriginator.ENGINE, LogType.STORAGE,
+                     c.getPlayer().getName() + " took out " + item.quantity() + " " + itemName + " (" + item.id() + ")");
 
                storage.sendTakenOut(c, item.inventoryType());
             } else {

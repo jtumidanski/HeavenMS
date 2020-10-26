@@ -9,9 +9,9 @@ import javax.persistence.EntityManager;
 import client.MapleCharacter;
 import client.MapleFamily;
 import client.MapleFamilyEntry;
-import client.MapleJob;
 import client.database.data.CharacterData;
 import config.YamlConfig;
+import constants.MapleJob;
 import database.DatabaseConnection;
 import database.administrator.CharacterAdministrator;
 import database.administrator.FamilyCharacterAdministrator;
@@ -40,63 +40,68 @@ public class MapleFamilyProcessor {
 
    public void loadAllFamilies() {
       List<Pair<Pair<Integer, Integer>, MapleFamilyEntry>> unmatchedJuniors = new ArrayList<>(200);
-      DatabaseConnection.getInstance().withConnection(connection -> FamilyCharacterProvider.getInstance().getAllFamilies(connection).forEach(familyData -> {
-         int cid = familyData.characterId();
-         String name = null;
-         int level = -1;
-         int jobID = -1;
-         int worldId = -1;
+      DatabaseConnection.getInstance()
+            .withConnection(connection -> FamilyCharacterProvider.getInstance().getAllFamilies(connection).forEach(familyData -> {
+               int cid = familyData.characterId();
+               String name = null;
+               int level = -1;
+               int jobID = -1;
+               int worldId = -1;
 
-         Optional<CharacterData> characterData = CharacterProvider.getInstance().getById(connection, familyData.characterId());
-         if (characterData.isPresent()) {
-            name = characterData.get().name();
-            level = characterData.get().level();
-            jobID = characterData.get().job();
-            worldId = characterData.get().world();
-         }
+               Optional<CharacterData> characterData =
+                     CharacterProvider.getInstance().getById(connection, familyData.characterId());
+               if (characterData.isPresent()) {
+                  name = characterData.get().name();
+                  level = characterData.get().level();
+                  jobID = characterData.get().job();
+                  worldId = characterData.get().world();
+               }
 
-         World world = Server.getInstance().getWorld(worldId);
-         if (world == null) {
-            return;
-         }
-         MapleFamily family = world.getFamily(familyData.familyId());
-         if (family == null) {
-            family = new MapleFamily(familyData.familyId(), worldId);
-            Server.getInstance().getWorld(worldId).addFamily(familyData.familyId(), family);
-         }
+               World world = Server.getInstance().getWorld(worldId);
+               if (world == null) {
+                  return;
+               }
+               MapleFamily family = world.getFamily(familyData.familyId());
+               if (family == null) {
+                  family = new MapleFamily(familyData.familyId(), worldId);
+                  Server.getInstance().getWorld(worldId).addFamily(familyData.familyId(), family);
+               }
 
-         MapleFamilyEntry familyEntry = new MapleFamilyEntry(family, cid, name, level, MapleJob.getById(jobID));
-         family.addEntry(familyEntry);
-         if (familyData.seniorId() <= 0) {
-            family.setLeader(familyEntry);
-            setMessage(family, familyData.precepts(), false);
-         }
+               MapleFamilyEntry familyEntry = new MapleFamilyEntry(family, cid, name, level, MapleJob.getById(jobID));
+               family.addEntry(familyEntry);
+               if (familyData.seniorId() <= 0) {
+                  family.setLeader(familyEntry);
+                  setMessage(family, familyData.precepts(), false);
+               }
 
-         MapleFamilyEntry senior = family.getEntryByID(familyData.seniorId());
-         if (senior != null) {
-            familyEntry.setSenior(family.getEntryByID(familyData.seniorId()), false);
-         } else {
-            if (familyData.seniorId() > 0) {
-               unmatchedJuniors.add(new Pair<>(new Pair<>(worldId, familyData.seniorId()), familyEntry));
-            }
-         }
-         familyEntry.setReputation(familyData.reputation());
-         familyEntry.setTodaysRep(familyData.todaysReputation());
-         familyEntry.setTotalReputation(familyData.totalReputation());
-         familyEntry.setRepsToSenior(familyData.reputationToSenior());
+               MapleFamilyEntry senior = family.getEntryByID(familyData.seniorId());
+               if (senior != null) {
+                  familyEntry.setSenior(family.getEntryByID(familyData.seniorId()), false);
+               } else {
+                  if (familyData.seniorId() > 0) {
+                     unmatchedJuniors.add(new Pair<>(new Pair<>(worldId, familyData.seniorId()), familyEntry));
+                  }
+               }
+               familyEntry.setReputation(familyData.reputation());
+               familyEntry.setTodaysRep(familyData.todaysReputation());
+               familyEntry.setTotalReputation(familyData.totalReputation());
+               familyEntry.setRepsToSenior(familyData.reputationToSenior());
 
-         FamilyEntitlementProvider.getInstance().getIdsByCharacter(connection, familyData.characterId()).forEach(familyEntry::setEntitlementUsed);
-      }));
+               FamilyEntitlementProvider.getInstance().getIdsByCharacter(connection, familyData.characterId())
+                     .forEach(familyEntry::setEntitlementUsed);
+            }));
 
       for (Pair<Pair<Integer, Integer>, MapleFamilyEntry> unmatchedJunior : unmatchedJuniors) {
          int world = unmatchedJunior.getLeft().getLeft();
          int seniorId = unmatchedJunior.getLeft().getRight();
          MapleFamilyEntry junior = unmatchedJunior.getRight();
-         MapleFamilyEntry senior = Server.getInstance().getWorld(world).getFamily(junior.getFamily().getID()).getEntryByID(seniorId);
+         MapleFamilyEntry senior =
+               Server.getInstance().getWorld(world).getFamily(junior.getFamily().getID()).getEntryByID(seniorId);
          if (senior != null) {
             junior.setSenior(senior, false);
          } else {
-            LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.FAMILY_ERROR, "Missing senior for character " + junior.getName() + " in world " + world);
+            LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.FAMILY_ERROR,
+                  "Missing senior for character " + junior.getName() + " in world " + world);
          }
       }
 
@@ -137,7 +142,9 @@ public class MapleFamilyProcessor {
          }
          if (!success) {
             entityManager.getTransaction().rollback();
-            LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.FAMILY_ERROR, "Family rep auto save failed for family " + mapleFamily.getID() + " on " + Calendar.getInstance().getTime().toString() + ".");
+            LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.FAMILY_ERROR,
+                  "Family rep auto save failed for family " + mapleFamily.getID() + " on " + Calendar.getInstance().getTime()
+                        .toString() + ".");
          } else {
             entityManager.getTransaction().commit();
          }
@@ -151,7 +158,8 @@ public class MapleFamilyProcessor {
    public void setMessage(MapleFamily mapleFamily, String message, boolean save) {
       mapleFamily.setMessage(message);
       if (save) {
-         DatabaseConnection.getInstance().withConnection(connection -> FamilyCharacterAdministrator.getInstance().updatePrecepts(connection, mapleFamily.getLeader().getChrId(), message));
+         DatabaseConnection.getInstance().withConnection(connection -> FamilyCharacterAdministrator.getInstance()
+               .updatePrecepts(connection, mapleFamily.getLeader().getChrId(), message));
       }
    }
 
@@ -172,7 +180,6 @@ public class MapleFamilyProcessor {
                }
             }
          }
-
       }
    }
 

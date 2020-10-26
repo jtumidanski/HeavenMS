@@ -6,6 +6,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 
 import client.processor.MapleFamilyProcessor;
+import constants.MapleJob;
 import database.DatabaseConnection;
 import database.administrator.CharacterAdministrator;
 import database.administrator.FamilyCharacterAdministrator;
@@ -96,7 +97,8 @@ public class MapleFamilyEntry {
          }
          if (!success) {
             entityManager.getTransaction().rollback();
-            LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.FAMILY_ERROR, "Could not absorb " + oldFamily.getName() + " family into " + newFamily.getName() + " family. (SQL ERROR)");
+            LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.FAMILY_ERROR,
+                  "Could not absorb " + oldFamily.getName() + " family into " + newFamily.getName() + " family. (SQL ERROR)");
          } else {
             entityManager.getTransaction().commit();
          }
@@ -139,7 +141,9 @@ public class MapleFamilyEntry {
          }
          if (!success) {
             entityManager.getTransaction().rollback();
-            LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.FAMILY_ERROR, "Could not fork family with new leader " + getName() + ". (Old senior : " + oldSenior.getName() + ", leader :" + oldFamily.getLeader().getName() + ")");
+            LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.FAMILY_ERROR,
+                  "Could not fork family with new leader " + getName() + ". (Old senior : " + oldSenior.getName() + ", leader :"
+                        + oldFamily.getLeader().getName() + ")");
          } else {
             entityManager.getTransaction().commit();
          }
@@ -169,7 +173,8 @@ public class MapleFamilyEntry {
       return true;
    }
 
-   private synchronized void addSeniorCount(int seniorCount, MapleFamily newFamily) { // traverses tree and subtracts seniors and updates family
+   private synchronized void addSeniorCount(int seniorCount,
+                                            MapleFamily newFamily) { // traverses tree and subtracts seniors and updates family
       if (newFamily != null) {
          this.family = newFamily;
       }
@@ -341,7 +346,8 @@ public class MapleFamilyEntry {
    }
 
    private boolean updateDBChangeFamily(int cid, int familyId, int seniorId) {
-      return DatabaseConnection.getInstance().withConnectionResult(connection -> updateDBChangeFamily(connection, cid, familyId, seniorId)).orElse(false);
+      return DatabaseConnection.getInstance()
+            .withConnectionResult(connection -> updateDBChangeFamily(connection, cid, familyId, seniorId)).orElse(false);
    }
 
    private boolean updateDBChangeFamily(EntityManager con, int cid, int familyId, int seniorId) {
@@ -464,7 +470,8 @@ public class MapleFamilyEntry {
       getFamily().setTotalGenerations(counts.getLeft() + 1);
    }
 
-   private Pair<Integer, Integer> traverseAndUpdateCounts(int seniors) { // recursion probably limits family size, but it should handle a depth of a few thousand
+   private Pair<Integer, Integer> traverseAndUpdateCounts(
+         int seniors) { // recursion probably limits family size, but it should handle a depth of a few thousand
       setTotalSeniors(seniors);
       this.generation = seniors;
       int juniorCount = 0;
@@ -479,7 +486,8 @@ public class MapleFamilyEntry {
          }
       }
       setTotalJuniors(juniorCount);
-      return new Pair<>(highestGeneration, juniorCount); //creating new objects to return is a bit inefficient, but cleaner than packing into a long
+      return new Pair<>(highestGeneration,
+            juniorCount); //creating new objects to return is a bit inefficient, but cleaner than packing into a long
    }
 
    public boolean useEntitlement(MapleFamilyEntitlement entitlement) {
@@ -487,14 +495,16 @@ public class MapleFamilyEntry {
       if (entitlements[id] >= 1) {
          return false;
       }
-      DatabaseConnection.getInstance().withConnection(connection -> FamilyEntitlementAdministrator.getInstance().create(connection, id, getChrId()));
+      DatabaseConnection.getInstance()
+            .withConnection(connection -> FamilyEntitlementAdministrator.getInstance().create(connection, id, getChrId()));
       entitlements[id]++;
       return true;
    }
 
    public boolean refundEntitlement(MapleFamilyEntitlement entitlement) {
       int id = entitlement.ordinal();
-      DatabaseConnection.getInstance().withConnection(connection -> FamilyEntitlementAdministrator.getInstance().deleteByCharacterAndId(connection, getChrId(), id));
+      DatabaseConnection.getInstance().withConnection(
+            connection -> FamilyEntitlementAdministrator.getInstance().deleteByCharacterAndId(connection, getChrId(), id));
       entitlements[id] = 0;
       return true;
    }
@@ -529,7 +539,8 @@ public class MapleFamilyEntry {
       if (!repChanged) {
          return true;
       }
-      FamilyCharacterAdministrator.getInstance().updateMember(entityManager, getChrId(), getReputation(), getTodaysRep(), getTotalReputation(), getRepsToSenior());
+      FamilyCharacterAdministrator.getInstance()
+            .updateMember(entityManager, getChrId(), getReputation(), getTodaysRep(), getTotalReputation(), getRepsToSenior());
       return true;
    }
 

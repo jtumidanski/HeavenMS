@@ -13,11 +13,11 @@ import java.util.stream.Stream;
 
 import client.inventory.Equip;
 import client.inventory.Item;
-import client.inventory.MapleInventoryType;
 import client.inventory.MaplePet;
 import client.processor.PetProcessor;
 import config.YamlConfig;
-import constants.inventory.ItemConstants;
+import constants.ItemConstants;
+import constants.MapleInventoryType;
 import database.DatabaseConnection;
 import database.provider.SpecialCashItemProvider;
 import net.server.Server;

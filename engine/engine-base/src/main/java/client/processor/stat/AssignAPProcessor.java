@@ -7,14 +7,14 @@ import java.util.List;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import client.MapleJob;
 import client.MapleStat;
 import client.SkillFactory;
 import client.autoban.AutoBanFactory;
 import client.inventory.Equip;
 import client.inventory.Item;
-import client.inventory.MapleInventoryType;
 import config.YamlConfig;
+import constants.MapleInventoryType;
+import constants.MapleJob;
 import constants.skills.BlazeWizard;
 import constants.skills.Brawler;
 import constants.skills.DawnWarrior;

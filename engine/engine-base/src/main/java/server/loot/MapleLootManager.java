@@ -2,21 +2,26 @@ package server.loot;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 import client.MapleCharacter;
+import rest.quest.attributes.QuestItemAttributes;
 import server.life.MapleMonsterInformationProvider;
 import server.life.MonsterDropEntry;
 import server.processor.QuestProcessor;
-import server.quest.MapleQuest;
 
 public class MapleLootManager {
 
-   private static boolean isRelevantDrop(MonsterDropEntry dropEntry, List<MapleCharacter> players, List<MapleLootInventory> playersInv) {
-      int qStartAmount = 0, qCompleteAmount = 0;
-      MapleQuest quest = QuestProcessor.getInstance().getQuest(dropEntry.questId());
-      if (quest != null) {
-         qStartAmount = quest.getStartItemAmountNeeded(dropEntry.itemId());
-         qCompleteAmount = quest.getCompleteItemAmountNeeded(dropEntry.itemId());
+   private static boolean isRelevantDrop(MonsterDropEntry dropEntry, List<MapleCharacter> players,
+                                         List<MapleLootInventory> playersInv) {
+      int qStartAmount = 0;
+      int qCompleteAmount = 0;
+
+      Optional<QuestItemAttributes> result = QuestProcessor.getInstance()
+            .getQuestItemAttributes(dropEntry.questId(), dropEntry.itemId());
+      if (result.isPresent()) {
+         qStartAmount = result.get().getStartItemAmountNeeded();
+         qCompleteAmount = result.get().getCompleteItemAmountNeeded();
       }
 
       //boolean restricted = MapleItemInformationProvider.getInstance().isPickupRestricted(dropEntry.itemId);
@@ -24,10 +29,10 @@ public class MapleLootManager {
          MapleLootInventory chrInv = playersInv.get(i);
 
          if (dropEntry.questId() > 0) {
-            int qItemAmount, chrQuestStatus = players.get(i).getQuestStatus(dropEntry.questId());
-            if (chrQuestStatus == 0) {
+            int qItemAmount;
+            if (QuestProcessor.getInstance().isNotStarted(players.get(i), dropEntry.questId())) {
                qItemAmount = qStartAmount;
-            } else if (chrQuestStatus != 1) {
+            } else if (!QuestProcessor.getInstance().isStarted(players.get(i), dropEntry.questId())) {
                continue;
             } else {
                qItemAmount = qCompleteAmount;
@@ -51,7 +56,9 @@ public class MapleLootManager {
 
    public static List<MonsterDropEntry> retrieveRelevantDrops(int monsterId, List<MapleCharacter> players) {
       List<MonsterDropEntry> loots = MapleMonsterInformationProvider.getInstance().retrieveEffectiveDrop(monsterId);
-      if (loots.isEmpty()) return loots;
+      if (loots.isEmpty()) {
+         return loots;
+      }
 
       List<MapleLootInventory> playersInv = new LinkedList<>();
       for (MapleCharacter chr : players) {
@@ -68,5 +75,4 @@ public class MapleLootManager {
 
       return effectiveLoot;
    }
-
 }

@@ -1,6 +1,6 @@
 package net.server.channel.handlers;
 
-import java.awt.Point;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -8,13 +8,13 @@ import java.util.Map;
 
 import client.MapleBuffStat;
 import client.MapleCharacter;
-import client.MapleJob;
 import client.Skill;
 import client.SkillFactory;
 import client.autoban.AutoBanFactory;
 import client.status.MonsterStatus;
 import client.status.MonsterStatusEffect;
 import config.YamlConfig;
+import constants.MapleJob;
 import constants.game.GameConstants;
 import constants.skills.Aran;
 import constants.skills.Assassin;
@@ -28,8 +28,8 @@ import constants.skills.Crossbowman;
 import constants.skills.DawnWarrior;
 import constants.skills.DragonKnight;
 import constants.skills.Evan;
-import constants.skills.FirePoisonArchMage;
 import constants.skills.Fighter;
+import constants.skills.FirePoisonArchMage;
 import constants.skills.Hero;
 import constants.skills.Hunter;
 import constants.skills.IceLighteningArchMagician;
@@ -65,13 +65,13 @@ import server.maps.MapleMap;
 import server.maps.MapleMapItem;
 import server.maps.MapleMapObject;
 import server.maps.MapleMapObjectType;
+import tools.I18nMessage;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
 import tools.Randomizer;
 import tools.ServerNoticeType;
-import tools.I18nMessage;
 import tools.packet.character.DamageCharacter;
 import tools.packet.character.SkillCoolDown;
 import tools.packet.monster.DamageMonster;
@@ -103,7 +103,8 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
       return mySkill.getEffect(skillLevel);
    }
 
-   private void damageMonsterWithSkill(final MapleCharacter attacker, final MapleMap map, final MapleMonster monster, final int damage, int skillId, int fixedTime) {
+   private void damageMonsterWithSkill(final MapleCharacter attacker, final MapleMap map, final MapleMonster monster,
+                                       final int damage, int skillId, int fixedTime) {
       int animationTime;
 
       if (fixedTime == 0) {
@@ -114,11 +115,13 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
 
       if (animationTime > 0) { // be sure to only use LIMITED ATTACKS with animation time here
          TimerManager.getInstance().schedule(() -> {
-            MasterBroadcaster.getInstance().sendToAllInMapRange(map, new DamageMonster(monster.objectId(), damage), monster.position());
+            MasterBroadcaster.getInstance()
+                  .sendToAllInMapRange(map, new DamageMonster(monster.objectId(), damage), monster.position());
             map.damageMonster(attacker, monster, damage);
          }, animationTime);
       } else {
-         MasterBroadcaster.getInstance().sendToAllInMapRange(map, new DamageMonster(monster.objectId(), damage), monster.position());
+         MasterBroadcaster.getInstance()
+               .sendToAllInMapRange(map, new DamageMonster(monster.objectId(), damage), monster.position());
          map.damageMonster(attacker, monster, damage);
       }
    }
@@ -137,7 +140,8 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
             return;
          }
          if (attack.skill() != 0) {
-            theSkill = SkillFactory.getSkill(attack.skill()).orElseThrow(); //returns back the skill id if its not a hidden skill so we are gucci
+            theSkill = SkillFactory.getSkill(attack.skill())
+                  .orElseThrow(); //returns back the skill id if its not a hidden skill so we are gucci
             attackEffect = getAttackEffect(attack, player, theSkill);
             if (attackEffect == null) {
                PacketCreator.announce(player, new EnableActions());
@@ -145,15 +149,17 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
             }
 
             if (player.getMp() < attackEffect.getMpCon()) {
-               AutoBanFactory.MPCON.addPoint(player.getAutoBanManager(), "Skill: " + attack.skill() + "; Player MP: " + player.getMp() + "; MP Needed: " + attackEffect.getMpCon());
+               AutoBanFactory.MPCON.addPoint(player.getAutoBanManager(),
+                     "Skill: " + attack.skill() + "; Player MP: " + player.getMp() + "; MP Needed: " + attackEffect.getMpCon());
             }
 
             int mobCount = attackEffect.getMobCount();
             if (attack.skill() != Cleric.HEAL) {
                if (player.isAlive()) {
-                  if (attack.skill() == Aran.BODY_PRESSURE || attack.skill() == Marauder.ENERGY_CHARGE || attack.skill() == ThunderBreaker.ENERGY_CHARGE) {
+                  if (attack.skill() == Aran.BODY_PRESSURE || attack.skill() == Marauder.ENERGY_CHARGE
+                        || attack.skill() == ThunderBreaker.ENERGY_CHARGE) {
                      // prevent touch dmg skills refreshing
-                  } else if(attack.skill() == DawnWarrior.FINAL_ATTACK || attack.skill() == WindArcher.FINAL_ATTACK) {
+                  } else if (attack.skill() == DawnWarrior.FINAL_ATTACK || attack.skill() == WindArcher.FINAL_ATTACK) {
                      // prevent cygnus FA refreshing
                      mobCount = 15;
                   } else if (attack.skill() == NightWalker.POISON_BOMB) {// Poison Bomb
@@ -161,12 +167,15 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
                   } else {
                      attackEffect.applyTo(player);
 
-                     if (attack.skill() == Page.FINAL_ATTACK_BW || attack.skill() == Page.FINAL_ATTACK_SWORD || attack.skill() == Fighter.FINAL_ATTACK_SWORD
-                           || attack.skill() == Fighter.FINAL_ATTACK_AXE || attack.skill() == Spearman.FINAL_ATTACK_SPEAR || attack.skill() == Spearman.FINAL_ATTACK_POLEARM
+                     if (attack.skill() == Page.FINAL_ATTACK_BW || attack.skill() == Page.FINAL_ATTACK_SWORD
+                           || attack.skill() == Fighter.FINAL_ATTACK_SWORD
+                           || attack.skill() == Fighter.FINAL_ATTACK_AXE || attack.skill() == Spearman.FINAL_ATTACK_SPEAR
+                           || attack.skill() == Spearman.FINAL_ATTACK_POLEARM
                            || attack.skill() == Hunter.FINAL_ATTACK || attack.skill() == Crossbowman.FINAL_ATTACK) {
 
                         mobCount = 15;//:(
-                     } else if (attack.skill() == Aran.HIDDEN_FULL_DOUBLE || attack.skill() == Aran.HIDDEN_FULL_TRIPLE || attack.skill() == Aran.HIDDEN_OVER_DOUBLE || attack.skill() == Aran.HIDDEN_OVER_TRIPLE) {
+                     } else if (attack.skill() == Aran.HIDDEN_FULL_DOUBLE || attack.skill() == Aran.HIDDEN_FULL_TRIPLE
+                           || attack.skill() == Aran.HIDDEN_OVER_DOUBLE || attack.skill() == Aran.HIDDEN_OVER_TRIPLE) {
                         mobCount = 12;
                      }
                   }
@@ -176,7 +185,8 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
             }
 
             if (attack.numAttacked() > mobCount) {
-               AutoBanFactory.MOB_COUNT.autoBan(player, "Skill: " + attack.skill() + "; Count: " + attack.numAttacked() + " Max: " + attackEffect.getMobCount());
+               AutoBanFactory.MOB_COUNT.autoBan(player,
+                     "Skill: " + attack.skill() + "; Count: " + attack.numAttacked() + " Max: " + attackEffect.getMobCount());
                return;
             }
          }
@@ -247,9 +257,11 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
 
                if (attack.skill() == Aran.COMBO_SMASH || attack.skill() == Aran.BODY_PRESSURE) {
                   distanceToDetect += 40000;
-               } else if (attack.skill() == Bishop.GENESIS || attack.skill() == IceLighteningArchMagician.BLIZZARD || attack.skill() == FirePoisonArchMage.METEOR_SHOWER) {
+               } else if (attack.skill() == Bishop.GENESIS || attack.skill() == IceLighteningArchMagician.BLIZZARD
+                     || attack.skill() == FirePoisonArchMage.METEOR_SHOWER) {
                   distanceToDetect += 275000;
-               } else if (attack.skill() == Hero.BRANDISH || attack.skill() == DragonKnight.SPEAR_CRUSHER || attack.skill() == DragonKnight.POLE_ARM_CRUSHER) {
+               } else if (attack.skill() == Hero.BRANDISH || attack.skill() == DragonKnight.SPEAR_CRUSHER
+                     || attack.skill() == DragonKnight.POLE_ARM_CRUSHER) {
                   distanceToDetect += 40000;
                } else if (attack.skill() == DragonKnight.DRAGON_ROAR || attack.skill() == SuperGM.SUPER_DRAGON_ROAR) {
                   distanceToDetect += 250000;
@@ -258,7 +270,8 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
                }
 
                if (distance > distanceToDetect) {
-                  AutoBanFactory.DISTANCE_HACK.alert(player, "Distance Sq to monster: " + distance + " SID: " + attack.skill() + " MID: " + monster.id());
+                  AutoBanFactory.DISTANCE_HACK
+                        .alert(player, "Distance Sq to monster: " + distance + " SID: " + attack.skill() + " MID: " + monster.id());
                   monster.refreshMobPosition();
                }
 
@@ -283,7 +296,11 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
                }
                totDamage += totDamageToOneMonster;
                monster.aggroMonsterDamage(player, totDamageToOneMonster);
-               if (player.getBuffedValue(MapleBuffStat.PICKPOCKET) != null && (attack.skill() == 0 || attack.skill() == Rogue.DOUBLE_STAB || attack.skill() == Bandit.SAVAGE_BLOW || attack.skill() == ChiefBandit.ASSAULTER || attack.skill() == ChiefBandit.BAND_OF_THIEVES || attack.skill() == Shadower.ASSASSINATE || attack.skill() == Shadower.TAUNT || attack.skill() == Shadower.BOOMERANG_STEP)) {
+               if (player.getBuffedValue(MapleBuffStat.PICKPOCKET) != null && (attack.skill() == 0
+                     || attack.skill() == Rogue.DOUBLE_STAB || attack.skill() == Bandit.SAVAGE_BLOW
+                     || attack.skill() == ChiefBandit.ASSAULTER || attack.skill() == ChiefBandit.BAND_OF_THIEVES
+                     || attack.skill() == Shadower.ASSASSINATE || attack.skill() == Shadower.TAUNT
+                     || attack.skill() == Shadower.BOOMERANG_STEP)) {
                   Skill pickpocket = SkillFactory.getSkill(ChiefBandit.PICKPOCKET).orElseThrow();
                   int pickPocketLevel = (player.isGM()) ? pickpocket.getMaxLevel() : player.getSkillLevel(pickpocket);
                   if (pickPocketLevel > 0) {
@@ -300,14 +317,20 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
                               eachdf = eachd;
                            }
 
-                           TimerManager.getInstance().schedule(() -> map.spawnMesoDrop(Math.min((int) Math.max(((double) eachdf / (double) 20000) * (double) maxMeso, 1), maxMeso), new Point((int) (monster.position().getX() + Randomizer.nextInt(100) - 50), (int) (monster.position().getY())), monster, player, true, (byte) 2), delay);
+                           TimerManager.getInstance().schedule(() -> map.spawnMesoDrop(
+                                 Math.min((int) Math.max(((double) eachdf / (double) 20000) * (double) maxMeso, 1), maxMeso),
+                                 new Point((int) (monster.position().getX() + Randomizer.nextInt(100) - 50),
+                                       (int) (monster.position().getY())), monster, player, true, (byte) 2), delay);
                            delay += 100;
                         }
                      }
                   }
-               } else if (attack.skill() == Marauder.ENERGY_DRAIN || attack.skill() == ThunderBreaker.ENERGY_DRAIN || attack.skill() == NightWalker.VAMPIRE || attack.skill() == Assassin.DRAIN) {
+               } else if (attack.skill() == Marauder.ENERGY_DRAIN || attack.skill() == ThunderBreaker.ENERGY_DRAIN
+                     || attack.skill() == NightWalker.VAMPIRE || attack.skill() == Assassin.DRAIN) {
                   Skill attackSkill = SkillFactory.getSkill(attack.skill()).orElseThrow();
-                  player.addHP(Math.min(monster.getMaxHp(), Math.min((int) ((double) totDamage * (double) attackSkill.getEffect(player.getSkillLevel(attackSkill)).getX() / 100.0), player.getCurrentMaxHp() / 2)));
+                  player.addHP(Math.min(monster.getMaxHp(), Math.min(
+                        (int) ((double) totDamage * (double) attackSkill.getEffect(player.getSkillLevel(attackSkill)).getX()
+                              / 100.0), player.getCurrentMaxHp() / 2)));
                } else if (attack.skill() == Bandit.STEAL) {
                   Skill steal = SkillFactory.getSkill(Bandit.STEAL).orElseThrow();
                   if (monster.getStolen().size() < 1) { // One steal per mob <3
@@ -319,7 +342,9 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
                            int rndPool = (int) Math.floor(Math.random() * dropPool.get(dropPool.size() - 1));
 
                            int i = 0;
-                           while (rndPool >= dropPool.get(i)) i++;
+                           while (rndPool >= dropPool.get(i)) {
+                              i++;
+                           }
 
                            List<MonsterDropEntry> toSteal = new ArrayList<>();
                            toSteal.add(mi.retrieveDrop(monster.id()).get(i));
@@ -332,11 +357,13 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
                } else if (attack.skill() == FirePoisonArchMage.FIRE_DEMON) {
                   SkillFactory.getSkill(attack.skill())
                         .map(skill -> skill.getEffect(player.getSkillLevel(skill)))
-                        .ifPresent(effect -> monster.setTempEffectiveness(Element.ICE, ElementalEffectiveness.WEAK, effect.getDuration() * 1000));
+                        .ifPresent(effect -> monster
+                              .setTempEffectiveness(Element.ICE, ElementalEffectiveness.WEAK, effect.getDuration() * 1000));
                } else if (attack.skill() == IceLighteningArchMagician.ICE_DEMON) {
                   SkillFactory.getSkill(attack.skill())
                         .map(skill -> skill.getEffect(player.getSkillLevel(skill)))
-                        .ifPresent(effect -> monster.setTempEffectiveness(Element.FIRE, ElementalEffectiveness.WEAK, effect.getDuration() * 1000));
+                        .ifPresent(effect -> monster
+                              .setTempEffectiveness(Element.FIRE, ElementalEffectiveness.WEAK, effect.getDuration() * 1000));
                } else if (attack.skill() == Outlaw.HOMING_BEACON || attack.skill() == Corsair.BULLS_EYE) {
                   SkillFactory.getSkill(attack.skill())
                         .map(skill -> skill.getEffect(player.getSkillLevel(skill)))
@@ -345,7 +372,8 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
                   if (!monster.isBoss()) {
                      SkillFactory.executeIfHasSkill(player, attack.skill(), (skill, skillLevel) -> {
                         MapleStatEffect DoT = skill.getEffect(skillLevel);
-                        MonsterStatusEffect monsterStatusEffect = new MonsterStatusEffect(Collections.singletonMap(MonsterStatus.POISON, 1), skill, null, false);
+                        MonsterStatusEffect monsterStatusEffect =
+                              new MonsterStatusEffect(Collections.singletonMap(MonsterStatus.POISON, 1), skill, null, false);
                         monster.applyStatus(player, monsterStatusEffect, true, DoT.getDuration(), false);
                      });
                   }
@@ -356,7 +384,9 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
                      if (totDamageToOneMonster > 0) {
                         SkillFactory.getSkill(Aran.SNOW_CHARGE).ifPresent(skill -> {
                            int skillLevel = player.getSkillLevel(skill);
-                           MonsterStatusEffect monsterStatusEffect = new MonsterStatusEffect(Collections.singletonMap(MonsterStatus.SPEED, skill.getEffect(skillLevel).getX()), skill, null, false);
+                           MonsterStatusEffect monsterStatusEffect = new MonsterStatusEffect(
+                                 Collections.singletonMap(MonsterStatus.SPEED, skill.getEffect(skillLevel).getX()), skill, null,
+                                 false);
                            monster.applyStatus(player, monsterStatusEffect, false, skill.getEffect(skillLevel).getY() * 1000);
                         });
                      }
@@ -368,7 +398,9 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
                      MapleStatEffect effect = skill.getEffect(skillLevel);
 
                      if (effect.makeChanceResult()) {
-                        MonsterStatusEffect monsterStatusEffect = new MonsterStatusEffect(Collections.singletonMap(MonsterStatus.SPEED, effect.getX()), skill, null, false);
+                        MonsterStatusEffect monsterStatusEffect =
+                              new MonsterStatusEffect(Collections.singletonMap(MonsterStatus.SPEED, effect.getX()), skill, null,
+                                    false);
                         monster.applyStatus(player, monsterStatusEffect, false, effect.getY() * 1000);
                      }
                   });
@@ -379,7 +411,9 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
                      MapleStatEffect effect = skill.getEffect(skillLevel);
 
                      if (effect.makeChanceResult()) {
-                        MonsterStatusEffect monsterStatusEffect = new MonsterStatusEffect(Collections.singletonMap(MonsterStatus.SPEED, effect.getX()), skill, null, false);
+                        MonsterStatusEffect monsterStatusEffect =
+                              new MonsterStatusEffect(Collections.singletonMap(MonsterStatus.SPEED, effect.getX()), skill, null,
+                                    false);
                         monster.applyStatus(player, monsterStatusEffect, false, effect.getY() * 60 * 1000);
                      }
                   });
@@ -390,7 +424,9 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
                      MapleStatEffect effect = skill.getEffect(skillLevel);
 
                      if (effect.makeChanceResult()) {
-                        MonsterStatusEffect monsterStatusEffect = new MonsterStatusEffect(Collections.singletonMap(MonsterStatus.ACC, effect.getX()), skill, null, false);
+                        MonsterStatusEffect monsterStatusEffect =
+                              new MonsterStatusEffect(Collections.singletonMap(MonsterStatus.ACC, effect.getX()), skill, null,
+                                    false);
                         monster.applyStatus(player, monsterStatusEffect, false, effect.getY() * 1000);
                      }
                   });
@@ -401,11 +437,13 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
                      if (player.isBuffFrom(MapleBuffStat.WK_CHARGE, chargeSkill)) {
                         if (totDamageToOneMonster > 0) {
                            if (charge == WhiteKnight.BW_ICE_CHARGE || charge == WhiteKnight.SWORD_ICE_CHARGE) {
-                              monster.setTempEffectiveness(Element.ICE, ElementalEffectiveness.WEAK, chargeSkill.getEffect(player.getSkillLevel(chargeSkill)).getY() * 1000);
+                              monster.setTempEffectiveness(Element.ICE, ElementalEffectiveness.WEAK,
+                                    chargeSkill.getEffect(player.getSkillLevel(chargeSkill)).getY() * 1000);
                               break;
                            }
                            if (charge == WhiteKnight.BW_FIRE_CHARGE || charge == WhiteKnight.SWORD_FIRE_CHARGE) {
-                              monster.setTempEffectiveness(Element.FIRE, ElementalEffectiveness.WEAK, chargeSkill.getEffect(player.getSkillLevel(chargeSkill)).getY() * 1000);
+                              monster.setTempEffectiveness(Element.FIRE, ElementalEffectiveness.WEAK,
+                                    chargeSkill.getEffect(player.getSkillLevel(chargeSkill)).getY() * 1000);
                               break;
                            }
                         }
@@ -416,7 +454,8 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
                         Skill chargeSkill = SkillFactory.getSkill(charge).orElseThrow();
                         if (player.isBuffFrom(MapleBuffStat.WK_CHARGE, chargeSkill)) {
                            if (totDamageToOneMonster > 0) {
-                              monster.setTempEffectiveness(Element.HOLY, ElementalEffectiveness.WEAK, chargeSkill.getEffect(player.getSkillLevel(chargeSkill)).getY() * 1000);
+                              monster.setTempEffectiveness(Element.HOLY, ElementalEffectiveness.WEAK,
+                                    chargeSkill.getEffect(player.getSkillLevel(chargeSkill)).getY() * 1000);
                               break;
                            }
                         }
@@ -426,14 +465,17 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
                   Skill skill = SkillFactory.getSkill(21100005).orElseThrow();
                   player.addHP(((totDamage * skill.getEffect(player.getSkillLevel(skill)).getX()) / 100));
                } else if (job == 412 || job == 422 || job == 1411) {
-                  Skill type = SkillFactory.getSkill(player.getJob().getId() == 412 ? 4120005 : (player.getJob().getId() == 1411 ? 14110004 : 4220005)).orElseThrow();
+                  Skill type = SkillFactory
+                        .getSkill(player.getJob().getId() == 412 ? 4120005 : (player.getJob().getId() == 1411 ? 14110004 : 4220005))
+                        .orElseThrow();
                   if (player.getSkillLevel(type) > 0) {
                      MapleStatEffect venomEffect = type.getEffect(player.getSkillLevel(type));
                      for (int i = 0; i < attackCount; i++) {
                         if (venomEffect.makeChanceResult()) {
                            if (monster.getVenomMulti() < 3) {
                               monster.setVenomMulti((monster.getVenomMulti() + 1));
-                              MonsterStatusEffect monsterStatusEffect = new MonsterStatusEffect(Collections.singletonMap(MonsterStatus.POISON, 1), type, null, false);
+                              MonsterStatusEffect monsterStatusEffect =
+                                    new MonsterStatusEffect(Collections.singletonMap(MonsterStatus.POISON, 1), type, null, false);
                               monster.applyStatus(player, monsterStatusEffect, false, venomEffect.getDuration(), true);
                            }
                         }
@@ -483,7 +525,8 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
                                  api.gainItem(shellId, (short) -1, false);
                                  totDamageToOneMonster *= player.getLevel();
                               } else {
-                                 MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("RAN_OUT_OF_SHELLS"));
+                                 MessageBroadcaster.getInstance()
+                                       .sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("RAN_OUT_OF_SHELLS"));
                               }
                            } else {
                               totDamageToOneMonster = 0;
@@ -496,7 +539,8 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
                   Map<MonsterStatus, Integer> attackEffectStati = attackEffect.getMonsterStati();
                   if (!attackEffectStati.isEmpty()) {
                      if (attackEffect.makeChanceResult()) {
-                        monster.applyStatus(player, new MonsterStatusEffect(attackEffectStati, theSkill, null, false), attackEffect.isPoison(), attackEffect.getDuration());
+                        monster.applyStatus(player, new MonsterStatusEffect(attackEffectStati, theSkill, null, false),
+                              attackEffect.isPoison(), attackEffect.getDuration());
                      }
                   }
                }
@@ -509,7 +553,8 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
                            .map(MapleStatEffect::getDamage)
                            .orElse(0);
                      int HHDmg = (player.calculateMaxBaseDamage(player.getTotalWeaponAttack()) * (skillDamage / 100));
-                     damageMonsterWithSkill(player, map, monster, (int) (Math.floor(Math.random() * (HHDmg / 5) + HHDmg * .8)), attack.skill(), 1777);
+                     damageMonsterWithSkill(player, map, monster, (int) (Math.floor(Math.random() * (HHDmg / 5) + HHDmg * .8)),
+                           attack.skill(), 1777);
                   }
                } else if (attack.skill() == Aran.COMBO_TEMPEST) {
                   if (!monster.isBoss()) {
@@ -519,11 +564,13 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
                            .map(skill -> skill.getEffect(player.getSkillLevel(skill)))
                            .map(MapleStatEffect::getDamage).orElse(0);
                      int TmpDmg = (player.calculateMaxBaseDamage(player.getTotalWeaponAttack()) * (skillDamage / 100));
-                     damageMonsterWithSkill(player, map, monster, (int) (Math.floor(Math.random() * (TmpDmg / 5) + TmpDmg * .8)), attack.skill(), 0);
+                     damageMonsterWithSkill(player, map, monster, (int) (Math.floor(Math.random() * (TmpDmg / 5) + TmpDmg * .8)),
+                           attack.skill(), 0);
                   }
                } else {
                   if (attack.skill() == Aran.BODY_PRESSURE) {
-                     MasterBroadcaster.getInstance().sendToAllInMap(map, new DamageMonster(monster.objectId(), totDamageToOneMonster));
+                     MasterBroadcaster.getInstance()
+                           .sendToAllInMap(map, new DamageMonster(monster.objectId(), totDamageToOneMonster));
                   }
 
                   map.damageMonster(player, monster, totDamageToOneMonster);
@@ -535,7 +582,9 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
                      if (ms.left == 145) {
                         MobSkill toUse = MobSkillFactory.getMobSkill(ms.left, ms.right);
                         player.addHP(-toUse.x());
-                        MasterBroadcaster.getInstance().sendToAllInMap(map, new DamageCharacter(0, monster.id(), player.getId(), toUse.x(), 0, 0, false, 0, true, monster.objectId(), 0, 0), true, player);
+                        MasterBroadcaster.getInstance().sendToAllInMap(map,
+                              new DamageCharacter(0, monster.id(), player.getId(), toUse.x(), 0, 0, false, 0, true,
+                                    monster.objectId(), 0, 0), true, player);
                      }
                   }
                }
@@ -546,7 +595,9 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
                      if (ms.left == 145) {
                         MobSkill toUse = MobSkillFactory.getMobSkill(ms.left, ms.right);
                         player.addHP(-toUse.y());
-                        MasterBroadcaster.getInstance().sendToAllInMap(map, new DamageCharacter(0, monster.id(), player.getId(), toUse.y(), 0, 0, false, 0, true, monster.objectId(), 0, 0), true, player);
+                        MasterBroadcaster.getInstance().sendToAllInMap(map,
+                              new DamageCharacter(0, monster.id(), player.getId(), toUse.y(), 0, 0, false, 0, true,
+                                    monster.objectId(), 0, 0), true, player);
                      }
                   }
                }

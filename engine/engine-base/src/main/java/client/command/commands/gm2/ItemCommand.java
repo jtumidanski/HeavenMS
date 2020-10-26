@@ -3,7 +3,7 @@ package client.command.commands.gm2;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.inventory.manipulator.MapleInventoryManipulator;
-import constants.inventory.ItemConstants;
+import constants.ItemConstants;
 
 public class ItemCommand extends AbstractItemProductionCommand {
    {
