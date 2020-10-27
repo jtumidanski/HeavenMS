@@ -387,7 +387,7 @@ public class CharacterResource {
                boolean canHold = character.getAbstractPlayerInteraction()
                      .canHoldAllAfterRemoving(toAddItemIds, toAddQuantity, toRemoveItemIds, toRemoveQuantity);
                if (canHold) {
-                  resultBuilder.setStatus(Response.Status.OK);
+                  resultBuilder.setStatus(Response.Status.NO_CONTENT);
                   resultBuilder.addData(new ResultObjectBuilder(NoopAttributes.class, 0));
                }
             });
@@ -547,7 +547,7 @@ public class CharacterResource {
                resultBuilder.setStatus(Response.Status.OK);
                MessageBroadcaster.getInstance()
                      .sendServerNotice(character, ServerNoticeType.valueOf(data.getAttributes().getType()),
-                           I18nMessage.from(data.getAttributes().getType()).with(data.getAttributes().getReplacements()));
+                           I18nMessage.from(data.getAttributes().getToken()).with(data.getAttributes().getReplacements()));
             });
       return resultBuilder.build();
    }
