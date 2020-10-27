@@ -26,7 +26,9 @@ class Quest1021 {
          }
 
          if (status == 0) {
-            qm.sendNext(I18nMessage.from("1021_HELLO").with(qm.getPlayer().getGender() == 0 ? I18nMessage.from("INFORMAL_MALE") : I18nMessage.from("INFORMAL_FEMALE").to(qm.getClient()).evaluate()))
+            String token = qm.getPlayer().getGender() == 0 ? "INFORMAL_MALE" : "INFORMAL_FEMALE"
+            String i18nToken = I18nMessage.from(token).to(qm.getClient()).evaluate()
+            qm.sendNext(I18nMessage.from("1021_HELLO").with(i18nToken))
          } else if (status == 1) {
             qm.sendNextPrev(I18nMessage.from("1021_WHO_MADE_ME"))
          } else if (status == 2) {
