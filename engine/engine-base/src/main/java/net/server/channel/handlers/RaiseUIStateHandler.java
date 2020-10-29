@@ -4,8 +4,8 @@ import client.MapleClient;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.RaiseUIStatePacket;
 import net.server.channel.packet.reader.RaiseUIStateReader;
-import rest.master.attributes.DelayedQuestUpdate;
-import rest.master.attributes.builders.QuestUpdateAttributesBuilder;
+import rest.DelayedQuestUpdate;
+import rest.builders.QuestUpdateAttributesBuilder;
 import server.processor.QuestProcessor;
 
 public class RaiseUIStateHandler extends AbstractPacketHandler<RaiseUIStatePacket> {

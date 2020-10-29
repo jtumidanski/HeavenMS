@@ -63,6 +63,12 @@
         </dependency>
         <dependency>
             <groupId>ms</groupId>
+            <artifactId>engine-api</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>ms</groupId>
             <artifactId>engine-database</artifactId>
             <version>1.0-SNAPSHOT</version>
             <scope>compile</scope>
@@ -75,11 +81,28 @@
         </dependency>
         <dependency>
             <groupId>ms</groupId>
-            <artifactId>shared-rest</artifactId>
+            <artifactId>logs-api</artifactId>
             <version>1.0-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
-
+        <dependency>
+            <groupId>ms</groupId>
+            <artifactId>bos-api</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>ms</groupId>
+            <artifactId>cos-api</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>ms</groupId>
+            <artifactId>qos-api</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
         <dependency>
             <groupId>org.apache.mina</groupId>
             <artifactId>mina-core</artifactId>

@@ -16,6 +16,7 @@
         <module>engine-base</module>
         <module>engine-model</module>
         <module>engine-database</module>
+        <module>engine-api</module>
     </modules>
 
     <dependencies>

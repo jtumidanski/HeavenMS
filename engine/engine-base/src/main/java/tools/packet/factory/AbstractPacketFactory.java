@@ -26,7 +26,7 @@ import constants.MapleInventoryType;
 import constants.game.ExpTable;
 import constants.game.GameConstants;
 import net.server.PlayerCoolDownValueHolder;
-import rest.quest.attributes.CharacterQuestAttributes;
+import rest.CharacterQuestAttributes;
 import server.MapleItemInformationProvider;
 import server.maps.MapleMiniGame;
 import server.processor.QuestProcessor;

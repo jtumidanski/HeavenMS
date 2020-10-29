@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import client.MapleCharacter;
-import rest.quest.attributes.QuestItemAttributes;
+import rest.QuestItemAttributes;
 import server.life.MapleMonsterInformationProvider;
 import server.life.MonsterDropEntry;
 import server.processor.QuestProcessor;
