@@ -1,17 +1,16 @@
 package database.administrator;
 
+import accessor.AbstractQueryExecutor;
+import entity.MonsterBook;
+
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
 
-import accessor.AbstractQueryExecutor;
-import database.DeleteForCharacter;
-import entity.MonsterBook;
-
-public class MonsterBookAdministrator extends AbstractQueryExecutor implements DeleteForCharacter {
+public class MonsterBookAdministrator extends AbstractQueryExecutor {
    private static MonsterBookAdministrator instance;
 
    public static MonsterBookAdministrator getInstance() {
@@ -24,7 +23,6 @@ public class MonsterBookAdministrator extends AbstractQueryExecutor implements D
    private MonsterBookAdministrator() {
    }
 
-   @Override
    public void deleteForCharacter(EntityManager entityManager, int characterId) {
       Query query = entityManager.createQuery("DELETE FROM MonsterBook WHERE characterId = :characterId");
       query.setParameter("characterId", characterId);

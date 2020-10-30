@@ -11,7 +11,7 @@ import provider.MapleDataProvider;
 import provider.MapleDataProviderFactory;
 import provider.MapleDataTool;
 import rest.DataBody;
-import rest.quest.attributes.QuestAttributes;
+import rest.QuestAttributes;
 import server.MapleItemInformationProvider;
 import server.processor.QuestProcessor;
 import tools.I18nMessage;

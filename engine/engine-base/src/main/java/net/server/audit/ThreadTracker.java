@@ -16,11 +16,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import com.ms.logs.LogType;
+import com.ms.logs.LoggerOriginator;
+import com.ms.logs.LoggerUtil;
 import net.server.audit.locks.MonitoredLockType;
 import server.TimerManager;
-import tools.LogType;
-import tools.LoggerOriginator;
-import tools.LoggerUtil;
 
 /**
  * This tool has the main purpose of auditing deadlocks throughout the server and must be used only for debugging. The flag is USE_THREAD_TRACKER.

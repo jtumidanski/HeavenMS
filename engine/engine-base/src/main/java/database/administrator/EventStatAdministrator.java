@@ -8,11 +8,10 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import accessor.AbstractQueryExecutor;
-import database.DeleteForCharacter;
 import entity.EventStat;
 import server.events.MapleEvents;
 
-public class EventStatAdministrator extends AbstractQueryExecutor implements DeleteForCharacter {
+public class EventStatAdministrator extends AbstractQueryExecutor {
    private static EventStatAdministrator instance;
 
    public static EventStatAdministrator getInstance() {
@@ -25,7 +24,6 @@ public class EventStatAdministrator extends AbstractQueryExecutor implements Del
    private EventStatAdministrator() {
    }
 
-   @Override
    public void deleteForCharacter(EntityManager entityManager, int characterId) {
       Query query = entityManager.createQuery("DELETE FROM EventStat WHERE characterId = :characterId");
       query.setParameter("characterId", characterId);

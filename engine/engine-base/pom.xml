@@ -166,5 +166,31 @@
             <version>1.0-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>ms</groupId>
+            <artifactId>logs-util</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>mavenapache</id>
+            <name>mavenapache</name>
+            <url>https://repo.maven.apache.org/maven2</url>
+        </repository>
+        <repository>
+            <id>repsy</id>
+            <name>heavenms</name>
+            <url>https://repo.repsy.io/mvn/jtumidanski/default</url>
+        </repository>
+    </repositories>
+
+    <distributionManagement>
+        <repository>
+            <id>repsy</id>
+            <name>HeavenMS Repo</name>
+            <url>https://repo.repsy.io/mvn/jtumidanski/default</url>
+        </repository>
+    </distributionManagement>
 </project>

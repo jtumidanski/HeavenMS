@@ -2,6 +2,9 @@ package net.server.channel.handlers;
 
 import client.MapleCharacter;
 import client.MapleClient;
+import com.ms.logs.LogType;
+import com.ms.logs.LoggerOriginator;
+import com.ms.logs.LoggerUtil;
 import constants.game.GameConstants;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.FieldDamageMobPacket;
@@ -9,9 +12,6 @@ import net.server.channel.packet.reader.FieldDamageMobReader;
 import server.life.MapleMonster;
 import server.life.MapleMonsterInformationProvider;
 import server.maps.MapleMap;
-import tools.LogType;
-import tools.LoggerOriginator;
-import tools.LoggerUtil;
 import tools.MasterBroadcaster;
 import tools.packet.monster.DamageMonster;
 

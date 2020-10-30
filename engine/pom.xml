@@ -31,4 +31,12 @@
             <version>5.4.9.Final</version>
         </dependency>
     </dependencies>
+
+    <distributionManagement>
+        <repository>
+            <id>repsy</id>
+            <name>HeavenMS Repo</name>
+            <url>https://repo.repsy.io/mvn/jtumidanski/default</url>
+        </repository>
+    </distributionManagement>
 </project>

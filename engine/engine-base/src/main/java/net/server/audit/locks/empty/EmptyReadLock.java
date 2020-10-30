@@ -1,10 +1,10 @@
 package net.server.audit.locks.empty;
 
+import com.ms.logs.LogType;
+import com.ms.logs.LoggerOriginator;
+import com.ms.logs.LoggerUtil;
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.MonitoredReadLock;
-import tools.LogType;
-import tools.LoggerOriginator;
-import tools.LoggerUtil;
 
 public class EmptyReadLock extends AbstractEmptyLock implements MonitoredReadLock {
    private final MonitoredLockType id;

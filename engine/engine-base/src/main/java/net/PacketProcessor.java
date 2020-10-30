@@ -4,11 +4,11 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import com.ms.logs.LogType;
+import com.ms.logs.LoggerOriginator;
+import com.ms.logs.LoggerUtil;
 import net.opcodes.RecvOpcode;
 import net.server.HandlerFactory;
-import tools.LogType;
-import tools.LoggerOriginator;
-import tools.LoggerUtil;
 
 public final class PacketProcessor {
 

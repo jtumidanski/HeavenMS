@@ -1,17 +1,16 @@
 package database.administrator;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.List;
+import accessor.AbstractQueryExecutor;
+import entity.mts.MtsItem;
+
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.List;
 
-import accessor.AbstractQueryExecutor;
-import database.DeleteForCharacter;
-import entity.mts.MtsItem;
-
-public class MtsItemAdministrator extends AbstractQueryExecutor implements DeleteForCharacter {
+public class MtsItemAdministrator extends AbstractQueryExecutor {
    private static MtsItemAdministrator instance;
 
    public static MtsItemAdministrator getInstance() {
@@ -24,7 +23,6 @@ public class MtsItemAdministrator extends AbstractQueryExecutor implements Delet
    private MtsItemAdministrator() {
    }
 
-   @Override
    public void deleteForCharacter(EntityManager entityManager, int characterId) {
       TypedQuery<Integer> query = entityManager.createQuery("SELECT m.id FROM MtsCart m WHERE m.characterId = :characterId", Integer.class);
       query.setParameter("characterId", characterId);

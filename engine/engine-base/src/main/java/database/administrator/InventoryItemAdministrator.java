@@ -6,11 +6,10 @@ import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import accessor.AbstractQueryExecutor;
-import database.DeleteForCharacter;
 import entity.InventoryItem;
 import tools.Pair;
 
-public class InventoryItemAdministrator extends AbstractQueryExecutor implements DeleteForCharacter {
+public class InventoryItemAdministrator extends AbstractQueryExecutor {
    private static InventoryItemAdministrator instance;
 
    public static InventoryItemAdministrator getInstance() {
@@ -23,7 +22,6 @@ public class InventoryItemAdministrator extends AbstractQueryExecutor implements
    private InventoryItemAdministrator() {
    }
 
-   @Override
    public void deleteForCharacter(EntityManager entityManager, int characterId) {
       Query query = entityManager.createQuery("DELETE FROM InventoryItem WHERE characterId = :characterId");
       query.setParameter("characterId", characterId);

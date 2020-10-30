@@ -7,12 +7,11 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import accessor.AbstractQueryExecutor;
-import database.DeleteForCharacter;
 import entity.LocationType;
 import server.maps.SavedLocation;
 import tools.Pair;
 
-public class SavedLocationAdministrator extends AbstractQueryExecutor implements DeleteForCharacter {
+public class SavedLocationAdministrator extends AbstractQueryExecutor {
    private static SavedLocationAdministrator instance;
 
    public static SavedLocationAdministrator getInstance() {
@@ -25,7 +24,6 @@ public class SavedLocationAdministrator extends AbstractQueryExecutor implements
    private SavedLocationAdministrator() {
    }
 
-   @Override
    public void deleteForCharacter(EntityManager entityManager, int characterId) {
       Query query = entityManager.createQuery("DELETE FROM SavedLocation WHERE characterId = :characterId");
       query.setParameter("characterId", characterId);

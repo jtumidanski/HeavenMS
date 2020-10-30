@@ -1,20 +1,18 @@
 package scripting.event;
 
+import com.ms.logs.LogType;
+import com.ms.logs.LoggerOriginator;
+import com.ms.logs.LoggerUtil;
+import net.server.channel.Channel;
+import scripting.AbstractScriptManager;
+
+import javax.script.Invocable;
+import javax.script.ScriptEngine;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.script.Invocable;
-import javax.script.ScriptEngine;
-
-import net.server.channel.Channel;
-import scripting.AbstractScriptManager;
-import tools.LogType;
-import tools.LoggerOriginator;
-import tools.LoggerUtil;
 
 public class EventScriptManager extends AbstractScriptManager {
 

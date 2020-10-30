@@ -4,12 +4,12 @@ import java.util.Optional;
 
 import client.MapleClient;
 import client.processor.CharacterProcessor;
+import com.ms.logs.LogType;
+import com.ms.logs.LoggerOriginator;
+import com.ms.logs.LoggerUtil;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.reader.DeleteCharacterReader;
 import net.server.login.packet.DeleteCharacterPacket;
-import tools.LogType;
-import tools.LoggerOriginator;
-import tools.LoggerUtil;
 import tools.PacketCreator;
 import tools.packet.DeleteCharacter;
 import tools.packet.DeleteCharacterResponse;

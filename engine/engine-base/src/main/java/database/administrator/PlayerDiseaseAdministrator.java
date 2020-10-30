@@ -1,20 +1,19 @@
 package database.administrator;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
-
 import accessor.AbstractQueryExecutor;
 import client.MapleAbnormalStatus;
-import database.DeleteForCharacter;
 import entity.PlayerDisease;
 import server.life.MobSkill;
 import tools.Pair;
 
-public class PlayerDiseaseAdministrator extends AbstractQueryExecutor implements DeleteForCharacter {
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+public class PlayerDiseaseAdministrator extends AbstractQueryExecutor {
    private static PlayerDiseaseAdministrator instance;
 
    public static PlayerDiseaseAdministrator getInstance() {
@@ -40,7 +39,6 @@ public class PlayerDiseaseAdministrator extends AbstractQueryExecutor implements
       insertBulk(entityManager, playerDiseaseList);
    }
 
-   @Override
    public void deleteForCharacter(EntityManager entityManager, int characterId) {
       Query query = entityManager.createQuery("DELETE FROM PlayerDisease WHERE characterId = :characterId");
       query.setParameter("characterId", characterId);

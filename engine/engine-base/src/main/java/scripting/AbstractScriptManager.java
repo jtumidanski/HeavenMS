@@ -9,9 +9,9 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
 import client.MapleClient;
-import tools.LogType;
-import tools.LoggerOriginator;
-import tools.LoggerUtil;
+import com.ms.logs.LogType;
+import com.ms.logs.LoggerOriginator;
+import com.ms.logs.LoggerUtil;
 
 public abstract class AbstractScriptManager {
    private final ScriptEngineFactory sef;

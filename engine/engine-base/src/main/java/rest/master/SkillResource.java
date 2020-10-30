@@ -12,8 +12,8 @@ import builder.ResultBuilder;
 import builder.ResultObjectBuilder;
 import client.Skill;
 import client.SkillFactory;
-import rest.master.attributes.SkillAttributes;
-import rest.master.attributes.builders.SkillAttributesBuilder;
+import rest.SkillAttributes;
+import rest.builders.SkillAttributesBuilder;
 import server.MapleItemInformationProvider;
 
 @Path("skills")

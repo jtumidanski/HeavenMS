@@ -5,6 +5,9 @@ import java.util.Set;
 
 import client.MapleCharacter;
 import client.MapleClient;
+import com.ms.logs.LogType;
+import com.ms.logs.LoggerOriginator;
+import com.ms.logs.LoggerUtil;
 import net.opcodes.RecvOpcode;
 
 public class MapleLogger {

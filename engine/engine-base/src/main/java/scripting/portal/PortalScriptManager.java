@@ -6,11 +6,11 @@ import javax.script.Invocable;
 import javax.script.ScriptEngine;
 
 import client.MapleClient;
+import com.ms.logs.LogType;
+import com.ms.logs.LoggerOriginator;
+import com.ms.logs.LoggerUtil;
 import scripting.AbstractScriptManager;
 import server.maps.MaplePortal;
-import tools.LogType;
-import tools.LoggerOriginator;
-import tools.LoggerUtil;
 
 public class PortalScriptManager extends AbstractScriptManager {
 

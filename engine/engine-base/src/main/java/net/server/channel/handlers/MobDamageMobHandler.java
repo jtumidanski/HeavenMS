@@ -7,15 +7,15 @@ import client.MapleClient;
 import client.autoban.AutoBanFactory;
 import client.status.MonsterStatus;
 import client.status.MonsterStatusEffect;
+import com.ms.logs.LogType;
+import com.ms.logs.LoggerOriginator;
+import com.ms.logs.LoggerUtil;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.MobDamageMobPacket;
 import net.server.channel.packet.reader.MobDamageMobReader;
 import server.life.MapleMonster;
 import server.life.MapleMonsterInformationProvider;
 import server.maps.MapleMap;
-import tools.LogType;
-import tools.LoggerOriginator;
-import tools.LoggerUtil;
 import tools.MasterBroadcaster;
 import tools.packet.monster.DamageMonster;
 

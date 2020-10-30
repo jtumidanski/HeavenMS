@@ -7,11 +7,11 @@ import javax.script.Invocable;
 import javax.script.ScriptEngine;
 
 import client.MapleClient;
+import com.ms.logs.LogType;
+import com.ms.logs.LoggerOriginator;
+import com.ms.logs.LoggerUtil;
 import constants.game.GameConstants;
 import scripting.AbstractScriptManager;
-import tools.LogType;
-import tools.LoggerOriginator;
-import tools.LoggerUtil;
 
 public class QuestScriptManager extends AbstractScriptManager {
 

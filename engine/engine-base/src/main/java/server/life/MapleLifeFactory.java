@@ -11,15 +11,15 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import com.ms.logs.LogType;
+import com.ms.logs.LoggerOriginator;
+import com.ms.logs.LoggerUtil;
 import provider.MapleData;
 import provider.MapleDataProvider;
 import provider.MapleDataProviderFactory;
 import provider.MapleDataTool;
 import provider.wz.MapleDataType;
 import server.life.builder.MapleMonsterStatsBuilder;
-import tools.LogType;
-import tools.LoggerOriginator;
-import tools.LoggerUtil;
 import tools.Pair;
 import tools.StringUtil;
 

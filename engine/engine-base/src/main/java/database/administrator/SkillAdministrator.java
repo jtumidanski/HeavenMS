@@ -12,9 +12,8 @@ import javax.persistence.TypedQuery;
 import accessor.AbstractQueryExecutor;
 import client.Skill;
 import client.SkillEntry;
-import database.DeleteForCharacter;
 
-public class SkillAdministrator extends AbstractQueryExecutor implements DeleteForCharacter {
+public class SkillAdministrator extends AbstractQueryExecutor {
    private static SkillAdministrator instance;
 
    public static SkillAdministrator getInstance() {
@@ -27,7 +26,6 @@ public class SkillAdministrator extends AbstractQueryExecutor implements DeleteF
    private SkillAdministrator() {
    }
 
-   @Override
    public void deleteForCharacter(EntityManager entityManager, int characterId) {
       Query query = entityManager.createQuery("DELETE FROM Skill WHERE characterId = :characterId");
       query.setParameter("characterId", characterId);

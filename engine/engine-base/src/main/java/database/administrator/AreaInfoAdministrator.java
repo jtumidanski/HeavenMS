@@ -6,10 +6,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import accessor.AbstractQueryExecutor;
-import database.DeleteForCharacter;
 import entity.AreaInfo;
 
-public class AreaInfoAdministrator extends AbstractQueryExecutor implements DeleteForCharacter {
+public class AreaInfoAdministrator extends AbstractQueryExecutor {
    private static AreaInfoAdministrator instance;
 
    public static AreaInfoAdministrator getInstance() {
@@ -22,7 +21,6 @@ public class AreaInfoAdministrator extends AbstractQueryExecutor implements Dele
    private AreaInfoAdministrator() {
    }
 
-   @Override
    public void deleteForCharacter(EntityManager entityManager, int characterId) {
       Query query = entityManager.createQuery("DELETE FROM AreaInfo WHERE characterId = :characterId");
       query.setParameter("characterId", characterId);

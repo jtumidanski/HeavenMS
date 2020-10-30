@@ -6,11 +6,10 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import accessor.AbstractQueryExecutor;
-import database.DeleteForCharacter;
 import entity.CoolDown;
 import net.server.PlayerCoolDownValueHolder;
 
-public class CoolDownAdministrator extends AbstractQueryExecutor implements DeleteForCharacter {
+public class CoolDownAdministrator extends AbstractQueryExecutor {
    private static CoolDownAdministrator instance;
 
    public static CoolDownAdministrator getInstance() {
@@ -35,7 +34,6 @@ public class CoolDownAdministrator extends AbstractQueryExecutor implements Dele
       insertBulk(entityManager, coolDownList);
    }
 
-   @Override
    public void deleteForCharacter(EntityManager entityManager, int characterId) {
       Query query = entityManager.createQuery("DELETE FROM CoolDown WHERE characterId = :characterId");
       query.setParameter("characterId", characterId);

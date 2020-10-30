@@ -3,11 +3,11 @@ package net.server;
 import java.util.Optional;
 
 import client.MapleClient;
+import com.ms.logs.LogType;
+import com.ms.logs.LoggerOriginator;
+import com.ms.logs.LoggerUtil;
 import net.MaplePacketHandler;
 import net.server.channel.packet.PacketReaderFactory;
-import tools.LogType;
-import tools.LoggerOriginator;
-import tools.LoggerUtil;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 public abstract class AbstractPacketHandler<T extends MaplePacket> implements MaplePacketHandler {

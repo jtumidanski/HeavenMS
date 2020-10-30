@@ -1,14 +1,13 @@
 package database.administrator;
 
 
+import accessor.AbstractQueryExecutor;
+import entity.FameLog;
+
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import accessor.AbstractQueryExecutor;
-import database.DeleteForCharacter;
-import entity.FameLog;
-
-public class FameLogAdministrator extends AbstractQueryExecutor implements DeleteForCharacter {
+public class FameLogAdministrator extends AbstractQueryExecutor {
    private static FameLogAdministrator instance;
 
    public static FameLogAdministrator getInstance() {
@@ -28,7 +27,6 @@ public class FameLogAdministrator extends AbstractQueryExecutor implements Delet
       insert(entityManager, fameLog);
    }
 
-   @Override
    public void deleteForCharacter(EntityManager entityManager, int characterId) {
       Query query = entityManager.createQuery("DELETE FROM FameLog WHERE characterIdTo = :characterId");
       query.setParameter("characterId", characterId);

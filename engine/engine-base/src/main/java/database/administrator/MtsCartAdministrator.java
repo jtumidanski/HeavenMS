@@ -5,10 +5,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import accessor.AbstractQueryExecutor;
-import database.DeleteForCharacter;
 import entity.mts.MtsCart;
 
-public class MtsCartAdministrator extends AbstractQueryExecutor implements DeleteForCharacter {
+public class MtsCartAdministrator extends AbstractQueryExecutor {
    private static MtsCartAdministrator instance;
 
    public static MtsCartAdministrator getInstance() {
@@ -21,7 +20,6 @@ public class MtsCartAdministrator extends AbstractQueryExecutor implements Delet
    private MtsCartAdministrator() {
    }
 
-   @Override
    public void deleteForCharacter(EntityManager entityManager, int characterId) {
       Query query = entityManager.createQuery("DELETE FROM MtsCart WHERE characterId = :characterId");
       query.setParameter("characterId", characterId);

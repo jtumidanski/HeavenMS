@@ -6,10 +6,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import accessor.AbstractQueryExecutor;
-import database.DeleteForCharacter;
 import net.server.SkillMacro;
 
-public class SkillMacroAdministrator extends AbstractQueryExecutor implements DeleteForCharacter {
+public class SkillMacroAdministrator extends AbstractQueryExecutor {
    private static SkillMacroAdministrator instance;
 
    public static SkillMacroAdministrator getInstance() {
@@ -22,7 +21,6 @@ public class SkillMacroAdministrator extends AbstractQueryExecutor implements De
    private SkillMacroAdministrator() {
    }
 
-   @Override
    public void deleteForCharacter(EntityManager entityManager, int characterId) {
       Query query = entityManager.createQuery("DELETE FROM SkillMacro WHERE characterId = :characterId");
       query.setParameter("characterId", characterId);

@@ -1,18 +1,17 @@
 package database.administrator;
 
+import accessor.AbstractQueryExecutor;
+import client.KeyBinding;
+import entity.KeyMap;
+
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
 
-import accessor.AbstractQueryExecutor;
-import client.KeyBinding;
-import database.DeleteForCharacter;
-import entity.KeyMap;
-
-public class KeyMapAdministrator extends AbstractQueryExecutor implements DeleteForCharacter {
+public class KeyMapAdministrator extends AbstractQueryExecutor {
    private static KeyMapAdministrator instance;
 
    public static KeyMapAdministrator getInstance() {
@@ -25,7 +24,6 @@ public class KeyMapAdministrator extends AbstractQueryExecutor implements Delete
    private KeyMapAdministrator() {
    }
 
-   @Override
    public void deleteForCharacter(EntityManager entityManager, int characterId) {
       Query query = entityManager.createQuery("DELETE FROM KeyMap WHERE characterId = :characterId");
       query.setParameter("characterId", characterId);

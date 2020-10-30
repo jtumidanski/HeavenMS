@@ -10,8 +10,8 @@ import javax.ws.rs.core.Response;
 
 import builder.ResultBuilder;
 import builder.ResultObjectBuilder;
-import rest.master.attributes.ItemAttributes;
-import rest.master.attributes.builders.ItemAttributesBuilder;
+import rest.ItemAttributes;
+import rest.builders.ItemAttributesBuilder;
 import server.MapleItemInformationProvider;
 
 @Path("items")

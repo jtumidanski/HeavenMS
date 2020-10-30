@@ -11,7 +11,7 @@ import client.inventory.MaplePet;
 import constants.MapleInventoryType;
 import net.server.Server;
 import net.server.guild.MapleAlliance;
-import rest.quest.attributes.CharacterQuestAttributes;
+import rest.CharacterQuestAttributes;
 import server.MapleItemInformationProvider;
 import server.processor.QuestProcessor;
 import tools.data.output.MaplePacketLittleEndianWriter;

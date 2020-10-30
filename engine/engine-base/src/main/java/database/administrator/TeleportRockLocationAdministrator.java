@@ -6,10 +6,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import accessor.AbstractQueryExecutor;
-import database.DeleteForCharacter;
 import entity.TransferRockLocation;
 
-public class TeleportRockLocationAdministrator extends AbstractQueryExecutor implements DeleteForCharacter {
+public class TeleportRockLocationAdministrator extends AbstractQueryExecutor {
    private static TeleportRockLocationAdministrator instance;
 
    public static TeleportRockLocationAdministrator getInstance() {
@@ -22,7 +21,6 @@ public class TeleportRockLocationAdministrator extends AbstractQueryExecutor imp
    private TeleportRockLocationAdministrator() {
    }
 
-   @Override
    public void deleteForCharacter(EntityManager entityManager, int characterId) {
       Query query = entityManager.createQuery("DELETE FROM TransferRockLocation WHERE characterId = :characterId");
       query.setParameter("characterId", characterId);
