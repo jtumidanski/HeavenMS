@@ -9,6 +9,7 @@ COPY engine/engine-base/pom.xml engine/engine-base/pom.xml
 COPY engine/engine-database/pom.xml engine/engine-database/pom.xml
 COPY engine/engine-model/pom.xml engine/engine-model/pom.xml
 COPY engine/engine-common/pom.xml engine/engine-common/pom.xml
+COPY engine/engine-api/pom.xml engine/engine-api/pom.xml
 
 COPY pom.xml pom.xml
 
@@ -19,6 +20,7 @@ COPY engine/engine-base/src engine/engine-base/src
 COPY engine/engine-database/src engine/engine-database/src
 COPY engine/engine-model/src engine/engine-model/src
 COPY engine/engine-common/src engine/engine-common/src
+COPY engine/engine-api/src engine/engine-api/src
 
 # package our application code
 RUN mvn install -DskipTests
