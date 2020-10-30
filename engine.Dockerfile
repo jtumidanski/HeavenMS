@@ -41,4 +41,4 @@ ENV JAVA_TOOL_OPTIONS -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,addr
 
 RUN chmod +x /wait
 
-CMD /wait && java --enable-preview -jar engine/engine-base-1.0-SNAPSHOT-jar-with-dependencies.jar -Dwzpath=wz -Xdebug
+CMD /wait && java --enable-preview -jar engine/engine-base-1.0-SNAPSHOT.jar -Dwzpath=wz -Xdebug
