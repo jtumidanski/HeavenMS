@@ -1,93 +1,61 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
+# Docker
+# Build and push an image to Azure Container Registry
+# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
 
 trigger:
-  branches:
-    include:
-    - master
-  paths:
-    include:
-    - shared/*
-    - parent/*
-    - engine/*
-    - script/*
+  - master
 
 resources:
-  repositories:
-    - repository: AppCore # The name used to reference this repository in the checkout step
-      type: github
-      endpoint: jtumidanski
-      name: jtumidanski/app-core
-      trigger:
-        - main
-    - repository: self
+  - repo: self
 
 variables:
   # Container registry service connection established during pipeline creation
-  dockerRegistryServiceConnection: '6785a84c-c1b4-4562-b6a6-6accd92e953f'
-  imageRepository: 'ms-engine'
+  dockerRegistryServiceConnection: '7b0ec93b-680d-46ec-88bf-43cbad4835ed'
+  imageRepository: 'msquests'
   containerRegistry: 'heavenms.azurecr.io'
-  dockerfilePath: '$(Build.SourcesDirectory)/HeavenMS/engine/Dockerfile'
+  dockerfilePath: '$(Build.SourcesDirectory)/engine.Dockerfile'
   tag: '$(Build.BuildId)'
 
 stages:
-- stage: Build
-  displayName: Build
-  jobs:  
-  - job: Build
-    displayName: Build
-    pool:
-      vmImage: 'macos-latest'
-    steps:
-        - checkout: AppCore
-        - task: Maven@3
-          inputs:
-            mavenPomFile: 'app-core/pom.xml'
-            mavenOptions: '-Xmx3072m'
-            publishJUnitResults: false
-            options: '-DskipTests'
-            goals: 'install'
-          env:
-            JAVA_HOME: $(JAVA_HOME_14_X64)
-            PATH: $(JAVA_HOME_14_X64)/bin:$(PATH)
-        - checkout: self
-        - task: Maven@3
-          inputs:
-            mavenPomFile: 'HeavenMS/pom.xml'
-            mavenOptions: '-Xmx3072m'
-            publishJUnitResults: false
-            options: '-DskipTests'
-            goals: 'install'
-          env:
-            JAVA_HOME: $(JAVA_HOME_14_X64)
-            PATH: $(JAVA_HOME_14_X64)/bin:$(PATH)
-        - task: PublishBuildArtifacts@1
-          inputs:
-            PathtoPublish: '$(Build.SourcesDirectory)'
-            ArtifactName: 'drop'
-            publishLocation: 'Container'
-- stage: BuildContainer
-  displayName: Build Container
-  jobs:  
-  - job: BuildContainer
-    displayName: Build Container
-    pool:
-      vmImage: 'ubuntu-latest'
-    steps:
-      - task: DownloadBuildArtifacts@0
-        inputs:
-          buildType: 'current'
-          downloadType: 'single'
-          artifactName: 'drop'
-          downloadPath: '$(System.SourcesDirectory)'
-      - task: Docker@2
-        displayName: Build and push an image to container registry
-        inputs:
-          command: buildAndPush
-          repository: $(imageRepository)
-          dockerfile: $(dockerfilePath)
-          containerRegistry: $(dockerRegistryServiceConnection)
-          tags: |
-            $(tag)
+  - stage: BuildArtifacts
+    displayName: Build and Deploy Artifacts
+    jobs:
+      - job: Build
+        displayName: Build and Deploy Artifacts
+        pool:
+          vmImage: 'macos-latest'
+        steps:
+          - task: MavenAuthenticate@0
+            inputs:
+              artifactsFeeds: 'JustinTumidanski'
+              mavenServiceConnections: 'maven'
+          - task: Maven@3
+            inputs:
+              mavenPomFile: 'pom.xml'
+              goals: 'compile deploy'
+              publishJUnitResults: false
+              javaHomeOption: 'JDKVersion'
+              mavenVersionOption: 'Default'
+              mavenAuthenticateFeed: false
+              effectivePomSkip: false
+              sonarQubeRunAnalysis: false
+            env:
+              JAVA_HOME: $(JAVA_HOME_14_X64)
+              PATH: $(JAVA_HOME_14_X64)/bin:$(PATH)
+  - stage: BuildDocker
+    displayName: Build and Push Docker Image
+    jobs:
+      - job: Build
+        displayName: Build and Push Docker Image
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - task: Docker@2
+            displayName: Build and push an image to container registry
+            inputs:
+              command: buildAndPush
+              repository: $(imageRepository)
+              dockerfile: $(dockerfilePath)
+              containerRegistry: $(dockerRegistryServiceConnection)
+              tags: |
+                $(tag)
