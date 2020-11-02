@@ -63,4 +63,8 @@ public class CharacterAttributesBuilder extends Builder<CharacterAttributes, Cha
    public CharacterAttributesBuilder setY(Integer y) {
       return add(attr -> attr.setY(y));
    }
+
+   public CharacterAttributesBuilder setHp(Integer hp) {
+      return add(attr -> attr.setHp(hp));
+   }
 }

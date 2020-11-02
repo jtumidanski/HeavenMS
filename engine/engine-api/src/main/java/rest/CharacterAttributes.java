@@ -25,6 +25,8 @@ public class CharacterAttributes implements AttributeResult {
 
    private Integer y;
 
+   private Integer hp;
+
    public String getName() {
       return name;
    }
@@ -119,5 +121,13 @@ public class CharacterAttributes implements AttributeResult {
 
    public void setY(Integer y) {
       this.y = y;
+   }
+
+   public Integer getHp() {
+      return hp;
+   }
+
+   public void setHp(Integer hp) {
+      this.hp = hp;
    }
 }
