@@ -10,7 +10,7 @@ import java.awt.*
 class Map100000006 {
 
    static def start(MapScriptMethods ms) {
-      if (ms.getQuestStatus(2175) == 1) {
+      if (ms.isQuestStarted(2175)) {
          int mobId = 9300156
          MapleCharacter player = ms.getPlayer()
          MapleMap map = player.getMap()

@@ -4,8 +4,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
+import com.ms.qos.rest.QuestItemAttributes;
+
 import client.MapleCharacter;
-import rest.QuestItemAttributes;
 import server.life.MapleMonsterInformationProvider;
 import server.life.MonsterDropEntry;
 import server.processor.QuestProcessor;

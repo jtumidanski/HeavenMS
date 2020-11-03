@@ -5,28 +5,33 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.ms.qos.rest.CharacterQuestAttributes;
+import com.ms.qos.rest.CharacterQuestManagerAttributes;
+import com.ms.qos.rest.CharacterQuestProgressAttributes;
+import com.ms.qos.rest.InfoExAttributes;
+import com.ms.qos.rest.InfoNumberAttributes;
+import com.ms.qos.rest.QuestAttributes;
+import com.ms.qos.rest.QuestCompleteAttributes;
+import com.ms.qos.rest.QuestItemAttributes;
+import com.ms.qos.rest.QuestProgressAttributes;
+import com.ms.qos.rest.QuestStartAttributes;
+import com.ms.qos.rest.ScriptedQuestCompleteAttributes;
+import com.ms.qos.rest.ScriptedQuestStartAttributes;
+import com.ms.qos.rest.builders.CharacterQuestAttributesBuilder;
+import com.ms.qos.rest.builders.QuestCompleteAttributesBuilder;
+import com.ms.qos.rest.builders.QuestProgressAttributesBuilder;
+import com.ms.qos.rest.builders.QuestStartAttributesBuilder;
+import com.ms.qos.rest.builders.ScriptedQuestCompleteAttributesBuilder;
+import com.ms.qos.rest.builders.ScriptedQuestStartAttributesBuilder;
+import com.ms.shared.rest.RestService;
+import com.ms.shared.rest.UriBuilder;
+
 import builder.InputObjectBuilder;
 import builder.ResultObjectBuilder;
 import client.MapleCharacter;
-import com.ms.shared.rest.RestService;
-import com.ms.shared.rest.UriBuilder;
-import rest.CharacterQuestAttributes;
-import rest.CharacterQuestProgressAttributes;
 import rest.DataBody;
 import rest.DataContainer;
-import rest.InfoExAttributes;
-import rest.InfoNumberAttributes;
 import rest.NoopAttributes;
-import rest.QuestAttributes;
-import rest.QuestCompleteAttributes;
-import rest.QuestItemAttributes;
-import rest.QuestProgressAttributes;
-import rest.QuestStartAttributes;
-import rest.builders.CharacterQuestAttributesBuilder;
-import rest.builders.QuestCompleteAttributesBuilder;
-import rest.builders.QuestProgressAttributesBuilder;
-import rest.builders.QuestStartAttributesBuilder;
-import scripting.quest.QuestScriptManager;
 import tools.I18nMessage;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
@@ -142,15 +147,6 @@ public class QuestProcessor {
       UriBuilder.service(RestService.QUEST)
             .path("characters").path(character.getId()).path("quests").queryParam("scripted", true)
             .getRestClient()
-            .success((code, body) -> {
-               boolean hasScriptRequirement = UriBuilder.service(RestService.QUEST).path("quests").path(questId)
-                     .getRestClient(QuestAttributes.class)
-                     .getWithResponse()
-                     .result()
-                     .map(container -> container.getData().getAttributes().getHasScriptRequirement())
-                     .orElse(false);
-               QuestScriptManager.getInstance().start(character.getClient(), (short) questId, npcId, hasScriptRequirement);
-            })
             .create(new InputObjectBuilder().setData(new ResultObjectBuilder(QuestStartAttributes.class, questId)
                   .setAttribute(new QuestStartAttributesBuilder()
                         .setNpcId(npcId)
@@ -179,16 +175,6 @@ public class QuestProcessor {
       UriBuilder.service(RestService.QUEST)
             .path("characters").path(character.getId()).path("quests").path(questId).path("complete").queryParam("scripted", true)
             .getRestClient()
-            .success((code, body) -> {
-               boolean hasScriptRequirement =
-                     UriBuilder.service(RestService.QUEST).path("quests").path(questId).queryParam("checkEnd", true)
-                           .getRestClient(QuestAttributes.class)
-                           .getWithResponse()
-                           .result()
-                           .map(container -> container.getData().getAttributes().getHasScriptRequirement())
-                           .orElse(false);
-               QuestScriptManager.getInstance().end(character.getClient(), (short) questId, npcId, hasScriptRequirement);
-            })
             .create(new InputObjectBuilder().setData(new ResultObjectBuilder(QuestCompleteAttributes.class, "")
                   .setAttribute(new QuestCompleteAttributesBuilder()
                         .setNpcId(npcId)
@@ -447,5 +433,48 @@ public class QuestProcessor {
             .result()
             .map(DataContainer::getDataAsList)
             .orElse(new ArrayList<>());
+   }
+
+   public Optional<DataContainer<CharacterQuestManagerAttributes>> getQuestManagerInfo(int characterId) {
+      return UriBuilder.service(RestService.QUEST).path("characters").path(characterId).path("scriptedQuests")
+            .getRestClient(CharacterQuestManagerAttributes.class)
+            .getWithResponse()
+            .result();
+   }
+
+   public void disposeScript(int characterId) {
+      UriBuilder.service(RestService.QUEST).path("characters").path(characterId).path("scriptedQuests").path("dispose")
+            .getRestClient()
+            .create();
+   }
+
+   public void forceStartScript(int characterId, int questId) {
+      UriBuilder.service(RestService.QUEST).path("characters").path(characterId).path("scriptedQuests").path(questId).path("force")
+            .getRestClient()
+            .create();
+   }
+
+   public void startScript(int characterId, byte mode, byte type, int selection) {
+      UriBuilder.service(RestService.QUEST).path("characters").path(characterId).path("scriptedQuests")
+            .getRestClient()
+            .create(new InputObjectBuilder().setData(new ResultObjectBuilder(ScriptedQuestStartAttributes.class, 0)
+                  .setAttribute(new ScriptedQuestStartAttributesBuilder()
+                        .setMode(mode)
+                        .setType(type)
+                        .setSelection(selection)
+                  )
+                  .build()));
+   }
+
+   public void completeScript(int characterId, byte mode, byte type, int selection) {
+      UriBuilder.service(RestService.QUEST).path("characters").path(characterId).path("scriptedQuests").path("complete")
+            .getRestClient()
+            .create(new InputObjectBuilder().setData(new ResultObjectBuilder(ScriptedQuestCompleteAttributes.class, 0)
+                  .setAttribute(new ScriptedQuestCompleteAttributesBuilder()
+                        .setMode(mode)
+                        .setType(type)
+                        .setSelection(selection)
+                  )
+                  .build()));
    }
 }

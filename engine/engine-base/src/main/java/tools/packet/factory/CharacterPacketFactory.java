@@ -3,6 +3,8 @@ package tools.packet.factory;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.ms.qos.rest.CharacterQuestAttributes;
+
 import client.MapleCharacter;
 import client.MapleMount;
 import client.MonsterBook;
@@ -11,7 +13,6 @@ import client.inventory.MaplePet;
 import constants.MapleInventoryType;
 import net.server.Server;
 import net.server.guild.MapleAlliance;
-import rest.CharacterQuestAttributes;
 import server.MapleItemInformationProvider;
 import server.processor.QuestProcessor;
 import tools.data.output.MaplePacketLittleEndianWriter;

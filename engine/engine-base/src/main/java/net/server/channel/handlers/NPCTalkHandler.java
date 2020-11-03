@@ -1,10 +1,11 @@
 package net.server.channel.handlers;
 
-import client.MapleClient;
-import client.processor.npc.DueyProcessor;
 import com.ms.logs.LogType;
 import com.ms.logs.LoggerOriginator;
 import com.ms.logs.LoggerUtil;
+
+import client.MapleClient;
+import client.processor.npc.DueyProcessor;
 import config.YamlConfig;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.NPCTalkPacket;
@@ -13,6 +14,7 @@ import scripting.npc.NPCScriptManager;
 import server.life.MapleNPC;
 import server.life.MaplePlayerNPC;
 import server.maps.MapleMapObject;
+import server.processor.QuestProcessor;
 import tools.I18nMessage;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
@@ -44,13 +46,15 @@ public final class NPCTalkHandler extends AbstractPacketHandler<NPCTalkPacket> {
       MapleMapObject obj = client.getPlayer().getMap().getMapObject(packet.objectId());
       if (obj instanceof MapleNPC npc) {
          if (YamlConfig.config.server.USE_DEBUG) {
-            MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("NPC_TALK").with(npc.id()));
+            MessageBroadcaster.getInstance()
+                  .sendServerNotice(client.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("NPC_TALK").with(npc.id()));
          }
 
          if (npc.id() == 9010009) {   //is duey
             DueyProcessor.dueySendTalk(client, false);
          } else {
-            if (client.getCM() != null || client.getQM() != null) {
+            boolean hasQuestManager = QuestProcessor.getInstance().getQuestManagerInfo(client.getPlayer().getId()).isPresent();
+            if (client.getCM() != null || hasQuestManager) {
                PacketCreator.announce(client, new EnableActions());
                return;
             }
@@ -63,7 +67,8 @@ public final class NPCTalkHandler extends AbstractPacketHandler<NPCTalkPacket> {
                boolean hasNpcScript = NPCScriptManager.getInstance().start(client, npc.id(), packet.objectId(), null);
                if (!hasNpcScript) {
                   if (!npc.hasShop()) {
-                     LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.NPC_UNCODED, "NPC " + npc.getName() + "(" + npc.id() + ") is not coded.");
+                     LoggerUtil.printError(LoggerOriginator.ENGINE, LogType.NPC_UNCODED,
+                           "NPC " + npc.getName() + "(" + npc.id() + ") is not coded.");
                      return;
                   } else if (client.getPlayer().getShop() != null) {
                      PacketCreator.announce(client, new EnableActions());

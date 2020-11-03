@@ -66,13 +66,12 @@ import scripting.event.EventInstanceManager;
 import scripting.event.EventManager;
 import scripting.npc.NPCConversationManager;
 import scripting.npc.NPCScriptManager;
-import scripting.quest.QuestActionManager;
-import scripting.quest.QuestScriptManager;
 import server.ThreadManager;
 import server.life.MapleMonster;
 import server.maps.FieldLimit;
 import server.maps.MapleMap;
 import server.maps.MapleMiniDungeonInfo;
+import server.processor.QuestProcessor;
 import tools.HexTool;
 import tools.I18nMessage;
 import tools.LogHelper;
@@ -804,10 +803,6 @@ public class MapleClient {
       return NPCScriptManager.getInstance().getCM(this);
    }
 
-   public QuestActionManager getQM() {
-      return QuestScriptManager.getInstance().getQM(this);
-   }
-
    public boolean acceptToS() {
       boolean disconnect = false;
       if (accountName == null) {
@@ -979,11 +974,6 @@ public class MapleClient {
       }
    }
 
-   public void announceHint(String msg, int length) {
-      PacketCreator.announce(this, new ShowHint(msg, length, 10));
-      PacketCreator.announce(this, new EnableActions());
-   }
-
    public void changeChannel(int channel) {
       Server server = Server.getInstance();
       if (player.isBanned()) {
@@ -1073,7 +1063,7 @@ public class MapleClient {
    public void closePlayerScriptInteractions() {
       this.removeClickedNPC();
       NPCScriptManager.getInstance().dispose(this);
-      QuestScriptManager.getInstance().dispose(this);
+      QuestProcessor.getInstance().disposeScript(getPlayer().getId());
    }
 
    public boolean attemptCsCoupon() {

@@ -1,5 +1,6 @@
 package npc
-import tools.I18nMessage
+import tools.I18nMessage
+
 
 
 import scripting.npc.NPCConversationManager
@@ -23,7 +24,8 @@ class NPC9102100 {
 
    def action(Byte mode, Byte type, Integer selection) {
       if (status == 0 && mode == 0) {
-         cm.sendNext(I18nMessage.from("9102100_COVERED_IN_GRASS"))
+         cm.sendNext(I18nMessage.from("9102100_COVERED_IN_GRASS"))
+
          cm.dispose()
          return
       }
@@ -33,19 +35,23 @@ class NPC9102100 {
          status--
       }
       if (status == 0) {
-         if (cm.getQuestStatus(4646) == 1) {
+         if (cm.isQuestStarted(4646)) {
             if (cm.haveItem(4031921)) {
-               cm.sendNext(I18nMessage.from("9102100_POOP_WAS_IN_THERE"))
+               cm.sendNext(I18nMessage.from("9102100_POOP_WAS_IN_THERE"))
+
                cm.dispose()
             } else {
-               cm.sendYesNo(I18nMessage.from("9102100_PULL_IT_OUT"))
+               cm.sendYesNo(I18nMessage.from("9102100_PULL_IT_OUT"))
+
             }
          } else {
-            cm.sendOk(I18nMessage.from("9102100_COULD_NOT_FIND_ANYTHING"))
+            cm.sendOk(I18nMessage.from("9102100_COULD_NOT_FIND_ANYTHING"))
+
             cm.dispose()
          }
       } else if (status == 1) {
-         cm.sendNext(I18nMessage.from("9102100_THIS_NOTE"))
+         cm.sendNext(I18nMessage.from("9102100_THIS_NOTE"))
+
          cm.gainItem(4031921, (short) 1)
          cm.dispose()
       }

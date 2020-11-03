@@ -99,8 +99,7 @@ services:
     expose:
       - '8080'
     volumes:
-      - ./wz:/wz:ro
-      - ./config.yaml:/config.yaml:ro
+      - ./config.yaml:/qos/config.yaml:ro
     container_name: ms-qos
   engine:
     user: root

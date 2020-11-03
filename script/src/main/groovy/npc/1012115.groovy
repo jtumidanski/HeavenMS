@@ -10,14 +10,12 @@ class NPC1012115 {
    int sel = -1
 
    def start() {
-      status = cm.getQuestStatus(20706)
-
-      if (status == 0) {
+      if (cm.isQuestNotStarted(20706)) {
          cm.sendNext(I18nMessage.from("1012115_NOTHING_SUSPICIOUS"))
-      } else if (status == 1) {
+      } else if (cm.isQuestStarted(20706)) {
          cm.forceCompleteQuest(20706)
          cm.sendNext(I18nMessage.from("1012115_COMPLETE"))
-      } else if (status == 2) {
+      } else if (cm.isQuestCompleted(20706)) {
          cm.sendNext(I18nMessage.from("1012115_ALREADY_COMPLETE"))
       }
       cm.dispose()

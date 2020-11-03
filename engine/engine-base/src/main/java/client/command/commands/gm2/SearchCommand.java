@@ -3,6 +3,8 @@ package client.command.commands.gm2;
 import java.io.File;
 import java.util.List;
 
+import com.ms.qos.rest.QuestAttributes;
+
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
@@ -11,7 +13,6 @@ import provider.MapleDataProvider;
 import provider.MapleDataProviderFactory;
 import provider.MapleDataTool;
 import rest.DataBody;
-import rest.QuestAttributes;
 import server.MapleItemInformationProvider;
 import server.processor.QuestProcessor;
 import tools.I18nMessage;

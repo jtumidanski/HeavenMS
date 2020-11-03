@@ -11,6 +11,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiConsumer;
 
+import com.ms.logs.LogType;
+import com.ms.logs.LoggerOriginator;
+import com.ms.logs.LoggerUtil;
+
 import client.MapleCharacter;
 import client.MapleClient;
 import client.MapleSkinColor;
@@ -20,9 +24,6 @@ import client.inventory.Item;
 import client.inventory.ItemFactory;
 import client.inventory.MaplePet;
 import client.processor.PetProcessor;
-import com.ms.logs.LogType;
-import com.ms.logs.LoggerOriginator;
-import com.ms.logs.LoggerUtil;
 import config.YamlConfig;
 import constants.ItemConstants;
 import constants.MapleJob;
@@ -63,6 +64,7 @@ import server.partyquest.MonsterCarnival;
 import server.partyquest.Pyramid;
 import server.partyquest.Pyramid.PyramidMode;
 import server.processor.MapleShopProcessor;
+import server.processor.NpcConversationProcessor;
 import tools.I18nMessage;
 import tools.LogHelper;
 import tools.MasterBroadcaster;
@@ -78,7 +80,6 @@ import tools.packet.field.effect.EnvironmentChange;
 import tools.packet.fredrick.GetFredrickInfo;
 import tools.packet.message.GachaponMessage;
 import tools.packet.npctalk.GetDimensionalMirror;
-import tools.packet.npctalk.GetNPCTalk;
 import tools.packet.npctalk.GetNPCTalkNum;
 import tools.packet.npctalk.GetNPCTalkStyle;
 import tools.packet.npctalk.GetNPCTalkText;
@@ -153,19 +154,19 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
    }
 
    public void sendNext(UserMessage text) {
-      PacketCreator.announce(getClient(), new GetNPCTalk(npc, (byte) 0, text.to(getClient()).evaluate(), "00 01", (byte) 0));
+      NpcConversationProcessor.getInstance().sendNext(getPlayer(), npc, text);
    }
 
    public void sendPrev(UserMessage text) {
-      PacketCreator.announce(getClient(), new GetNPCTalk(npc, (byte) 0, text.to(getClient()).evaluate(), "01 00", (byte) 0));
+      NpcConversationProcessor.getInstance().sendPrev(getPlayer(), npc, text);
    }
 
    public void sendNextPrev(UserMessage text) {
-      PacketCreator.announce(getClient(), new GetNPCTalk(npc, (byte) 0, text.to(getClient()).evaluate(), "01 01", (byte) 0));
+      NpcConversationProcessor.getInstance().sendNextPrev(getPlayer(), npc, text);
    }
 
    public void sendOk(UserMessage text) {
-      PacketCreator.announce(getClient(), new GetNPCTalk(npc, (byte) 0, text.to(getClient()).evaluate(), "00 00", (byte) 0));
+      NpcConversationProcessor.getInstance().sendOk(getPlayer(), npc, text);
    }
 
    public void sendDefault() {
@@ -173,43 +174,43 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
    }
 
    public void sendYesNo(UserMessage text) {
-      PacketCreator.announce(getClient(), new GetNPCTalk(npc, (byte) 1, text.to(getClient()).evaluate(), "", (byte) 0));
+      NpcConversationProcessor.getInstance().sendYesNo(getPlayer(), npc, text);
    }
 
    public void sendAcceptDecline(UserMessage text) {
-      PacketCreator.announce(getClient(), new GetNPCTalk(npc, (byte) 0x0C, text.to(getClient()).evaluate(), "", (byte) 0));
+      NpcConversationProcessor.getInstance().sendAcceptDecline(getPlayer(), npc, text);
    }
 
    public void sendSimple(UserMessage text) {
-      PacketCreator.announce(getClient(), new GetNPCTalk(npc, (byte) 4, text.to(getClient()).evaluate(), "", (byte) 0));
+      NpcConversationProcessor.getInstance().sendSimple(getPlayer(), npc, text);
    }
 
    public void sendNext(UserMessage text, byte speaker) {
-      PacketCreator.announce(getClient(), new GetNPCTalk(npc, (byte) 0, text.to(getClient()).evaluate(), "00 01", speaker));
+      NpcConversationProcessor.getInstance().sendNext(getPlayer(), npc, text, speaker);
    }
 
    public void sendPrev(UserMessage text, byte speaker) {
-      PacketCreator.announce(getClient(), new GetNPCTalk(npc, (byte) 0, text.to(getClient()).evaluate(), "01 00", speaker));
+      NpcConversationProcessor.getInstance().sendPrev(getPlayer(), npc, text, speaker);
    }
 
    public void sendNextPrev(UserMessage text, byte speaker) {
-      PacketCreator.announce(getClient(), new GetNPCTalk(npc, (byte) 0, text.to(getClient()).evaluate(), "01 01", speaker));
+      NpcConversationProcessor.getInstance().sendNextPrev(getPlayer(), npc, text, speaker);
    }
 
    public void sendOk(UserMessage text, byte speaker) {
-      PacketCreator.announce(getClient(), new GetNPCTalk(npc, (byte) 0, text.to(getClient()).evaluate(), "00 00", speaker));
+      NpcConversationProcessor.getInstance().sendOk(getPlayer(), npc, text, speaker);
    }
 
    public void sendYesNo(UserMessage text, byte speaker) {
-      PacketCreator.announce(getClient(), new GetNPCTalk(npc, (byte) 1, text.to(getClient()).evaluate(), "", speaker));
+      NpcConversationProcessor.getInstance().sendYesNo(getPlayer(), npc, text, speaker);
    }
 
    public void sendAcceptDecline(UserMessage text, byte speaker) {
-      PacketCreator.announce(getClient(), new GetNPCTalk(npc, (byte) 0x0C, text.to(getClient()).evaluate(), "", speaker));
+      NpcConversationProcessor.getInstance().sendAcceptDecline(getPlayer(), npc, text, speaker);
    }
 
    public void sendSimple(UserMessage text, byte speaker) {
-      PacketCreator.announce(getClient(), new GetNPCTalk(npc, (byte) 4, text.to(getClient()).evaluate(), "", speaker));
+      NpcConversationProcessor.getInstance().sendSimple(getPlayer(), npc, text, speaker);
    }
 
    public void sendStyle(UserMessage text, int[] styles) {
@@ -222,7 +223,7 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
    }
 
    public void sendGetNumber(UserMessage text, int def, int min, int max) {
-      PacketCreator.announce(getClient(), new GetNPCTalkNum(npc, text.to(getClient()).evaluate(), def, min, max));
+      NpcConversationProcessor.getInstance().sendGetNumber(getPlayer(), npc, text, def, min, max);
    }
 
    public void sendGetText(UserMessage text) {

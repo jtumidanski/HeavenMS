@@ -180,6 +180,7 @@ import server.partyquest.MonsterCarnival;
 import server.partyquest.MonsterCarnivalParty;
 import server.partyquest.PartyQuest;
 import server.processor.MapleTradeProcessor;
+import server.processor.PlayerInteractionProcessor;
 import server.processor.QuestProcessor;
 import server.processor.maps.MapleDoorProcessor;
 import server.processor.maps.MapleMapObjectProcessor;
@@ -7530,7 +7531,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public void showHint(String msg, int length) {
-      client.announceHint(msg, length);
+      PlayerInteractionProcessor.getInstance().showHint(this, msg, length, 10);
    }
 
    public void showNote() {
@@ -7645,7 +7646,8 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
    public void announceUpdateQuest(QuestUpdateAttributes questUpdate) {
       MapleClient c = this.getClient();
-      if (c.getQM() != null || c.getCM() != null) {
+      boolean hasQuestManager = QuestProcessor.getInstance().getQuestManagerInfo(getId()).isPresent();
+      if (hasQuestManager || c.getCM() != null) {
          synchronized (npcUpdateQuests) {
             npcUpdateQuests.add(questUpdate);
          }

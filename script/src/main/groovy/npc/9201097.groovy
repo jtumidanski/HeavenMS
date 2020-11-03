@@ -1,8 +1,7 @@
 package npc
-import tools.I18nMessage
-
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -84,22 +83,23 @@ class NPC9201097 {
 
    def action(Byte mode, Byte type, Integer selection) {
       if (mode <= 0) {
-         cm.sendOk(I18nMessage.from("9201097_SHOULD_NOT_BE_A_BAD_DEAL"))
+         cm.sendOk(I18nMessage.from("9201097_SHOULD_NOT_BE_A_BAD_DEAL"))
+
          cm.dispose()
          return
       }
 
       status++
       if (status == 0) { // first interaction with NPC
-         if (cm.getQuestStatus(8225) != 2) {
-            cm.sendNext(I18nMessage.from("9201097_NOT_A_BANDIT"))
+         if (!cm.isQuestCompleted(8225)) {
+            cm.sendNext(I18nMessage.from("9201097_NOT_A_BANDIT"))
             cm.dispose()
             return
          }
 
-         cm.sendNext(I18nMessage.from("9201097_GOT_A_BIT_OF_TIME"))
+         cm.sendNext(I18nMessage.from("9201097_GOT_A_BIT_OF_TIME"))
       } else if (status == 1) {
-         cm.sendYesNo(I18nMessage.from("9201097_DEAL_IS_SIMPLE"))
+         cm.sendYesNo(I18nMessage.from("9201097_DEAL_IS_SIMPLE"))
       } else if (status == 2) {
          String eQuestChoice = makeChoices(eQuestChoices)
          cm.sendSimple(eQuestChoice)
@@ -113,24 +113,24 @@ class NPC9201097 {
             qnt = 25
          }
 
-         cm.sendYesNo(I18nMessage.from("9201097_YOU_WANT_TO_TRADE").with(qnt, requiredItem))
+         cm.sendYesNo(I18nMessage.from("9201097_YOU_WANT_TO_TRADE").with(qnt, requiredItem))
       } else if (status == 4) {
          itemSet = (Math.floor(Math.random() * eQuestPrizes[lastSelection].length)).intValue()
          int[][] reward = eQuestPrizes[lastSelection]
          prizeItem = reward[itemSet][0]
          prizeQuantity = reward[itemSet][1]
          if (!cm.haveItem(requiredItem, qnt)) {
-            cm.sendOk(I18nMessage.from("9201097_ARE_YOU_SURE").with(qnt, requiredItem))
+            cm.sendOk(I18nMessage.from("9201097_ARE_YOU_SURE").with(qnt, requiredItem))
          } else if (prizeItem == 0) {
             cm.gainItem(requiredItem, (short) -qnt)
             cm.gainMeso(prizeQuantity)
-            cm.sendOk(I18nMessage.from("9201097_FOR_YOUR").with(qnt, requiredItem, prizeQuantity))
+            cm.sendOk(I18nMessage.from("9201097_FOR_YOUR").with(qnt, requiredItem, prizeQuantity))
          } else if (!cm.canHold(prizeItem)) {
-            cm.sendOk(I18nMessage.from("9201097_USE_AND_ETC_INVENTORY_FULL"))
+            cm.sendOk(I18nMessage.from("9201097_USE_AND_ETC_INVENTORY_FULL"))
          } else {
             cm.gainItem(requiredItem, (short) -qnt)
             cm.gainItem(prizeItem, (short) prizeQuantity)
-            cm.sendOk(I18nMessage.from("9201097_FOR_YOUR_ITEM").with(qnt, requiredItem, prizeQuantity, prizeItem))
+            cm.sendOk(I18nMessage.from("9201097_FOR_YOUR_ITEM").with(qnt, requiredItem, prizeQuantity, prizeItem))
          }
          cm.dispose()
       }

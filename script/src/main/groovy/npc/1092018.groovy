@@ -36,9 +36,7 @@ class NPC1092018 {
          }
 
          if (status == 0) {
-            int qs = cm.getQuestStatus(2162)
-
-            if ((qs == 0 || qs == 1) && !cm.haveItem(4031839, 1)) {
+            if ((!cm.isQuestCompleted(2162)) && !cm.haveItem(4031839, 1)) {
                if (cm.canHold(4031839, 1)) {
                   cm.gainItem(4031839, (short) 1)
                   cm.sendNext("(You retrieved a Crumpled Paper standing out of the trash can. It's content seems important.)", (byte) 2)

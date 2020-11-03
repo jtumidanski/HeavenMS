@@ -49,6 +49,7 @@ import server.maps.MapleMapObject;
 import server.maps.MapleMapObjectType;
 import server.partyquest.PartyQuest;
 import server.partyquest.Pyramid;
+import server.processor.PlayerInteractionProcessor;
 import server.processor.QuestProcessor;
 import tools.I18nMessage;
 import tools.MasterBroadcaster;
@@ -63,20 +64,15 @@ import tools.packet.field.effect.MapEffect;
 import tools.packet.field.effect.MapSound;
 import tools.packet.field.effect.MusicChange;
 import tools.packet.field.effect.ShowEffect;
-import tools.packet.foreigneffect.ShowGuideHint;
 import tools.packet.foreigneffect.ShowGuideTalk;
-import tools.packet.foreigneffect.ShowHint;
-import tools.packet.foreigneffect.ShowTitleEarned;
 import tools.packet.inventory.ModifyInventoryPacket;
 import tools.packet.npctalk.GetNPCTalk;
 import tools.packet.remove.RemoveItem;
 import tools.packet.showitemgaininchat.ShowInfo;
-import tools.packet.showitemgaininchat.ShowIntro;
 import tools.packet.showitemgaininchat.ShowItemGainInChat;
 import tools.packet.spawn.SpawnGuide;
 import tools.packet.stat.EnableActions;
 import tools.packet.statusinfo.GetItemMessage;
-import tools.packet.statusinfo.ShowInfoText;
 import tools.packet.ui.DisableMiniMap;
 import tools.packet.ui.DisableUI;
 import tools.packet.ui.LockUI;
@@ -373,6 +369,10 @@ public class AbstractPlayerInteraction {
 
    public boolean isQuestStarted(int quest) {
       return QuestProcessor.getInstance().isStarted(c.getPlayer(), quest);
+   }
+
+   public boolean isQuestNotStarted(int quest) {
+      return QuestProcessor.getInstance().isNotStarted(c.getPlayer(), quest);
    }
 
    public void setQuestProgress(int id, String progress) {
@@ -676,12 +676,11 @@ public class AbstractPlayerInteraction {
    }
 
    public void showIntro(String path) {
-      PacketCreator.announce(c, new ShowIntro(path));
+      PlayerInteractionProcessor.getInstance().showIntro(getPlayer(), path);
    }
 
    public void showInfo(String path) {
-      PacketCreator.announce(c, new ShowInfo(path));
-      PacketCreator.announce(c, new EnableActions());
+      PlayerInteractionProcessor.getInstance().showInfo(getPlayer(), path);
    }
 
    public MapleGuild getGuild() {
@@ -849,8 +848,7 @@ public class AbstractPlayerInteraction {
    }
 
    public void showInstruction(String msg, int width, int height) {
-      PacketCreator.announce(c, new ShowHint(msg, width, height));
-      PacketCreator.announce(c, new EnableActions());
+      PlayerInteractionProcessor.getInstance().showHint(getPlayer(), msg, width, height);
    }
 
    public void disableMiniMap() {
@@ -974,7 +972,7 @@ public class AbstractPlayerInteraction {
    }
 
    public void guideHint(int hint) {
-      PacketCreator.announce(c, new ShowGuideHint(hint));
+      PlayerInteractionProcessor.getInstance().guideHint(getPlayer(), hint);
    }
 
    public void updateAreaInfo(Short area, String info) {
@@ -987,11 +985,11 @@ public class AbstractPlayerInteraction {
    }
 
    public void earnTitle(String msg) {
-      PacketCreator.announce(c, new ShowTitleEarned(msg));
+      PlayerInteractionProcessor.getInstance().earnTitle(getPlayer(), msg);
    }
 
    public void showInfoText(String msg) {
-      PacketCreator.announce(c, new ShowInfoText(msg));
+      PlayerInteractionProcessor.getInstance().showInfoText(getPlayer(), msg);
    }
 
    public void openUI(byte ui) {
@@ -1009,7 +1007,7 @@ public class AbstractPlayerInteraction {
    }
 
    public void playSound(String sound) {
-      MasterBroadcaster.getInstance().sendToAllInMap(getPlayer().getMap(), new EnvironmentChange(sound, 4));
+      PlayerInteractionProcessor.getInstance().playSound(getPlayer(), sound);
    }
 
    public void environmentChange(String env, int mode) {

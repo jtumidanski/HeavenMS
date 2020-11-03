@@ -12,7 +12,7 @@ class NPC1061012 {
    int sel = -1
 
    def start() {
-      if (cm.getQuestStatus(6107) == 1 || cm.getQuestStatus(6108) == 1) {
+      if (cm.isQuestStarted(6107) || cm.isQuestStarted(6108)) {
          int ret = checkJob()
          if (ret == -1) {
             cm.sendOk(I18nMessage.from("1061012_FORM_A_PARTY"))

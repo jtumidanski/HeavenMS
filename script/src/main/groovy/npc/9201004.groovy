@@ -1,5 +1,6 @@
 package npc
-import tools.I18nMessage
+import tools.I18nMessage
+
 
 import client.MapleCharacter
 import client.Ring
@@ -74,17 +75,20 @@ class NPC9201004 {
          } else if (status == 1) {
             switch (selection) {
                case 0:
-                  cm.sendOk(I18nMessage.from("9201004_PROCESS_IS_STRAIGHT_FORWARD"))
+                  cm.sendOk(I18nMessage.from("9201004_PROCESS_IS_STRAIGHT_FORWARD"))
+
                   cm.dispose()
                   break
 
                case 1:
-                  cm.sendOk(I18nMessage.from("9201004_MUST_ALREADY_BE_ENGAGED"))
+                  cm.sendOk(I18nMessage.from("9201004_MUST_ALREADY_BE_ENGAGED"))
+
                   cm.dispose()
                   break
 
                case 2:
-                  cm.sendOk(I18nMessage.from("9201004_DIVORCE_IS_POSSIBLE").with(divorceFee))
+                  cm.sendOk(I18nMessage.from("9201004_DIVORCE_IS_POSSIBLE").with(divorceFee))
+
                   cm.dispose()
                   break
 
@@ -94,28 +98,34 @@ class NPC9201004 {
                      Object itemId = getWeddingRingItemId(cm.getPlayer())
 
                      if (itemId != null) {
-                        cm.sendOk(I18nMessage.from("9201004_DIVOCE_SUCCESS"))
+                        cm.sendOk(I18nMessage.from("9201004_DIVOCE_SUCCESS"))
+
                         cm.gainItem((int) itemId, (short) -1)
                      } else if (hasEquippedWeddingRing(cm.getPlayer())) {
-                        cm.sendOk(I18nMessage.from("9201004_TAKE_RING_OFF"))
+                        cm.sendOk(I18nMessage.from("9201004_TAKE_RING_OFF"))
+
                      } else {
-                        cm.sendOk(I18nMessage.from("9201004_YOU_ARE_NOT_MARRIED"))
+                        cm.sendOk(I18nMessage.from("9201004_YOU_ARE_NOT_MARRIED"))
+
                      }
 
                      cm.dispose()
                      return
                   }
 
-                  cm.sendYesNo(I18nMessage.from("9201004_DIVORCE_CONFIRMATION"))
+                  cm.sendYesNo(I18nMessage.from("9201004_DIVORCE_CONFIRMATION"))
+
                   break
             }
          } else if (status == 2) {
             if (cm.getMeso() < divorceFee) {
-               cm.sendOk(I18nMessage.from("9201004_NEED_DIVORCE_FEE").with(divorceFee))
+               cm.sendOk(I18nMessage.from("9201004_NEED_DIVORCE_FEE").with(divorceFee))
+
                cm.dispose()
                return
-            } else if (ringObj.isEquipped()) {
-               cm.sendOk(I18nMessage.from("9201004_TAKE_OFF_YOUR_RING"))
+            } else if (ringObj.equipped()) {
+               cm.sendOk(I18nMessage.from("9201004_TAKE_OFF_YOUR_RING"))
+
                cm.dispose()
                return
             }
@@ -124,7 +134,8 @@ class NPC9201004 {
             RingActionHandler.breakMarriageRing(cm.getPlayer(), ringObj.itemId())
             cm.gainItem(ringObj.itemId(), (short) -1)
 
-            cm.sendOk(I18nMessage.from("9201004_DIVORCED_YOUR_PARTNER"))
+            cm.sendOk(I18nMessage.from("9201004_DIVORCED_YOUR_PARTNER"))
+
             cm.dispose()
          }
       }

@@ -30,7 +30,7 @@ class NPC1092007 {
          }
 
          if (status == 0) {
-            if (cm.getQuestStatus(2175) == 1) {
+            if (cm.isQuestStarted(2175)) {
                if (cm.getPlayer().canHold(2030019)) {
                   cm.sendOk(I18nMessage.from("1092007_TAKE_THIS"))
                } else {

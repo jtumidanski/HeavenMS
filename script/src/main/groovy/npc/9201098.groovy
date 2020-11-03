@@ -1,5 +1,6 @@
 package npc
-import tools.I18nMessage
+import tools.I18nMessage
+
 
 
 import scripting.npc.NPCConversationManager
@@ -17,19 +18,23 @@ class NPC9201098 {
    int sel = -1
 
    def start() {
-      if (cm.getQuestStatus(8223) == 2) {
+      if (cm.isQuestCompleted(8223)) {
          if (cm.haveItem(3992041)) {
-            cm.sendOk(I18nMessage.from("9201098_DEFENDERS"))
+            cm.sendOk(I18nMessage.from("9201098_DEFENDERS"))
+
          } else {
             if (!cm.canHold(3992041)) {
-               cm.sendOk(I18nMessage.from("9201098_NEED_SETUP_SLOT"))
+               cm.sendOk(I18nMessage.from("9201098_NEED_SETUP_SLOT"))
+
             } else {
-               cm.sendOk(I18nMessage.from("9201098_LOST_YOUR_KEY"))
+               cm.sendOk(I18nMessage.from("9201098_LOST_YOUR_KEY"))
+
                cm.gainItem(3992041, (short) 1)
             }
          }
       } else {
-         cm.sendOk(I18nMessage.from("9201098_BRAVE_ADVENTURER"))
+         cm.sendOk(I18nMessage.from("9201098_BRAVE_ADVENTURER"))
+
       }
 
       cm.dispose()

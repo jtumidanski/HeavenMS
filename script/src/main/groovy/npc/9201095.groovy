@@ -1,5 +1,6 @@
 package npc
-import tools.I18nMessage
+import tools.I18nMessage
+
 
 import scripting.npc.NPCConversationManager
 
@@ -25,8 +26,9 @@ class NPC9201095 {
    boolean equip
 
    def start() {
-      if (cm.getQuestStatus(8225) != 2) {
-         cm.sendOk(I18nMessage.from("9201095_STEP_ASIDE"))
+      if (!cm.isQuestCompleted(8225)) {
+         cm.sendOk(I18nMessage.from("9201095_STEP_ASIDE"))
+
          cm.dispose()
          return
       }
@@ -123,11 +125,13 @@ class NPC9201095 {
          recvQty = qty
 
          if (!cm.canHold(recvItem, recvQty)) {
-            cm.sendOk(I18nMessage.from("9201095_FREE_SLOT_NEEDED"))
+            cm.sendOk(I18nMessage.from("9201095_FREE_SLOT_NEEDED"))
+
             cm.dispose()
             return
          } else if (cm.getMeso() < cost * qty) {
-            cm.sendOk(I18nMessage.from("9201095_NOT_ENOUGH_MESO"))
+            cm.sendOk(I18nMessage.from("9201095_NOT_ENOUGH_MESO"))
+
             cm.dispose()
             return
          } else {
@@ -143,7 +147,8 @@ class NPC9201095 {
          }
 
          if (!complete) {
-            cm.sendOk(I18nMessage.from("9201095_NEED_ITEMS"))
+            cm.sendOk(I18nMessage.from("9201095_NEED_ITEMS"))
+
          } else {
             if (mats instanceof ArrayList && matQty instanceof ArrayList) {
                for (int i = 0; i < mats.size(); i++) {
@@ -157,7 +162,8 @@ class NPC9201095 {
             }
 
             cm.gainItem(recvItem, (short) recvQty)
-            cm.sendOk(I18nMessage.from("9201095_ALL_DONE"))
+            cm.sendOk(I18nMessage.from("9201095_ALL_DONE"))
+
          }
          cm.dispose()
       }

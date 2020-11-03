@@ -10,11 +10,11 @@ import tools.ServerNoticeType
 boolean enter(PortalPlayerInteraction pi) {
    int mapId = 0
 
-   if (pi.getQuestStatus(20701) == 1) {
+   if (pi.isQuestStarted(20701)) {
       mapId = 913000000
-   } else if (pi.getQuestStatus(20702) == 1) {
+   } else if (pi.isQuestStarted(20702)) {
       mapId = 913000100
-   } else if (pi.getQuestStatus(20703) == 1) {
+   } else if (pi.isQuestStarted(20703)) {
       mapId = 913000200
    }
    if (mapId > 0) {

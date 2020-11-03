@@ -1,5 +1,6 @@
 package npc
-import tools.I18nMessage
+import tools.I18nMessage
+
 
 
 import scripting.npc.NPCConversationManager
@@ -17,10 +18,11 @@ class NPC9201099 {
    int sel = -1
 
    def start() {
-      if (cm.getQuestStatus(8224) == 2) {
+      if (cm.isQuestCompleted(8224)) {
          cm.openShopNPC(9201099)
       } else {
-         cm.sendOk(I18nMessage.from("9201099_WHAT_ARE_YOU_LOOKING_AT"))
+         cm.sendOk(I18nMessage.from("9201099_WHAT_ARE_YOU_LOOKING_AT"))
+
       }
 
       cm.dispose()

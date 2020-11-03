@@ -2,12 +2,13 @@ package map.onUserEnter
 
 
 import scripting.map.MapScriptMethods
+import server.processor.QuestProcessor
 
 class MapBabyPigMap {
 
    static def start(MapScriptMethods ms) {
       ms.unlockUI()
-      ms.getClient().getQM().forceStartQuest(22015)
+      QuestProcessor.getInstance().forceStartScript(ms.getClient().getPlayer().getId(), 22015)
    }
 }
 

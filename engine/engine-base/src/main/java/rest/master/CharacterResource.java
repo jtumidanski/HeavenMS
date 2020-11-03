@@ -3,11 +3,12 @@ package rest.master;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.PATCH;
 import javax.ws.rs.POST;
@@ -18,15 +19,27 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.ms.engine.rest.CharacterStatisticsAttributes;
+import com.ms.engine.rest.InfoTextAttributes;
+import com.ms.engine.rest.IntroAttributes;
+import com.ms.engine.rest.MountAttributes;
+import com.ms.engine.rest.TitleAttributes;
+import com.ms.engine.rest.builders.CharacterStatisticsAttributesBuilder;
+import com.ms.engine.rest.builders.MountAttributesBuilder;
+
 import builder.ResultBuilder;
 import builder.ResultObjectBuilder;
+import client.MapleBuffStat;
 import client.MapleCharacter;
+import client.MapleMount;
+import client.inventory.Item;
 import client.inventory.MaplePet;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import client.processor.ItemProcessor;
 import client.processor.PetProcessor;
 import config.YamlConfig;
 import constants.MapleInventoryType;
+import constants.MapleJob;
 import constants.PetFlag;
 import database.DatabaseConnection;
 import database.provider.CharacterProvider;
@@ -39,28 +52,34 @@ import rest.CharacterItemAttributes;
 import rest.CharacterSkillAttributes;
 import rest.CheckSpaceAttributes;
 import rest.CheckSpaceResponseAttributes;
-import rest.DataBody;
+import rest.FamilyAttributes;
 import rest.FreeSlotAttributes;
+import rest.HintAttributes;
+import rest.InfoPlayerInteractionAttributes;
 import rest.InputBody;
 import rest.MessageAttributes;
 import rest.MonsterBookAttributes;
 import rest.NoopAttributes;
-import rest.NpcAttributes;
+import rest.NpcConversationAttributes;
+import rest.NpcCoolDownAttributes;
 import rest.PetAttributes;
 import rest.QuestCompletionAttributes;
 import rest.QuestFinishAttributes;
 import rest.QuestTimeLimitAttributes;
 import rest.QuestUpdateAttributes;
+import rest.SoundAttributes;
 import rest.builders.CharacterAttributesBuilder;
 import rest.builders.CharacterItemAttributesBuilder;
 import rest.builders.CharacterSkillAttributesBuilder;
 import rest.builders.CheckSpaceResponseAttributesBuilder;
+import rest.builders.FamilyAttributesBuilder;
 import rest.builders.FreeSlotAttributesBuilder;
 import rest.builders.MonsterBookAttributesBuilder;
-import rest.builders.NpcAttributesBuilder;
 import rest.builders.PetAttributesBuilder;
+import scripting.event.EventManager;
 import server.MapleItemInformationProvider;
-import server.life.MapleNPC;
+import server.processor.NpcConversationProcessor;
+import server.processor.PlayerInteractionProcessor;
 import tools.I18nMessage;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
@@ -92,34 +111,43 @@ public class CharacterResource {
       return resultBuilder.build();
    }
 
+   protected Response forCharacter(int characterId, BiConsumer<MapleCharacter, ResultBuilder> consumer) {
+      ResultBuilder resultBuilder = new ResultBuilder(Response.Status.NOT_FOUND);
+
+      int worldId = Server.getInstance().getCharacterWorld(characterId);
+      if (worldId == -1) {
+         return resultBuilder.build();
+      }
+
+      Server.getInstance().getWorld(worldId).getPlayerStorage()
+            .getCharacterById(characterId).ifPresent(character -> consumer.accept(character, resultBuilder));
+      return resultBuilder.build();
+   }
+
    @GET
    @Path("/{id}")
    @Consumes(MediaType.APPLICATION_JSON)
    @Produces(MediaType.APPLICATION_JSON)
    public Response getCharacter(@PathParam("id") Integer characterId) {
-      int worldId = Server.getInstance().getCharacterWorld(characterId);
-      if (worldId == -1) {
-         return Response.status(Response.Status.NOT_FOUND).build();
-      }
+      return forCharacter(characterId, this::handleGetCharacter);
+   }
 
-      ResultBuilder resultBuilder = new ResultBuilder();
-      Server.getInstance()
-            .getWorld(worldId)
-            .getPlayerStorage()
-            .getCharacterById(characterId).ifPresent(character ->
-            resultBuilder.addData(new ResultObjectBuilder(CharacterAttributes.class, characterId)
-                  .setAttribute(new CharacterAttributesBuilder()
-                        .setMapId(character.getMapId())
-                        .setJobId(character.getJob().getId())
-                        .setLevel(character.getLevel())
-                        .setExperience(character.getExp())
-                        .setMeso(character.getMeso())
-                        .setGm(character.isGM())
-                        .setX(character.position().x)
-                        .setY(character.position().y)
-                  )
-            ));
-      return resultBuilder.build();
+   protected void handleGetCharacter(MapleCharacter character, ResultBuilder resultBuilder) {
+      resultBuilder.addData(new ResultObjectBuilder(CharacterAttributes.class, character.getId())
+            .setAttribute(new CharacterAttributesBuilder()
+                  .setMapId(character.getMapId())
+                  .setJobId(character.getJob().getId())
+                  .setJobStyle(character.getJobStyle().ordinal())
+                  .setLevel(character.getLevel())
+                  .setExperience(character.getExp())
+                  .setMeso(character.getMeso())
+                  .setGm(character.isGM())
+                  .setGender(character.getGender())
+                  .setX(character.position().x)
+                  .setY(character.position().y)
+                  .setRemainingSp(character.getRemainingSp())
+            )
+      );
    }
 
    @PATCH
@@ -127,45 +155,93 @@ public class CharacterResource {
    @Consumes(MediaType.APPLICATION_JSON)
    @Produces(MediaType.APPLICATION_JSON)
    public Response updateCharacter(@PathParam("id") Integer characterId, InputBody<CharacterAttributes> inputBody) {
-      ResultBuilder resultBuilder = new ResultBuilder(Response.Status.NOT_FOUND);
-      int worldId = Server.getInstance().getCharacterWorld(characterId);
-      if (worldId == -1) {
-         return resultBuilder.build();
+      return forCharacter(characterId, (character, resultBuilder) -> handleUpdateCharacter(inputBody, character, resultBuilder));
+   }
+
+   protected void handleUpdateCharacter(InputBody<CharacterAttributes> inputBody, MapleCharacter character,
+                                        ResultBuilder resultBuilder) {
+      resultBuilder.setStatus(Response.Status.NO_CONTENT);
+      Integer experienceGain = inputBody.attribute(CharacterAttributes::getExperience);
+      if (experienceGain != null) {
+         if (!YamlConfig.config.server.USE_QUEST_RATE) {
+            character.gainExp(experienceGain * character.getExpRate(), true, true);
+         } else {
+            character.gainExp(experienceGain * character.getQuestExpRate(), true, true);
+         }
       }
+      Integer fameGain = inputBody.attribute(CharacterAttributes::getFame);
+      if (fameGain != null) {
+         character.gainFame(fameGain);
+      }
+      Integer mesoGain = inputBody.attribute(CharacterAttributes::getMeso);
+      if (mesoGain != null) {
+         if (mesoGain < 0) {
+            character.gainMeso(mesoGain, true, false, true);
+         } else {
+            if (!YamlConfig.config.server.USE_QUEST_RATE) {
+               character.gainMeso(mesoGain * character.getMesoRate(), true, false, true);
+            } else {
+               character.gainMeso(mesoGain * character.getQuestMesoRate(), true, false, true);
+            }
+         }
+      }
+      Integer jobId = inputBody.attribute(CharacterAttributes::getJobId);
+      if (jobId != null) {
+         character.changeJob(MapleJob.getById(jobId));
+      }
+   }
 
-      Server.getInstance()
-            .getWorld(worldId)
-            .getPlayerStorage()
-            .getCharacterById(characterId)
-            .ifPresent(character -> {
-               resultBuilder.setStatus(Response.Status.NO_CONTENT);
+   @GET
+   @Path("/{id}/statistics")
+   @Consumes(MediaType.APPLICATION_JSON)
+   @Produces(MediaType.APPLICATION_JSON)
+   public Response getCharacterStatistics(@PathParam("id") Integer characterId) {
+      return forCharacter(characterId, this::handleGetCharacterStatistics);
+   }
 
-               Integer experienceGain = inputBody.getData().getAttributes().getExperience();
-               if (experienceGain != null) {
-                  if (!YamlConfig.config.server.USE_QUEST_RATE) {
-                     character.gainExp(experienceGain * character.getExpRate(), true, true);
-                  } else {
-                     character.gainExp(experienceGain * character.getQuestExpRate(), true, true);
-                  }
-               }
-               Integer fameGain = inputBody.getData().getAttributes().getFame();
-               if (fameGain != null) {
-                  character.gainFame(fameGain);
-               }
-               Integer mesoGain = inputBody.getData().getAttributes().getMeso();
-               if (mesoGain != null) {
-                  if (mesoGain < 0) {
-                     character.gainMeso(mesoGain, true, false, true);
-                  } else {
-                     if (!YamlConfig.config.server.USE_QUEST_RATE) {
-                        character.gainMeso(mesoGain * character.getMesoRate(), true, false, true);
-                     } else {
-                        character.gainMeso(mesoGain * character.getQuestMesoRate(), true, false, true);
-                     }
-                  }
-               }
-            });
-      return resultBuilder.build();
+   protected void handleGetCharacterStatistics(MapleCharacter character, ResultBuilder resultBuilder) {
+      resultBuilder.addData(new ResultObjectBuilder(CharacterStatisticsAttributes.class, character.getId())
+            .setAttribute(new CharacterStatisticsAttributesBuilder()
+                  .setStrength(character.getStr())
+                  .setDexterity(character.getDex())
+                  .setLuck(character.getLuk())
+                  .setIntelligence(character.getHp())
+                  .setHp(character.getHp())
+            )
+      );
+   }
+
+   @PATCH
+   @Path("/{id}/statistics")
+   @Consumes(MediaType.APPLICATION_JSON)
+   @Produces(MediaType.APPLICATION_JSON)
+   public Response updateCharacterStatistics(@PathParam("id") Integer characterId,
+                                             InputBody<CharacterStatisticsAttributes> inputBody) {
+      return forCharacter(characterId,
+            (character, resultBuilder) -> handleUpdateCharacterStatistics(inputBody, character, resultBuilder));
+   }
+
+   protected void handleUpdateCharacterStatistics(InputBody<CharacterStatisticsAttributes> inputBody, MapleCharacter character,
+                                                  ResultBuilder resultBuilder) {
+      resultBuilder.setStatus(Response.Status.NO_CONTENT);
+
+      Integer hp = inputBody.attribute(CharacterStatisticsAttributes::getHp);
+      if (hp != null) {
+         character.updateHp(hp);
+      }
+   }
+
+   @DELETE
+   @Path("/{id}/statistics")
+   @Consumes(MediaType.APPLICATION_JSON)
+   @Produces(MediaType.APPLICATION_JSON)
+   public Response resetStatistics(@PathParam("id") Integer characterId) {
+      return forCharacter(characterId, this::handleResetCharacterStatistics);
+   }
+
+   protected void handleResetCharacterStatistics(MapleCharacter character, ResultBuilder resultBuilder) {
+      resultBuilder.setStatus(Response.Status.NO_CONTENT);
+      character.resetStats();
    }
 
    @GET
@@ -173,32 +249,22 @@ public class CharacterResource {
    @Consumes(MediaType.APPLICATION_JSON)
    @Produces(MediaType.APPLICATION_JSON)
    public Response getCharactersPets(@PathParam("id") Integer characterId, @QueryParam("slot") Short slot) {
-      int worldId = Server.getInstance().getCharacterWorld(characterId);
-      if (worldId == -1) {
-         return Response.status(Response.Status.NOT_FOUND).build();
-      }
+      return forCharacter(characterId, (character, resultBuilder) -> handleGetCharacterPets(character, resultBuilder, slot));
+   }
 
+   protected void handleGetCharacterPets(MapleCharacter character, ResultBuilder resultBuilder, Short slot) {
       Predicate<MaplePet> filter = questStatus -> true;
       if (slot != null) {
          filter = pet -> pet.position() == slot;
       }
-
-      ResultBuilder resultBuilder = new ResultBuilder();
-      Predicate<MaplePet> finalFilter = filter;
-      Server.getInstance()
-            .getWorld(worldId)
-            .getPlayerStorage()
-            .getCharacterById(characterId).ifPresent(character ->
-            Arrays.stream(character.getPets())
-                  .filter(Objects::nonNull)
-                  .filter(finalFilter)
-                  .forEach(pet -> resultBuilder.addData(new ResultObjectBuilder(PetAttributes.class, pet.uniqueId())
-                        .setAttribute(new PetAttributesBuilder()
-                              .setSlot(pet.position())
-                              .setFlag(pet.flag())
-                              .setCloseness(pet.closeness()))))
-      );
-      return resultBuilder.build();
+      Arrays.stream(character.getPets())
+            .filter(Objects::nonNull)
+            .filter(filter)
+            .forEach(pet -> resultBuilder.addData(new ResultObjectBuilder(PetAttributes.class, pet.uniqueId())
+                  .setAttribute(new PetAttributesBuilder()
+                        .setSlot(pet.position())
+                        .setFlag(pet.flag())
+                        .setCloseness(pet.closeness()))));
    }
 
    @PATCH
@@ -207,41 +273,32 @@ public class CharacterResource {
    @Produces(MediaType.APPLICATION_JSON)
    public Response updatePet(@PathParam("id") Integer characterId, @PathParam("petId") Integer petId,
                              InputBody<PetAttributes> inputBody) {
-      ResultBuilder resultBuilder = new ResultBuilder(Response.Status.NOT_FOUND);
-      int worldId = Server.getInstance().getCharacterWorld(characterId);
-      if (worldId == -1) {
-         return resultBuilder.build();
+      return forCharacter(characterId, (character, resultBuilder) -> handleUpdatePet(character, petId, inputBody, resultBuilder));
+   }
+
+   protected void handleUpdatePet(MapleCharacter character, Integer petId, InputBody<PetAttributes> inputBody,
+                                  ResultBuilder resultBuilder) {
+      short slot = character.getPetIndex(petId);
+      if (slot < 0 || slot > 3) {
+         return;
       }
-
-      Server.getInstance()
-            .getWorld(worldId)
-            .getPlayerStorage()
-            .getCharacterById(characterId)
-            .ifPresent(character -> {
-               short slot = character.getPetIndex(petId);
-               if (slot < 0 || slot > 3) {
-                  return;
-               }
-               resultBuilder.setStatus(Response.Status.NO_CONTENT);
-
-               Short flag = inputBody.getData().getAttributes().getFlag();
-               if (flag != null) {
-                  character.updateAndGetPet(slot, pet -> {
-                     pet.setFlag(ItemProcessor.getInstance().setFlag(pet.id(), flag));
-                     return pet;
-                  });
-               }
-               Integer petFlag = inputBody.getData().getAttributes().getPetFlag();
-               if (petFlag != null) {
-                  PetProcessor.getInstance().addPetFlag(character, (byte) slot, PetFlag.getById(petFlag));
-               }
-               Integer closeness = inputBody.getData().getAttributes().getCloseness();
-               if (closeness != null) {
-                  Integer fullness = inputBody.getData().getAttributes().getFullness();
-                  PetProcessor.getInstance().gainClosenessFullness(character, (byte) slot, closeness, fullness);
-               }
-            });
-      return resultBuilder.build();
+      resultBuilder.setStatus(Response.Status.NO_CONTENT);
+      Short flag = inputBody.attribute(PetAttributes::getFlag);
+      if (flag != null) {
+         character.updateAndGetPet(slot, pet -> {
+            pet.setFlag(ItemProcessor.getInstance().setFlag(pet.id(), flag));
+            return pet;
+         });
+      }
+      Integer petFlag = inputBody.attribute(PetAttributes::getPetFlag);
+      if (petFlag != null) {
+         PetProcessor.getInstance().addPetFlag(character, (byte) slot, PetFlag.getById(petFlag));
+      }
+      Integer closeness = inputBody.attribute(PetAttributes::getCloseness);
+      if (closeness != null) {
+         Integer fullness = inputBody.attribute(PetAttributes::getFullness);
+         PetProcessor.getInstance().gainClosenessFullness(character, (byte) slot, closeness, fullness);
+      }
    }
 
    @POST
@@ -249,18 +306,10 @@ public class CharacterResource {
    @Consumes(MediaType.APPLICATION_JSON)
    @Produces(MediaType.APPLICATION_JSON)
    public Response gainBuff(@PathParam("id") Integer characterId, InputBody<NoopAttributes> inputBody) {
-      int worldId = Server.getInstance().getCharacterWorld(characterId);
-      if (worldId == -1) {
-         return Response.status(Response.Status.NOT_FOUND).build();
-      }
-
-      int itemEffect = Integer.parseInt(inputBody.getData().getId());
-      Server.getInstance()
-            .getWorld(worldId)
-            .getPlayerStorage()
-            .getCharacterById(characterId)
-            .ifPresent(character -> MapleItemInformationProvider.getInstance().getItemEffect(itemEffect).applyTo(character));
-      return Response.noContent().build();
+      return forCharacter(characterId, (character, resultBuilder) -> {
+         int itemEffect = inputBody.idAsInt();
+         MapleItemInformationProvider.getInstance().getItemEffect(itemEffect).applyTo(character);
+      });
    }
 
    @GET
@@ -269,29 +318,28 @@ public class CharacterResource {
    @Produces(MediaType.APPLICATION_JSON)
    public Response getBuff(@PathParam("id") Integer characterId,
                            @QueryParam("filter[sourceId]") Integer sourceId) {
-
-      int worldId = Server.getInstance().getCharacterWorld(characterId);
-      if (worldId == -1) {
-         return Response.status(Response.Status.NOT_FOUND).build();
-      }
-
-      Optional<MapleCharacter> character = Server.getInstance()
-            .getWorld(worldId)
-            .getPlayerStorage()
-            .getCharacterById(characterId);
-      if (character.isEmpty()) {
-         return Response.status(Response.Status.NOT_FOUND).build();
-      }
-
-      if (sourceId != null) {
-         boolean hasBuff = character.get().hasBuffFromSourceId(sourceId);
-         if (hasBuff) {
-            return Response.ok().build();
-         } else {
-            return Response.status(Response.Status.NOT_FOUND).build();
+      return forCharacter(characterId, (character, resultBuilder) -> {
+         if (sourceId != null) {
+            boolean hasBuff = character.hasBuffFromSourceId(sourceId);
+            if (hasBuff) {
+               resultBuilder.setStatus(Response.Status.OK);
+            }
          }
-      }
-      return Response.status(Response.Status.NOT_FOUND).build();
+      });
+   }
+
+   @GET
+   @Path("/{id}/buffSources/{statId}")
+   @Consumes(MediaType.APPLICATION_JSON)
+   @Produces(MediaType.APPLICATION_JSON)
+   public Response getBuffSource(@PathParam("id") Integer characterId,
+                                 @PathParam("statId") String statId) {
+      return forCharacter(characterId, (character, resultBuilder) -> {
+         MapleBuffStat stat = MapleBuffStat.valueOf(statId);
+         int sourceId = character.getBuffSource(stat);
+         resultBuilder.setStatus(Response.Status.OK);
+         resultBuilder.addData(new ResultObjectBuilder(NoopAttributes.class, sourceId));
+      });
    }
 
    @GET
@@ -300,25 +348,31 @@ public class CharacterResource {
    @Produces(MediaType.APPLICATION_JSON)
    public Response getSkill(@PathParam("id") Integer characterId,
                             @PathParam("skillId") Integer skillId) {
-      int worldId = Server.getInstance().getCharacterWorld(characterId);
-      if (worldId == -1) {
-         return Response.status(Response.Status.NOT_FOUND).build();
-      }
+      return forCharacter(characterId, (character, resultBuilder) -> {
+         resultBuilder.setStatus(Response.Status.OK);
+         resultBuilder.addData(new ResultObjectBuilder(CharacterSkillAttributes.class, skillId)
+               .setAttribute(new CharacterSkillAttributesBuilder()
+                     .setLevel(character.getSkillLevel(skillId))
+                     .setMasterLevel(character.getMasterLevel(skillId))
+                     .setExpiration(character.getSkillExpiration(skillId))
+               ));
+      });
+   }
 
-      ResultBuilder resultBuilder = new ResultBuilder(Response.Status.NOT_FOUND);
-      Server.getInstance()
-            .getWorld(worldId)
-            .getPlayerStorage()
-            .getCharacterById(characterId)
-            .ifPresent(character -> {
-               resultBuilder.setStatus(Response.Status.OK);
-               resultBuilder.addData(new ResultObjectBuilder(CharacterSkillAttributes.class, skillId)
-                     .setAttribute(new CharacterSkillAttributesBuilder()
-                           .setLevel(character.getSkillLevel(skillId))
-                           .setMasterLevel(character.getMasterLevel(skillId))
-                     ));
-            });
-      return resultBuilder.build();
+   @POST
+   @Path("/{id}/skills")
+   @Consumes(MediaType.APPLICATION_JSON)
+   @Produces(MediaType.APPLICATION_JSON)
+   public Response getSkill(@PathParam("id") Integer characterId, InputBody<CharacterSkillAttributes> inputBody) {
+      return forCharacter(characterId, (character, resultBuilder) -> {
+         resultBuilder.setStatus(Response.Status.NO_CONTENT);
+         character.getAbstractPlayerInteraction().teachSkill(
+               inputBody.idAsInt(),
+               inputBody.attribute(CharacterSkillAttributes::getLevel).byteValue(),
+               inputBody.attribute(CharacterSkillAttributes::getMasterLevel).byteValue(),
+               inputBody.attribute(CharacterSkillAttributes::getExpiration)
+         );
+      });
    }
 
    @POST
@@ -326,32 +380,19 @@ public class CharacterResource {
    @Consumes(MediaType.APPLICATION_JSON)
    @Produces(MediaType.APPLICATION_JSON)
    public Response checkSpace(@PathParam("id") Integer characterId, InputBody<CheckSpaceAttributes> inputBody) {
-      ResultBuilder resultBuilder = new ResultBuilder(Response.Status.NOT_FOUND);
-      int worldId = Server.getInstance().getCharacterWorld(characterId);
-      if (worldId == -1) {
-         return resultBuilder.build();
-      }
-
-      Server.getInstance()
-            .getWorld(worldId)
-            .getPlayerStorage()
-            .getCharacterById(characterId)
-            .ifPresent(character -> {
-               resultBuilder.setStatus(Response.Status.OK);
-
-               int result = MapleInventoryManipulator.checkSpaceProgressively(character.getClient(),
-                     inputBody.getData().getAttributes().getItemId(),
-                     inputBody.getData().getAttributes().getQuantity(),
-                     inputBody.getData().getAttributes().getOwner(),
-                     inputBody.getData().getAttributes().getUsedSlots(),
-                     inputBody.getData().getAttributes().getUseProofInventory()
-               );
-
-               resultBuilder.addData(new ResultObjectBuilder(CheckSpaceResponseAttributes.class, 0)
-                     .setAttribute(new CheckSpaceResponseAttributesBuilder().setResult(result))
-               );
-            });
-      return resultBuilder.build();
+      return forCharacter(characterId, (character, resultBuilder) -> {
+         resultBuilder.setStatus(Response.Status.OK);
+         int result = MapleInventoryManipulator.checkSpaceProgressively(character.getClient(),
+               inputBody.attribute(CheckSpaceAttributes::getItemId),
+               inputBody.attribute(CheckSpaceAttributes::getQuantity),
+               inputBody.attribute(CheckSpaceAttributes::getOwner),
+               inputBody.attribute(CheckSpaceAttributes::getUsedSlots),
+               inputBody.attribute(CheckSpaceAttributes::getUseProofInventory)
+         );
+         resultBuilder.addData(new ResultObjectBuilder(CheckSpaceResponseAttributes.class, 0)
+               .setAttribute(new CheckSpaceResponseAttributesBuilder().setResult(result))
+         );
+      });
    }
 
    @POST
@@ -360,38 +401,23 @@ public class CharacterResource {
    @Produces(MediaType.APPLICATION_JSON)
    public Response canHoldAllAfterRemoving(@PathParam("id") Integer characterId,
                                            InputBody<CanHoldAllAttributes> inputBody) {
-      ResultBuilder resultBuilder = new ResultBuilder(Response.Status.NOT_FOUND);
-      int worldId = Server.getInstance().getCharacterWorld(characterId);
-      if (worldId == -1) {
-         return resultBuilder.build();
-      }
+      return forCharacter(characterId, (character, resultBuilder) -> {
+         List<Integer> toAddItemIds = inputBody.attribute(CanHoldAllAttributes::getAddable).stream()
+               .map(CanHoldItem::getItemId).collect(Collectors.toList());
+         List<Integer> toAddQuantity = inputBody.attribute(CanHoldAllAttributes::getAddable).stream()
+               .map(CanHoldItem::getQuantity).collect(Collectors.toList());
+         List<Integer> toRemoveItemIds = inputBody.attribute(CanHoldAllAttributes::getRemovables).stream()
+               .map(CanHoldItem::getItemId).collect(Collectors.toList());
+         List<Integer> toRemoveQuantity = inputBody.attribute(CanHoldAllAttributes::getRemovables).stream()
+               .map(CanHoldItem::getQuantity).collect(Collectors.toList());
 
-      Server.getInstance()
-            .getWorld(worldId)
-            .getPlayerStorage()
-            .getCharacterById(characterId)
-            .ifPresent(character -> {
-               List<Integer> toAddItemIds = inputBody.getData().getAttributes()
-                     .getAddable().stream()
-                     .map(CanHoldItem::getItemId).collect(Collectors.toList());
-               List<Integer> toAddQuantity = inputBody.getData().getAttributes()
-                     .getAddable().stream()
-                     .map(CanHoldItem::getQuantity).collect(Collectors.toList());
-               List<Integer> toRemoveItemIds = inputBody.getData().getAttributes()
-                     .getRemovables().stream()
-                     .map(CanHoldItem::getItemId).collect(Collectors.toList());
-               List<Integer> toRemoveQuantity = inputBody.getData().getAttributes()
-                     .getRemovables().stream()
-                     .map(CanHoldItem::getQuantity).collect(Collectors.toList());
-
-               boolean canHold = character.getAbstractPlayerInteraction()
-                     .canHoldAllAfterRemoving(toAddItemIds, toAddQuantity, toRemoveItemIds, toRemoveQuantity);
-               if (canHold) {
-                  resultBuilder.setStatus(Response.Status.NO_CONTENT);
-                  resultBuilder.addData(new ResultObjectBuilder(NoopAttributes.class, 0));
-               }
-            });
-      return resultBuilder.build();
+         boolean canHold = character.getAbstractPlayerInteraction()
+               .canHoldAllAfterRemoving(toAddItemIds, toAddQuantity, toRemoveItemIds, toRemoveQuantity);
+         if (canHold) {
+            resultBuilder.setStatus(Response.Status.NO_CONTENT);
+            resultBuilder.addData(new ResultObjectBuilder(NoopAttributes.class, 0));
+         }
+      });
    }
 
    @POST
@@ -400,24 +426,13 @@ public class CharacterResource {
    @Produces(MediaType.APPLICATION_JSON)
    public Response canHold(@PathParam("id") Integer characterId, @PathParam("itemId") Integer itemId,
                            InputBody<CanHoldAttributes> inputBody) {
-      ResultBuilder resultBuilder = new ResultBuilder(Response.Status.NOT_FOUND);
-      int worldId = Server.getInstance().getCharacterWorld(characterId);
-      if (worldId == -1) {
-         return resultBuilder.build();
-      }
-
-      Server.getInstance()
-            .getWorld(worldId)
-            .getPlayerStorage()
-            .getCharacterById(characterId)
-            .ifPresent(character -> {
-               boolean canHold = character.canHold(itemId, inputBody.getData().getAttributes().getQuantity());
-               if (canHold) {
-                  resultBuilder.setStatus(Response.Status.OK);
-                  resultBuilder.addData(new ResultObjectBuilder(NoopAttributes.class, 0));
-               }
-            });
-      return resultBuilder.build();
+      return forCharacter(characterId, (character, resultBuilder) -> {
+         boolean canHold = character.canHold(itemId, inputBody.attribute(CanHoldAttributes::getQuantity));
+         if (canHold) {
+            resultBuilder.setStatus(Response.Status.NO_CONTENT);
+            resultBuilder.addData(new ResultObjectBuilder(NoopAttributes.class, 0));
+         }
+      });
    }
 
    @GET
@@ -427,30 +442,28 @@ public class CharacterResource {
    public Response getInventoryItems(@PathParam("id") Integer characterId, @PathParam("type") String type,
                                      @QueryParam("filter[itemId]") Integer itemId,
                                      @QueryParam("filter[quantity]") Integer quantity) {
-      int worldId = Server.getInstance().getCharacterWorld(characterId);
-      if (worldId == -1) {
-         return new ResultBuilder(Response.Status.NOT_FOUND).build();
-      }
-
-      MapleInventoryType inventoryType = MapleInventoryType.getByName(type);
-      if (inventoryType == null) {
-         return new ResultBuilder(Response.Status.NOT_FOUND).build();
-      }
-
-      if (itemId == null || quantity == null) {
-         return new ResultBuilder(Response.Status.NOT_FOUND).build();
-      }
-
-      ResultBuilder resultBuilder = new ResultBuilder();
-      Server.getInstance()
-            .getWorld(worldId)
-            .getPlayerStorage()
-            .getCharacterById(characterId)
-            .ifPresent(character -> resultBuilder.addData(new ResultObjectBuilder(FreeSlotAttributes.class, type)
+      return forCharacter(characterId, (character, resultBuilder) -> {
+         MapleInventoryType inventoryType = MapleInventoryType.getByName(type);
+         if (inventoryType == null) {
+            return;
+         }
+         if (itemId == null && quantity == null) {
+            resultBuilder.addData(new ResultObjectBuilder(FreeSlotAttributes.class, type)
                   .setAttribute(new FreeSlotAttributesBuilder()
-                        .setCount(character.getInventory(inventoryType).freeSlotCountById(itemId, quantity))
-                  )));
-      return resultBuilder.build();
+                        .setCount((int) character.getInventory(inventoryType).getNumFreeSlot())
+                  ));
+            return;
+         }
+
+         if (itemId == null || quantity == null) {
+            return;
+         }
+
+         resultBuilder.addData(new ResultObjectBuilder(FreeSlotAttributes.class, type)
+               .setAttribute(new FreeSlotAttributesBuilder()
+                     .setCount(character.getInventory(inventoryType).freeSlotCountById(itemId, quantity))
+               ));
+      });
    }
 
    @GET
@@ -459,35 +472,22 @@ public class CharacterResource {
    @Produces(MediaType.APPLICATION_JSON)
    public Response getInventoryItems(@PathParam("id") Integer characterId, @PathParam("type") String type,
                                      @QueryParam("filter[itemId]") Integer itemId) {
-      int worldId = Server.getInstance().getCharacterWorld(characterId);
-      if (worldId == -1) {
-         return Response.status(Response.Status.NOT_FOUND).build();
-      }
-
-      MapleInventoryType inventoryType = MapleInventoryType.getByName(type);
-      if (inventoryType == null) {
-         return Response.status(Response.Status.NOT_FOUND).build();
-      }
-
-      ResultBuilder resultBuilder = new ResultBuilder();
-      if (itemId != null) {
-         Server.getInstance()
-               .getWorld(worldId)
-               .getPlayerStorage()
-               .getCharacterById(characterId)
-               .ifPresent(character ->
-                     character.getInventory(inventoryType)
-                           .listById(itemId)
-                           .forEach(item -> resultBuilder
-                                 .addData(new ResultObjectBuilder(CharacterItemAttributes.class, Integer.valueOf(item.position()))
-                                       .setAttribute(new CharacterItemAttributesBuilder()
-                                             .setItemId(item.id())
-                                             .setQuantity(item.quantity())
-                                       )
-                                 )));
-      }
-
-      return resultBuilder.build();
+      return forCharacter(characterId, (character, resultBuilder) -> {
+         MapleInventoryType inventoryType = MapleInventoryType.getByName(type);
+         if (inventoryType == null) {
+            return;
+         }
+         resultBuilder.setStatus(Response.Status.OK);
+         character.getInventory(inventoryType)
+               .listById(itemId)
+               .forEach(item -> resultBuilder
+                     .addData(new ResultObjectBuilder(CharacterItemAttributes.class, Integer.valueOf(item.position()))
+                           .setAttribute(new CharacterItemAttributesBuilder()
+                                 .setItemId(item.id())
+                                 .setQuantity(item.quantity())
+                           )
+                     ));
+      });
    }
 
    @PATCH
@@ -495,37 +495,61 @@ public class CharacterResource {
    @Consumes(MediaType.APPLICATION_JSON)
    @Produces(MediaType.APPLICATION_JSON)
    public Response addItem(@PathParam("id") Integer characterId, @PathParam("type") String type,
+                           @DefaultValue("true") @QueryParam("showMessage") Boolean showMessage,
                            InputBody<CharacterItemAttributes> inputBody) {
-      ResultBuilder resultBuilder = new ResultBuilder(Response.Status.NOT_FOUND);
-      int worldId = Server.getInstance().getCharacterWorld(characterId);
-      if (worldId == -1) {
-         return resultBuilder.build();
-      }
+      return forCharacter(characterId, (character, resultBuilder) -> {
+         resultBuilder.setStatus(Response.Status.OK);
 
-      Server.getInstance()
-            .getWorld(worldId)
-            .getPlayerStorage()
-            .getCharacterById(characterId)
-            .ifPresent(character -> {
-               resultBuilder.setStatus(Response.Status.OK);
+         if (inputBody.attribute(CharacterItemAttributes::getQuantity) >= 0) {
+            MapleInventoryManipulator.addById(character.getClient(),
+                  inputBody.attribute(CharacterItemAttributes::getItemId),
+                  inputBody.attribute(CharacterItemAttributes::getQuantity),
+                  inputBody.attribute(CharacterItemAttributes::getOwner),
+                  inputBody.attribute(CharacterItemAttributes::getPetId),
+                  inputBody.attribute(CharacterItemAttributes::getExpiration));
+            if (showMessage) {
+               PacketCreator.announce(character, new ShowItemGainInChat(
+                     inputBody.attribute(CharacterItemAttributes::getItemId),
+                     inputBody.attribute(CharacterItemAttributes::getQuantity)));
+            }
+         } else {
+            MapleInventoryType inventoryType = MapleInventoryType.getByName(type);
+            MapleInventoryManipulator
+                  .removeById(character.getClient(), inventoryType, inputBody.attribute(CharacterItemAttributes::getItemId),
+                        inputBody.attribute(CharacterItemAttributes::getQuantity), true, false);
+            if (showMessage) {
+               PacketCreator.announce(character, new ShowItemGainInChat(
+                     inputBody.attribute(CharacterItemAttributes::getItemId),
+                     (short) (inputBody.attribute(CharacterItemAttributes::getQuantity) * -1)));
+            }
+         }
+      });
+   }
 
-               if (inputBody.getData().getAttributes().getQuantity() >= 0) {
-                  MapleInventoryManipulator.addById(character.getClient(), inputBody.getData().getAttributes().getItemId(),
-                        inputBody.getData().getAttributes().getQuantity(), inputBody.getData().getAttributes().getOwner(),
-                        inputBody.getData().getAttributes().getPetId(), inputBody.getData().getAttributes().getExpiration());
-                  PacketCreator.announce(character, new ShowItemGainInChat(inputBody.getData().getAttributes().getItemId(),
-                        inputBody.getData().getAttributes().getQuantity()));
-               } else {
-                  MapleInventoryType inventoryType = MapleInventoryType.getByName(type);
-                  MapleInventoryManipulator
-                        .removeById(character.getClient(), inventoryType, inputBody.getData().getAttributes().getItemId(),
-                              inputBody.getData().getAttributes().getQuantity(), true, false);
-                  PacketCreator.announce(character, new ShowItemGainInChat(inputBody.getData().getAttributes().getItemId(),
-                        (short) (inputBody.getData().getAttributes().getQuantity() * -1)));
-               }
-            });
+   @DELETE
+   @Path("/{id}/inventories/{type}/items")
+   @Consumes(MediaType.APPLICATION_JSON)
+   @Produces(MediaType.APPLICATION_JSON)
+   public Response removeFromSlot(@PathParam("id") Integer characterId, @PathParam("type") String type,
+                                  @QueryParam("slot") Short slot) {
+      return forCharacter(characterId, (character, resultBuilder) -> {
+         resultBuilder.setStatus(Response.Status.OK);
+         MapleInventoryType typeEnum = MapleInventoryType.getByName(type);
+         Item tempItem = character.getInventory(typeEnum).getItem(slot);
+         MapleInventoryManipulator.removeFromSlot(character.getClient(), typeEnum, slot, tempItem.quantity(), false, false);
+      });
+   }
 
-      return resultBuilder.build();
+   @DELETE
+   @Path("/{id}/inventories/{type}/items/{itemId}")
+   @Consumes(MediaType.APPLICATION_JSON)
+   @Produces(MediaType.APPLICATION_JSON)
+   public Response removeById(@PathParam("id") Integer characterId, @PathParam("type") String type,
+                              @PathParam("itemId") Integer itemId) {
+      return forCharacter(characterId, (character, resultBuilder) -> {
+         resultBuilder.setStatus(Response.Status.OK);
+         character.getAbstractPlayerInteraction().removeAll(itemId);
+      });
    }
 
    @POST
@@ -533,23 +557,13 @@ public class CharacterResource {
    @Consumes(MediaType.APPLICATION_JSON)
    @Produces(MediaType.APPLICATION_JSON)
    public Response sendMessage(@PathParam("id") Integer characterId, InputBody<MessageAttributes> inputBody) {
-      ResultBuilder resultBuilder = new ResultBuilder(Response.Status.NOT_FOUND);
-      int worldId = Server.getInstance().getCharacterWorld(characterId);
-      if (worldId == -1) {
-         return resultBuilder.build();
-      }
-      DataBody<MessageAttributes> data = inputBody.getData();
-      Server.getInstance()
-            .getWorld(worldId)
-            .getPlayerStorage()
-            .getCharacterById(characterId)
-            .ifPresent(character -> {
-               resultBuilder.setStatus(Response.Status.OK);
-               MessageBroadcaster.getInstance()
-                     .sendServerNotice(character, ServerNoticeType.valueOf(data.getAttributes().getType()),
-                           I18nMessage.from(data.getAttributes().getToken()).with(data.getAttributes().getReplacements()));
-            });
-      return resultBuilder.build();
+      return forCharacter(characterId, (character, resultBuilder) -> {
+         resultBuilder.setStatus(Response.Status.OK);
+         MessageBroadcaster.getInstance()
+               .sendServerNotice(character, ServerNoticeType.valueOf(inputBody.attribute(MessageAttributes::getType)),
+                     I18nMessage.from(inputBody.attribute(MessageAttributes::getToken))
+                           .with(inputBody.attribute(MessageAttributes::getReplacements)));
+      });
    }
 
    @POST
@@ -557,21 +571,12 @@ public class CharacterResource {
    @Consumes(MediaType.APPLICATION_JSON)
    @Produces(MediaType.APPLICATION_JSON)
    public Response announceQuestFinish(@PathParam("id") Integer characterId, InputBody<QuestFinishAttributes> inputBody) {
-      ResultBuilder resultBuilder = new ResultBuilder(Response.Status.NOT_FOUND);
-      int worldId = Server.getInstance().getCharacterWorld(characterId);
-      if (worldId == -1) {
-         return resultBuilder.build();
-      }
-      Server.getInstance()
-            .getWorld(worldId)
-            .getPlayerStorage()
-            .getCharacterById(characterId)
-            .ifPresent(character -> {
-               resultBuilder.setStatus(Response.Status.OK);
-               PacketCreator.announce(character, new QuestFinish(Short.parseShort(inputBody.getData().getId()),
-                     inputBody.getData().getAttributes().getNpcId(), inputBody.getData().getAttributes().getNextQuestId()));
-            });
-      return resultBuilder.build();
+      return forCharacter(characterId, (character, resultBuilder) -> {
+         resultBuilder.setStatus(Response.Status.OK);
+         PacketCreator.announce(character, new QuestFinish(Short.parseShort(inputBody.id()),
+               inputBody.attribute(QuestFinishAttributes::getNpcId),
+               inputBody.attribute(QuestFinishAttributes::getNextQuestId)));
+      });
    }
 
    @POST
@@ -579,20 +584,10 @@ public class CharacterResource {
    @Consumes(MediaType.APPLICATION_JSON)
    @Produces(MediaType.APPLICATION_JSON)
    public Response announceQuestUpdate(@PathParam("id") Integer characterId, InputBody<QuestUpdateAttributes> inputBody) {
-      ResultBuilder resultBuilder = new ResultBuilder(Response.Status.NOT_FOUND);
-      int worldId = Server.getInstance().getCharacterWorld(characterId);
-      if (worldId == -1) {
-         return resultBuilder.build();
-      }
-      Server.getInstance()
-            .getWorld(worldId)
-            .getPlayerStorage()
-            .getCharacterById(characterId)
-            .ifPresent(character -> {
-               resultBuilder.setStatus(Response.Status.OK);
-               character.announceUpdateQuest(inputBody.getData().getAttributes());
-            });
-      return resultBuilder.build();
+      return forCharacter(characterId, (character, resultBuilder) -> {
+         resultBuilder.setStatus(Response.Status.OK);
+         character.announceUpdateQuest(inputBody.attributes());
+      });
    }
 
    @POST
@@ -600,20 +595,10 @@ public class CharacterResource {
    @Consumes(MediaType.APPLICATION_JSON)
    @Produces(MediaType.APPLICATION_JSON)
    public Response addQuestPoints(@PathParam("id") Integer characterId) {
-      ResultBuilder resultBuilder = new ResultBuilder(Response.Status.NOT_FOUND);
-      int worldId = Server.getInstance().getCharacterWorld(characterId);
-      if (worldId == -1) {
-         return resultBuilder.build();
-      }
-      Server.getInstance()
-            .getWorld(worldId)
-            .getPlayerStorage()
-            .getCharacterById(characterId)
-            .ifPresent(character -> {
-               resultBuilder.setStatus(Response.Status.OK);
-               character.awardQuestPoint(YamlConfig.config.server.QUEST_POINT_PER_QUEST_COMPLETE);
-            });
-      return resultBuilder.build();
+      return forCharacter(characterId, (character, resultBuilder) -> {
+         resultBuilder.setStatus(Response.Status.OK);
+         character.awardQuestPoint(YamlConfig.config.server.QUEST_POINT_PER_QUEST_COMPLETE);
+      });
    }
 
    @POST
@@ -621,21 +606,11 @@ public class CharacterResource {
    @Consumes(MediaType.APPLICATION_JSON)
    @Produces(MediaType.APPLICATION_JSON)
    public Response announceQuestComplete(@PathParam("id") Integer characterId, InputBody<QuestCompletionAttributes> inputBody) {
-      ResultBuilder resultBuilder = new ResultBuilder(Response.Status.NOT_FOUND);
-      int worldId = Server.getInstance().getCharacterWorld(characterId);
-      if (worldId == -1) {
-         return resultBuilder.build();
-      }
-      Server.getInstance()
-            .getWorld(worldId)
-            .getPlayerStorage()
-            .getCharacterById(characterId)
-            .ifPresent(character -> {
-               resultBuilder.setStatus(Response.Status.OK);
-               PacketCreator.announce(character, new ShowSpecialEffect(9)); // Quest completion
-               character.getMap().broadcastMessage(character, new ShowForeignEffect(characterId, 9)); //use 9 instead of 12 for both
-            });
-      return resultBuilder.build();
+      return forCharacter(characterId, (character, resultBuilder) -> {
+         resultBuilder.setStatus(Response.Status.OK);
+         PacketCreator.announce(character, new ShowSpecialEffect(9)); // Quest completion
+         character.getMap().broadcastMessage(character, new ShowForeignEffect(characterId, 9)); //use 9 instead of 12 for both
+      });
    }
 
    @POST
@@ -643,20 +618,10 @@ public class CharacterResource {
    @Consumes(MediaType.APPLICATION_JSON)
    @Produces(MediaType.APPLICATION_JSON)
    public Response showQuestExpiry(@PathParam("id") Integer characterId, @PathParam("questId") Integer questId) {
-      ResultBuilder resultBuilder = new ResultBuilder(Response.Status.NOT_FOUND);
-      int worldId = Server.getInstance().getCharacterWorld(characterId);
-      if (worldId == -1) {
-         return resultBuilder.build();
-      }
-      Server.getInstance()
-            .getWorld(worldId)
-            .getPlayerStorage()
-            .getCharacterById(characterId)
-            .ifPresent(character -> {
-               resultBuilder.setStatus(Response.Status.OK);
-               PacketCreator.announce(character, new QuestExpire(questId.shortValue()));
-            });
-      return resultBuilder.build();
+      return forCharacter(characterId, (character, resultBuilder) -> {
+         resultBuilder.setStatus(Response.Status.OK);
+         PacketCreator.announce(character, new QuestExpire(questId.shortValue()));
+      });
    }
 
    @POST
@@ -665,23 +630,13 @@ public class CharacterResource {
    @Produces(MediaType.APPLICATION_JSON)
    public Response addQuestTimeLimit(@PathParam("id") Integer characterId, @PathParam("questId") Integer questId,
                                      InputBody<QuestTimeLimitAttributes> inputBody) {
-      ResultBuilder resultBuilder = new ResultBuilder(Response.Status.NOT_FOUND);
-      int worldId = Server.getInstance().getCharacterWorld(characterId);
-      if (worldId == -1) {
-         return resultBuilder.build();
-      }
-      Server.getInstance()
-            .getWorld(worldId)
-            .getPlayerStorage()
-            .getCharacterById(characterId)
-            .ifPresent(character -> {
-               if (inputBody.getData().getId().equals("1")) {
-                  character.questTimeLimit(questId, inputBody.getData().getAttributes().getLimit().intValue());
-               } else if (inputBody.getData().getId().equals("2")) {
-                  character.questTimeLimit2(questId, inputBody.getData().getAttributes().getLimit());
-               }
-            });
-      return new ResultBuilder().build();
+      return forCharacter(characterId, (character, resultBuilder) -> {
+         if (inputBody.idAsInt() == 1) {
+            character.questTimeLimit(questId, inputBody.attribute(QuestTimeLimitAttributes::getLimit).intValue());
+         } else if (inputBody.idAsInt() == 2) {
+            character.questTimeLimit2(questId, inputBody.attribute(QuestTimeLimitAttributes::getLimit));
+         }
+      });
    }
 
    @DELETE
@@ -689,17 +644,11 @@ public class CharacterResource {
    @Consumes(MediaType.APPLICATION_JSON)
    @Produces(MediaType.APPLICATION_JSON)
    public Response removeQuestLimit(@PathParam("id") Integer characterId, @PathParam("questId") Integer questId) {
-      ResultBuilder resultBuilder = new ResultBuilder(Response.Status.NOT_FOUND);
-      int worldId = Server.getInstance().getCharacterWorld(characterId);
-      if (worldId == -1) {
-         return resultBuilder.build();
-      }
-      Server.getInstance()
-            .getWorld(worldId)
-            .getPlayerStorage()
-            .getCharacterById(characterId)
-            .ifPresent(character -> PacketCreator.announce(character, new RemoveQuestTimeLimit(questId.shortValue())));
-      return new ResultBuilder().build();
+      return forCharacter(characterId, (character, resultBuilder) -> handleRemoveQuestLimit(character, questId));
+   }
+
+   protected void handleRemoveQuestLimit(MapleCharacter character, Integer questId) {
+      PacketCreator.announce(character, new RemoveQuestTimeLimit(questId.shortValue()));
    }
 
    @GET
@@ -707,50 +656,236 @@ public class CharacterResource {
    @Consumes(MediaType.APPLICATION_JSON)
    @Produces(MediaType.APPLICATION_JSON)
    public Response getCharactersMonsterBook(@PathParam("id") Integer characterId) {
-      ResultBuilder resultBuilder = new ResultBuilder(Response.Status.NOT_FOUND);
-      int worldId = Server.getInstance().getCharacterWorld(characterId);
-      if (worldId == -1) {
-         return resultBuilder.build();
-      }
-      Server.getInstance()
-            .getWorld(worldId)
-            .getPlayerStorage()
-            .getCharacterById(characterId)
-            .ifPresent(character -> resultBuilder.addData(new ResultObjectBuilder(MonsterBookAttributes.class, characterId)
-                  .setAttribute(new MonsterBookAttributesBuilder()
-                        .setLevel(character.getMonsterBook().getBookLevel())
-                        .setCards(character.getMonsterBook().getCards())
-                  )));
-      return resultBuilder.build();
+      return forCharacter(characterId, (character, resultBuilder) -> {
+         resultBuilder.setStatus(Response.Status.OK);
+         resultBuilder.addData(new ResultObjectBuilder(MonsterBookAttributes.class, characterId)
+               .setAttribute(new MonsterBookAttributesBuilder()
+                     .setLevel(character.getMonsterBook().getBookLevel())
+                     .setCards(character.getMonsterBook().getCards())
+               ));
+      });
    }
 
    @GET
-   @Path("/{id}/map/npcs/{npcId}")
+   @Path("/{id}/npcClick")
    @Consumes(MediaType.APPLICATION_JSON)
    @Produces(MediaType.APPLICATION_JSON)
-   public Response getNpcInCharacterMap(@PathParam("id") Integer characterId, @PathParam("npcId") Integer npcId) {
-      ResultBuilder resultBuilder = new ResultBuilder(Response.Status.NOT_FOUND);
-      int worldId = Server.getInstance().getCharacterWorld(characterId);
-      if (worldId == -1) {
-         return resultBuilder.build();
-      }
-      Server.getInstance()
-            .getWorld(worldId)
-            .getPlayerStorage()
-            .getCharacterById(characterId)
-            .ifPresent(character -> {
-               MapleNPC npc = character.getMap().getNPCById(npcId);
-               if (npc == null) {
-                  return;
-               }
-               resultBuilder.setStatus(Response.Status.OK);
-               resultBuilder.addData(new ResultObjectBuilder(NpcAttributes.class, npcId)
-                     .setAttribute(new NpcAttributesBuilder()
-                           .setX(npc.position().x)
-                           .setY(npc.position().y)
-                     )
-               );
-            });
-      return resultBuilder.build();
+   public Response getNpcClick(@PathParam("id") Integer characterId) {
+      return forCharacter(characterId, (character, resultBuilder) -> {
+         boolean can = character.getClient().canClickNPC();
+         if (can) {
+            resultBuilder.setStatus(Response.Status.OK);
+         }
+      });
+   }
+
+   @PATCH
+   @Path("/{id}/npcClick")
+   @Consumes(MediaType.APPLICATION_JSON)
+   @Produces(MediaType.APPLICATION_JSON)
+   public Response setNpcClick(@PathParam("id") Integer characterId) {
+      return forCharacter(characterId, (character, resultBuilder) -> {
+         character.getClient().setClickedNPC();
+         resultBuilder.setStatus(Response.Status.NO_CONTENT);
+         resultBuilder.addData(new ResultObjectBuilder(NoopAttributes.class, characterId));
+      });
+   }
+
+   @POST
+   @Path("/{id}/flushDelayedUpdateQuests")
+   @Consumes(MediaType.APPLICATION_JSON)
+   @Produces(MediaType.APPLICATION_JSON)
+   public Response flushDelayedUpdateQuests(@PathParam("id") Integer characterId) {
+      return forCharacter(characterId, (character, resultBuilder) -> {
+         character.flushDelayedUpdateQuests();
+         resultBuilder.setStatus(Response.Status.NO_CONTENT);
+         resultBuilder.addData(new ResultObjectBuilder(NoopAttributes.class, characterId));
+      });
+   }
+
+   @PATCH
+   @Path("/{id}/npcCoolDown")
+   @Consumes(MediaType.APPLICATION_JSON)
+   @Produces(MediaType.APPLICATION_JSON)
+   public Response setNpcCoolDown(@PathParam("id") Integer characterId, InputBody<NpcCoolDownAttributes> inputBody) {
+      return forCharacter(characterId, (character, resultBuilder) -> {
+         character.setNpcCoolDown(inputBody.attribute(NpcCoolDownAttributes::getCoolDown));
+         resultBuilder.setStatus(Response.Status.NO_CONTENT);
+         resultBuilder.addData(new ResultObjectBuilder(NoopAttributes.class, characterId));
+      });
+   }
+
+   @POST
+   @Path("/{id}/npcs/{npcId}/conversations")
+   @Consumes(MediaType.APPLICATION_JSON)
+   @Produces(MediaType.APPLICATION_JSON)
+   public Response createNpcConversation(@PathParam("id") Integer characterId, @PathParam("npcId") Integer npcId,
+                                         InputBody<NpcConversationAttributes> inputBody) {
+      return forCharacter(characterId, (character, resultBuilder) -> {
+         I18nMessage message = I18nMessage.from(inputBody.attribute(NpcConversationAttributes::getToken));
+         List<String> arguments = inputBody.attribute(NpcConversationAttributes::getArguments);
+         message = message.with(arguments.toArray());
+
+         switch (inputBody.attribute(NpcConversationAttributes::getType)) {
+            case NEXT -> NpcConversationProcessor.getInstance()
+                  .sendNext(character, npcId, message, inputBody.attribute(NpcConversationAttributes::getSpeaker));
+            case PREVIOUS -> NpcConversationProcessor.getInstance()
+                  .sendPrev(character, npcId, message, inputBody.attribute(NpcConversationAttributes::getSpeaker));
+            case NEXT_PREVIOUS -> NpcConversationProcessor.getInstance()
+                  .sendNextPrev(character, npcId, message, inputBody.attribute(NpcConversationAttributes::getSpeaker));
+            case ACCEPT_DECLINE -> NpcConversationProcessor.getInstance()
+                  .sendAcceptDecline(character, npcId, message, inputBody.attribute(NpcConversationAttributes::getSpeaker));
+            case SIMPLE -> NpcConversationProcessor.getInstance()
+                  .sendSimple(character, npcId, message, inputBody.attribute(NpcConversationAttributes::getSpeaker));
+            case OK -> NpcConversationProcessor.getInstance()
+                  .sendOk(character, npcId, message, inputBody.attribute(NpcConversationAttributes::getSpeaker));
+            case YES_NO -> NpcConversationProcessor.getInstance()
+                  .sendYesNo(character, npcId, message, inputBody.attribute(NpcConversationAttributes::getSpeaker));
+            case GET_NUMBER -> NpcConversationProcessor.getInstance().sendGetNumber(character, npcId, message,
+                  inputBody.attribute(NpcConversationAttributes::getDef),
+                  inputBody.attribute(NpcConversationAttributes::getMin),
+                  inputBody.attribute(NpcConversationAttributes::getMax));
+         }
+         resultBuilder.setStatus(Response.Status.NO_CONTENT);
+         resultBuilder.addData(new ResultObjectBuilder(NoopAttributes.class, characterId));
+      });
+   }
+
+   @POST
+   @Path("/{id}/interactions/info")
+   @Consumes(MediaType.APPLICATION_JSON)
+   @Produces(MediaType.APPLICATION_JSON)
+   public Response createNpcConversation(@PathParam("id") Integer characterId,
+                                         InputBody<InfoPlayerInteractionAttributes> inputBody) {
+      return forCharacter(characterId, (character, resultBuilder) -> {
+         PlayerInteractionProcessor.getInstance()
+               .showInfo(character, inputBody.attribute(InfoPlayerInteractionAttributes::getPath));
+         resultBuilder.setStatus(Response.Status.NO_CONTENT);
+         resultBuilder.addData(new ResultObjectBuilder(NoopAttributes.class, characterId));
+      });
+   }
+
+   @POST
+   @Path("/{id}/interactions/hints")
+   @Consumes(MediaType.APPLICATION_JSON)
+   @Produces(MediaType.APPLICATION_JSON)
+   public Response createHint(@PathParam("id") Integer characterId,
+                              InputBody<HintAttributes> inputBody) {
+      return forCharacter(characterId, (character, resultBuilder) -> {
+         PlayerInteractionProcessor.getInstance()
+               .showHint(character, inputBody.attribute(HintAttributes::getMessage),
+                     inputBody.attribute(HintAttributes::getWidth),
+                     inputBody.attribute(HintAttributes::getHeight));
+         resultBuilder.setStatus(Response.Status.NO_CONTENT);
+         resultBuilder.addData(new ResultObjectBuilder(NoopAttributes.class, characterId));
+      });
+   }
+
+   @POST
+   @Path("/{id}/interactions/sounds")
+   @Consumes(MediaType.APPLICATION_JSON)
+   @Produces(MediaType.APPLICATION_JSON)
+   public Response createSound(@PathParam("id") Integer characterId,
+                               InputBody<SoundAttributes> inputBody) {
+      return forCharacter(characterId, (character, resultBuilder) -> {
+         PlayerInteractionProcessor.getInstance().playSound(character, inputBody.attribute(SoundAttributes::getPath));
+         resultBuilder.setStatus(Response.Status.NO_CONTENT);
+         resultBuilder.addData(new ResultObjectBuilder(NoopAttributes.class, characterId));
+      });
+   }
+
+   @POST
+   @Path("/{id}/interactions/guides/{guideId}")
+   @Consumes(MediaType.APPLICATION_JSON)
+   @Produces(MediaType.APPLICATION_JSON)
+   public Response createSound(@PathParam("id") Integer characterId, @PathParam("guideId") Integer guideId) {
+      return forCharacter(characterId, (character, resultBuilder) -> {
+         PlayerInteractionProcessor.getInstance().guideHint(character, guideId);
+         resultBuilder.setStatus(Response.Status.NO_CONTENT);
+         resultBuilder.addData(new ResultObjectBuilder(NoopAttributes.class, characterId));
+      });
+   }
+
+   @GET
+   @Path("/{id}/family")
+   @Consumes(MediaType.APPLICATION_JSON)
+   @Produces(MediaType.APPLICATION_JSON)
+   public Response getFamilyInformation(@PathParam("id") Integer characterId) {
+      return forCharacter(characterId, (character, resultBuilder) -> {
+         resultBuilder.setStatus(Response.Status.NO_CONTENT);
+         resultBuilder.addData(new ResultObjectBuilder(FamilyAttributes.class, characterId)
+               .setAttribute(new FamilyAttributesBuilder()
+                     .setJuniorCount(character.getFamilyEntry().getJuniorCount())
+               )
+         );
+      });
+   }
+
+   @GET
+   @Path("/{id}/mount")
+   @Consumes(MediaType.APPLICATION_JSON)
+   @Produces(MediaType.APPLICATION_JSON)
+   public Response getMountInformation(@PathParam("id") Integer characterId) {
+      return forCharacter(characterId, (character, resultBuilder) -> {
+         MapleMount mount = character.getMount();
+         if (mount != null) {
+            resultBuilder.setStatus(Response.Status.OK);
+            resultBuilder.addData(new ResultObjectBuilder(MountAttributes.class, mount.id())
+                  .setAttribute(new MountAttributesBuilder()
+                        .setLevel(mount.level())
+                  )
+            );
+         }
+      });
+   }
+
+   @POST
+   @Path("/{id}/titles")
+   @Consumes(MediaType.APPLICATION_JSON)
+   @Produces(MediaType.APPLICATION_JSON)
+   public Response earnTitle(@PathParam("id") Integer characterId, InputBody<TitleAttributes> inputBody) {
+      return forCharacter(characterId, (character, resultBuilder) -> {
+         String message = "<" + inputBody.attribute(TitleAttributes::getName) + "> has been awarded.";
+         PlayerInteractionProcessor.getInstance().earnTitle(character, message);
+         resultBuilder.setStatus(Response.Status.NO_CONTENT);
+      });
+   }
+
+   @POST
+   @Path("/{id}/intros")
+   @Consumes(MediaType.APPLICATION_JSON)
+   @Produces(MediaType.APPLICATION_JSON)
+   public Response showIntro(@PathParam("id") Integer characterId, InputBody<IntroAttributes> inputBody) {
+      return forCharacter(characterId, (character, resultBuilder) -> {
+         PlayerInteractionProcessor.getInstance().showIntro(character, inputBody.attribute(IntroAttributes::getPath));
+         resultBuilder.setStatus(Response.Status.NO_CONTENT);
+      });
+   }
+
+   @POST
+   @Path("/{id}/infoTexts")
+   @Consumes(MediaType.APPLICATION_JSON)
+   @Produces(MediaType.APPLICATION_JSON)
+   public Response showInfoText(@PathParam("id") Integer characterId, InputBody<InfoTextAttributes> inputBody) {
+      return forCharacter(characterId, (character, resultBuilder) -> {
+         PlayerInteractionProcessor.getInstance().showInfoText(character, inputBody.attribute(InfoTextAttributes::getText));
+         resultBuilder.setStatus(Response.Status.NO_CONTENT);
+      });
+   }
+
+   @POST
+   @Path("/{id}/events/{eventId}")
+   @Consumes(MediaType.APPLICATION_JSON)
+   @Produces(MediaType.APPLICATION_JSON)
+   public Response startEvent(@PathParam("id") Integer characterId, @PathParam("eventId") String eventId) {
+      return forCharacter(characterId, (character, resultBuilder) -> {
+         EventManager eventManager = character.getClient().getEventManager(eventId);
+         if (eventManager != null) {
+            boolean result = eventManager.startInstance(character);
+            if (result) {
+               resultBuilder.setStatus(Response.Status.NO_CONTENT);
+            }
+         }
+      });
    }
 }

@@ -14,18 +14,19 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import client.MapleCharacter;
 import com.ms.logs.LogType;
 import com.ms.logs.LoggerOriginator;
 import com.ms.logs.LoggerUtil;
+import com.ms.qos.rest.SkillBookAttributes;
 import com.ms.shared.rest.RestService;
 import com.ms.shared.rest.UriBuilder;
+
+import client.MapleCharacter;
 import constants.ItemConstants;
 import constants.SkillBookEntry;
 import database.DatabaseConnection;
 import database.provider.ReactorDropProvider;
 import rest.DataContainer;
-import rest.SkillBookAttributes;
 
 public class MapleSkillBookInformationProvider {
    private final static MapleSkillBookInformationProvider instance = new MapleSkillBookInformationProvider();
