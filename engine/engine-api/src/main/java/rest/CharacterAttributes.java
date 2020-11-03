@@ -7,7 +7,11 @@ public class CharacterAttributes implements AttributeResult {
 
    private Integer mapId;
 
+   private Integer portalId;
+
    private Integer jobId;
+
+   private Integer jobStyle;
 
    private Integer level;
 
@@ -51,12 +55,28 @@ public class CharacterAttributes implements AttributeResult {
       this.mapId = mapId;
    }
 
+   public Integer getPortalId() {
+      return portalId;
+   }
+
+   public void setPortalId(Integer portalId) {
+      this.portalId = portalId;
+   }
+
    public Integer getJobId() {
       return jobId;
    }
 
    public void setJobId(Integer jobId) {
       this.jobId = jobId;
+   }
+
+   public Integer getJobStyle() {
+      return jobStyle;
+   }
+
+   public void setJobStyle(Integer jobStyle) {
+      this.jobStyle = jobStyle;
    }
 
    public Integer getLevel() {
@@ -123,10 +143,12 @@ public class CharacterAttributes implements AttributeResult {
       this.y = y;
    }
 
+   @Deprecated
    public Integer getHp() {
       return hp;
    }
 
+   @Deprecated
    public void setHp(Integer hp) {
       this.hp = hp;
    }

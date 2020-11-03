@@ -4,5 +4,9 @@ public enum NpcConversationType {
    NEXT,
    NEXT_PREVIOUS,
    PREVIOUS,
-   ACCEPT_DECLINE
+   ACCEPT_DECLINE,
+   SIMPLE,
+   OK,
+   YES_NO,
+   GET_NUMBER
 }

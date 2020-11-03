@@ -28,8 +28,16 @@ public class CharacterAttributesBuilder extends Builder<CharacterAttributes, Cha
       return add(attr -> attr.setMapId(mapId));
    }
 
+   public CharacterAttributesBuilder setPortalId(Integer portalId) {
+      return add(attr -> attr.setPortalId(portalId));
+   }
+
    public CharacterAttributesBuilder setJobId(Integer jobId) {
       return add(attr -> attr.setJobId(jobId));
+   }
+
+   public CharacterAttributesBuilder setJobStyle(Integer jobStyle) {
+      return add(attr -> attr.setJobStyle(jobStyle));
    }
 
    public CharacterAttributesBuilder setLevel(Integer level) {
@@ -64,6 +72,7 @@ public class CharacterAttributesBuilder extends Builder<CharacterAttributes, Cha
       return add(attr -> attr.setY(y));
    }
 
+   @Deprecated
    public CharacterAttributesBuilder setHp(Integer hp) {
       return add(attr -> attr.setHp(hp));
    }
