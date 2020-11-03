@@ -5,9 +5,11 @@ public class CharacterAttributes implements AttributeResult {
 
    private Integer accountId;
 
-   private Integer mapId;
+   private Integer worldId;
 
-   private Integer portalId;
+   private Integer channelId;
+
+   private Integer mapId;
 
    private Integer jobId;
 
@@ -31,6 +33,8 @@ public class CharacterAttributes implements AttributeResult {
 
    private Integer hp;
 
+   private Integer remainingSp;
+
    public String getName() {
       return name;
    }
@@ -47,20 +51,28 @@ public class CharacterAttributes implements AttributeResult {
       this.accountId = accountId;
    }
 
+   public Integer getWorldId() {
+      return worldId;
+   }
+
+   public void setWorldId(Integer worldId) {
+      this.worldId = worldId;
+   }
+
+   public Integer getChannelId() {
+      return channelId;
+   }
+
+   public void setChannelId(Integer channelId) {
+      this.channelId = channelId;
+   }
+
    public Integer getMapId() {
       return mapId;
    }
 
    public void setMapId(Integer mapId) {
       this.mapId = mapId;
-   }
-
-   public Integer getPortalId() {
-      return portalId;
-   }
-
-   public void setPortalId(Integer portalId) {
-      this.portalId = portalId;
    }
 
    public Integer getJobId() {
@@ -151,5 +163,13 @@ public class CharacterAttributes implements AttributeResult {
    @Deprecated
    public void setHp(Integer hp) {
       this.hp = hp;
+   }
+
+   public Integer getRemainingSp() {
+      return remainingSp;
+   }
+
+   public void setRemainingSp(Integer remainingSp) {
+      this.remainingSp = remainingSp;
    }
 }

@@ -5,6 +5,8 @@ public class CharacterSkillAttributes implements AttributeResult {
 
    private Integer masterLevel;
 
+   private Long expiration;
+
    public Integer getLevel() {
       return level;
    }
@@ -19,5 +21,13 @@ public class CharacterSkillAttributes implements AttributeResult {
 
    public void setMasterLevel(Integer masterLevel) {
       this.masterLevel = masterLevel;
+   }
+
+   public Long getExpiration() {
+      return expiration;
+   }
+
+   public void setExpiration(Long expiration) {
+      this.expiration = expiration;
    }
 }

@@ -24,12 +24,16 @@ public class CharacterAttributesBuilder extends Builder<CharacterAttributes, Cha
       return add(attr -> attr.setAccountId(accountId));
    }
 
-   public CharacterAttributesBuilder setMapId(Integer mapId) {
-      return add(attr -> attr.setMapId(mapId));
+   public CharacterAttributesBuilder setWorldId(Integer worldId) {
+      return add(attr -> attr.setWorldId(worldId));
    }
 
-   public CharacterAttributesBuilder setPortalId(Integer portalId) {
-      return add(attr -> attr.setPortalId(portalId));
+   public CharacterAttributesBuilder setChannelId(Integer channelId) {
+      return add(attr -> attr.setChannelId(channelId));
+   }
+
+   public CharacterAttributesBuilder setMapId(Integer mapId) {
+      return add(attr -> attr.setMapId(mapId));
    }
 
    public CharacterAttributesBuilder setJobId(Integer jobId) {
@@ -75,5 +79,9 @@ public class CharacterAttributesBuilder extends Builder<CharacterAttributes, Cha
    @Deprecated
    public CharacterAttributesBuilder setHp(Integer hp) {
       return add(attr -> attr.setHp(hp));
+   }
+
+   public CharacterAttributesBuilder setRemainingSp(Integer remainingSp) {
+      return add(attr -> attr.setRemainingSp(remainingSp));
    }
 }

@@ -4,7 +4,8 @@ import builder.AttributeResultBuilder;
 import builder.Builder;
 import rest.CharacterSkillAttributes;
 
-public class CharacterSkillAttributesBuilder extends Builder<CharacterSkillAttributes, CharacterSkillAttributesBuilder> implements AttributeResultBuilder {
+public class CharacterSkillAttributesBuilder extends Builder<CharacterSkillAttributes, CharacterSkillAttributesBuilder>
+      implements AttributeResultBuilder {
    @Override
    public CharacterSkillAttributes construct() {
       return new CharacterSkillAttributes();
@@ -21,5 +22,9 @@ public class CharacterSkillAttributesBuilder extends Builder<CharacterSkillAttri
 
    public CharacterSkillAttributesBuilder setMasterLevel(Integer masterLevel) {
       return add(attr -> attr.setMasterLevel(masterLevel));
+   }
+
+   public CharacterSkillAttributesBuilder setExpiration(Long expiration) {
+      return add(attr -> attr.setExpiration(expiration));
    }
 }
